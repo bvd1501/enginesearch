@@ -1,0 +1,48 @@
+---
+server:
+  port: 8083
+
+spring:
+  datasource:
+    username: engine_app
+    password: gu.[8BSRCs35f3V
+    url: jdbc:mysql://localhost:3306/search_engine?useSSL=false&requireSSL=false&allowPublicKeyRetrieval=true
+  jpa:
+    properties:
+      hibernate:
+      #format_sql: true
+      dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      #ddl-auto: update
+      ddl-auto: create-drop
+    show-sql: true
+
+#logging:
+#  config: logback-spring.xml
+
+# example values
+indexing-settings:
+  sites:
+    #- url: https://www.lenta.ru
+    #  name: Лента.ру
+    #- url: https://www.skillbox.ru
+    #  name: Skillbox
+    #- url: https://www.playback.ru/
+    #  name: PlayBack.Ru
+    - url: https://www.tretyakovgallery.ru/
+      name: Galllery
+    - url: https://www.lutherancathedral.ru/
+      name: lutherancathedral.ru
+    - url: https://clusterfly.ru
+      name: MQTTBroker
+
+jsoup-setting:
+  #userAgent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0
+  #referrer: http://www:google.com
+  user-agent: BordoJavaSearchBot
+  referrer: http://www.google.com
+  timeout: 6000
+  ignoreHttpErrors: true
+  followRedirects: false
+
+...
