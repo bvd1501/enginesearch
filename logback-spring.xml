@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                <!--Указываем формат записи логов. Сначала дата, потом уровень ошибки, название логгера (чаще всего название класса) и сообщение-->
+                %d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+   <appender name="file_app" class="ch.qos.logback.core.FileAppender">
+       <file>logs/app.log</file>
+       <append>false</append>
+<!--       <filter class="ch.qos.logback.classic.filter.LevelFilter">-->
+<!--           <level>ERROR</level>-->
+<!--           <onMatch>ACCEPT</onMatch>-->
+<!--           <onMismatch>DENY</onMismatch>-->
+<!--       </filter>-->
+       <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+   <appender name="file_err" class="ch.qos.logback.core.FileAppender">
+        <file>logs/error.log</file>
+        <append>false</append>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>
+                <!--Указываем формат записи логов. Сначала дата, потом уровень ошибки, название логгера (чаще всего название класса) и сообщение-->
+                %d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+   <appender name="file_sql" class="ch.qos.logback.core.FileAppender">
+        <!-- Название файла куда будут писаться логи-->
+        <file>logs/sql.log</file>
+        <append>false</append>
+        <encoder>
+            <pattern>
+                 %d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n
+            </pattern>
+        </encoder>
+   </appender>
+
+    <logger name="org.hibernate.sql" level="DEBUG">
+        <appender-ref ref="file_sql"/>
+    </logger>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE">
+        <appender-ref ref="file_sql"/>
+    </logger>
+
+    <root level="ERROR">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file_err"/>
+    </root>
+    <root level="INFO" additivity="false">
+        <appender-ref ref="file_app"/>
+        <appender-ref ref="console"/>
+    </root>
+
+  </configuration>

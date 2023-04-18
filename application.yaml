@@ -17,8 +17,8 @@ spring:
       ddl-auto: create-drop
     show-sql: true
 
-#logging:
-#  config: logback-spring.xml
+logging:
+  config: logback-spring.xml
 
 # example values
 indexing-settings:
