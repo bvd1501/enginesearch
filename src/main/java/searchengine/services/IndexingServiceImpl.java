@@ -22,8 +22,8 @@ import java.util.concurrent.Future;
 @RequiredArgsConstructor
 public class IndexingServiceImpl implements IndexingService{
     private final SitesList sites;
-    private SiteRepo siteRepo;
-    private PageRepo pageRepo;
+    private final SiteRepo siteRepo;
+    private final PageRepo pageRepo;
     private final ExecutorService taskSitesIndexing = Executors.newCachedThreadPool();
     private final List<Future<?>> futureList = new ArrayList<>();
 
@@ -44,8 +44,13 @@ public class IndexingServiceImpl implements IndexingService{
 
     @Override
     public IndexingResponse getStopIndexing() {
-        //TODO остановка поиска
-        return null;
+        if (!isRunning()) {
+            return new IndexingResponse(false, "Индексация не запущена");
+        }
+        //TODO остановка потоков индексации
+        taskSitesIndexing.shutdownNow();
+        log.info("Остановка индексации сайтов");
+        return new IndexingResponse(true);
     }
 
     private boolean isRunning() {
@@ -74,11 +79,9 @@ public class IndexingServiceImpl implements IndexingService{
         currentSite.setStatusTime(new java.util.Date());
         siteRepo.save(currentSite);
         long result = pageRepo.countBySite(currentSite);
-        log.info("=================================================================");
         log.info("Сайт " + name +
                 ", найдено страниц " + result +
                 ", затрачено " + (System.currentTimeMillis() - startTime) + " мс");
-        log.info("=================================================================");
     }
 
 }

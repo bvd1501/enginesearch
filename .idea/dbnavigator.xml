@@ -20,7 +20,18 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files />
+    <open-files>
+      <object connection-id="e80c2799-8815-46a3-ad40-c82a8b18bbf4" object-ref="schemas/search_engine/tables/site" />
+      <object connection-id="e80c2799-8815-46a3-ad40-c82a8b18bbf4" object-ref="schemas/search_engine/tables/page" />
+    </open-files>
+  </component>
+  <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-actions connection-id="e80c2799-8815-46a3-ad40-c82a8b18bbf4" dataset="search_engine.page" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="e80c2799-8815-46a3-ad40-c82a8b18bbf4" dataset="search_engine.site" active-filter-id="">
+      <filter id="337e2a86-89a2-4d39-b5fc-ba9013393b52" name="*" temporary="false" custom-name="false" type="basic" join-type="AND">
+        <condition column="id" operator="=" value="*" active="true" />
+      </filter>
+    </filter-actions>
   </component>
   <component name="DBNavigator.Project.FileConnectionMappingManager">
     <mapping file-url="file://$PROJECT_DIR$/src/main/java/searchengine/model" connection-id="virtual-mysql-connection" session-id="MAIN" current-schema="" />
