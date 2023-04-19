@@ -2,7 +2,6 @@ package searchengine.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.Store;
 import org.springframework.stereotype.Service;
 import searchengine.config.SitesList;
 import searchengine.dto.indexing.IndexingResponse;
@@ -25,8 +24,8 @@ public class IndexingServiceImpl implements IndexingService{
     private final SitesList sites;
     private SiteRepo siteRepo;
     private PageRepo pageRepo;
-    private ExecutorService taskSitesIndexing = Executors.newCachedThreadPool();
-    private List<Future<?>> futureList = new ArrayList<>();
+    private final ExecutorService taskSitesIndexing = Executors.newCachedThreadPool();
+    private final List<Future<?>> futureList = new ArrayList<>();
 
     @Override
     public IndexingResponse getStartIndexing() {
@@ -34,9 +33,8 @@ public class IndexingServiceImpl implements IndexingService{
             return new IndexingResponse(false, "Индексация уже запущена");
         }
         sites.getSites().forEach(s->{
-            Future<?> future = taskSitesIndexing.submit(()->{
-                siteIndexing(s.getUrl(), s.getName());
-            });
+            Future<?> future = taskSitesIndexing.submit(()->
+                    siteIndexing(s.getUrl(), s.getName()));
             futureList.add(future);
         });
         log.info("Start indexing threads for all sites");
