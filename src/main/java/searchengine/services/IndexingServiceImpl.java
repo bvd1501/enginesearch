@@ -3,6 +3,7 @@ package searchengine.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import searchengine.config.JsoupCfg;
 import searchengine.config.SitesList;
 import searchengine.dto.indexing.IndexingResponse;
 import searchengine.model.SiteEntity;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 
 @Service
@@ -24,6 +26,7 @@ public class IndexingServiceImpl implements IndexingService{
     private final SitesList sites;
     private final SiteRepo siteRepo;
     private final PageRepo pageRepo;
+    private final JsoupCfg jsoupCfg;
     private final ExecutorService taskSitesIndexing = Executors.newCachedThreadPool();
     private final List<Future<?>> futureList = new ArrayList<>();
 
@@ -49,6 +52,7 @@ public class IndexingServiceImpl implements IndexingService{
         }
         //TODO остановка потоков индексации
         taskSitesIndexing.shutdownNow();
+        //taskSitesIndexing.close();
         log.info("Остановка индексации сайтов");
         return new IndexingResponse(true);
     }
@@ -71,10 +75,9 @@ public class IndexingServiceImpl implements IndexingService{
         SiteEntity currentSite = siteRepo.save(new SiteEntity(url, name));
         URI uri = URI.create(url);
         if (uri.getPath().isEmpty()) { uri = URI.create(url + "/");}
-//TODO Поиск страниц сайта
-        ////        PageIndex pageIndex = new PageIndex()
-//        //PageIndex.onePageIndex(uri);
-//
+        PageIndexUtil pageIndexUtilTask = new PageIndexUtil(pageRepo, siteRepo, jsoupCfg, uri);
+        new ForkJoinPool().invoke(pageIndexUtilTask);
+
         currentSite.setStatus(StatusType.INDEXED);
         currentSite.setStatusTime(new java.util.Date());
         siteRepo.save(currentSite);
