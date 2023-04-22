@@ -23,18 +23,20 @@ import java.util.concurrent.Future;
 @Slf4j
 @RequiredArgsConstructor
 public class IndexingServiceImpl implements IndexingService{
+    private static volatile boolean stopFlag = false;
     private final SitesList sites;
     private final SiteRepo siteRepo;
     private final PageRepo pageRepo;
     private final JsoupCfg jsoupCfg;
-    private final ExecutorService taskSitesIndexing = Executors.newCachedThreadPool();
-    private final List<Future<?>> futureList = new ArrayList<>();
+    private static final ExecutorService taskSitesIndexing = Executors.newCachedThreadPool();
+    private static final List<Future<?>> futureList = new ArrayList<>();
 
     @Override
     public IndexingResponse getStartIndexing() {
         if (isRunning()) {
             return new IndexingResponse(false, "Индексация уже запущена");
         }
+        setStopFlag(false);
         sites.getSites().forEach(s->{
             Future<?> future = taskSitesIndexing.submit(()->
                     siteIndexing(s.getUrl(), s.getName()));
@@ -50,14 +52,13 @@ public class IndexingServiceImpl implements IndexingService{
         if (!isRunning()) {
             return new IndexingResponse(false, "Индексация не запущена");
         }
-        //TODO остановка потоков индексации
         taskSitesIndexing.shutdownNow();
-        //taskSitesIndexing.close();
+        setStopFlag(true);
         log.info("Остановка индексации сайтов");
         return new IndexingResponse(true);
     }
 
-    private boolean isRunning() {
+    public boolean isRunning() {
         //Возвращаем true, если хоть один поток обработки сайтов еще работает
         for (Future<?> futureItem : futureList) {
             if (!futureItem.isDone()) {return true;}
@@ -85,6 +86,15 @@ public class IndexingServiceImpl implements IndexingService{
         log.info("Сайт " + name +
                 ", найдено страниц " + result +
                 ", затрачено " + (System.currentTimeMillis() - startTime) + " мс");
+    }
+
+
+    public static void setStopFlag(boolean stopFlagStatus) {
+        stopFlag = stopFlagStatus;
+    }
+
+    public static boolean isStopFlagSet() {
+        return stopFlag;
     }
 
 }

@@ -45,14 +45,16 @@ public class PageIndexUtil extends RecursiveAction {
      */
     @Override
     protected void compute() throws RuntimeException {
-
+        if (IndexingServiceImpl.isStopFlagSet()) {
+            return;
+        }
         /* Таймаут между запросами к страницам сайта */
         try {
             Thread.sleep(110);
         } catch (InterruptedException e) {
             e.printStackTrace();
-           log.error("Error on sleep thread");
-           Thread.currentThread().interrupt();
+            log.error("Error on sleep thread");
+            Thread.currentThread().interrupt();
         }
         if (pageRepo.countBySite_NameContainsAndPath(pageUri.getHost(), pageUri.getPath()) > 0) {
             return;

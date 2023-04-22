@@ -29,10 +29,10 @@ indexing-settings:
     #  name: Skillbox
     #- url: https://www.playback.ru/
     #  name: PlayBack.Ru
-    - url: https://www.tretyakovgallery.ru/
-      name: Galllery
-    - url: https://www.lutherancathedral.ru/
-      name: lutherancathedral.ru
+    #- url: https://www.tretyakovgallery.ru/
+    #  name: Galllery
+    #- url: https://www.lutherancathedral.ru/
+    #  name: lutherancathedral.ru
     - url: https://clusterfly.ru
       name: MQTTBroker
 

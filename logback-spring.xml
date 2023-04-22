@@ -46,12 +46,12 @@
         </encoder>
    </appender>
 
-    <logger name="org.hibernate.sql" level="DEBUG">
+    <logger name="org.hibernate.sql" level="DEBUG" additivity="false">
         <appender-ref ref="file_sql"/>
     </logger>
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE">
-        <appender-ref ref="file_sql"/>
-    </logger>
+<!--    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE">-->
+<!--        <appender-ref ref="file_sql"/>-->
+<!--    </logger>-->
 
     <root level="ERROR">
         <appender-ref ref="console"/>
