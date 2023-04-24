@@ -31,12 +31,14 @@ public class PageIndexUtil extends RecursiveAction {
     private final SiteRepo siteRepo;
     private final JsoupCfg jsoupCfg;
     private URI pageUri;
+    private SiteEntity site;
     private Set<URI> childrenUri;
 
-    public PageIndexUtil(PageRepo pageRepo, SiteRepo siteRepo, JsoupCfg jsoupCfg, URI uri) {
+    public PageIndexUtil(PageRepo pageRepo, SiteRepo siteRepo, JsoupCfg jsoupCfg, SiteEntity site, URI uri) {
         this.pageRepo = pageRepo;
         this.siteRepo = siteRepo;
         this.jsoupCfg = jsoupCfg;
+        this.site = site;
         this.pageUri = uri;
     }
 
@@ -45,9 +47,6 @@ public class PageIndexUtil extends RecursiveAction {
      */
     @Override
     protected void compute() throws RuntimeException {
-        if (IndexingServiceImpl.isStopFlagSet()) {
-            return;
-        }
         /* Таймаут между запросами к страницам сайта */
         try {
             Thread.sleep(110);
@@ -56,10 +55,12 @@ public class PageIndexUtil extends RecursiveAction {
             log.error("Error on sleep thread");
             Thread.currentThread().interrupt();
         }
-        if (pageRepo.countBySite_NameContainsAndPath(pageUri.getHost(), pageUri.getPath()) > 0) {
+        if (IndexingServiceImpl.isStopFlagSet()) {
             return;
         }
+
         childrenUri = readPage(pageUri);
+
         if (childrenUri == null) {
             log.debug("Not found valid links on: " + pageUri);
             return;
@@ -67,7 +68,10 @@ public class PageIndexUtil extends RecursiveAction {
         log.debug("Found " + childrenUri.isEmpty() + " valid links on: " + pageUri);
         ArrayList<PageIndexUtil> subTaskList = new ArrayList<>();
         for (URI itemURI : childrenUri) {
-            subTaskList.add(new PageIndexUtil(pageRepo, siteRepo, jsoupCfg, itemURI));
+            if (pageRepo.countBySiteAndPath(site, itemURI.getPath())>0) {
+                continue;
+            }
+            subTaskList.add(new PageIndexUtil(pageRepo, siteRepo, jsoupCfg, site, itemURI));
         }
         try {
             invokeAll(subTaskList);
@@ -78,66 +82,61 @@ public class PageIndexUtil extends RecursiveAction {
 
     @Nullable
     private HashSet<URI> readPage(URI uri) {
-        Optional<SiteEntity> optionalSiteEntity = siteRepo.findByUrlContains(uri.getHost());
-        if (optionalSiteEntity.isEmpty()) {
-            log.error("Not find site for " + uri + " in base");
+        HashSet<URI> uriSet = new HashSet<>();
+        PageEntity pageEntity = new PageEntity(site, pageUri.getPath());
+        if(pageRepo.countBySiteAndPath(pageEntity.getSite(), pageEntity.getPath())>0) {
             return null;
         }
-        SiteEntity siteEntity = optionalSiteEntity.get();
-        HashSet<URI> uriSet = new HashSet<>();
+        pageRepo.save(pageEntity);
         Elements elements;
+        Document doc;
         try {
-            Connection.Response response = Jsoup
+            doc = Jsoup
                     .connect(uri.toString())
                     .userAgent(jsoupCfg.getUserAgent())
                     .referrer(jsoupCfg.getReferrer())
                     .timeout(jsoupCfg.getTimeout())
                     .followRedirects(jsoupCfg.isFollowRedirects())
                     .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
-                    .execute();
-            Document doc = response.parse();
-            if ((response.statusCode() != 200)) {
-                siteRepo.updateStatusTimeAndLast_errorById(
-                        new java.util.Date(),
-                        "Read page code = " + response.statusCode(),
-                        siteEntity.getId()
-                );
+                    .get();
+            int statusCode = doc.connection().response().statusCode();
+            if ((statusCode != 200)) {
+                pageRepo.updateCodeAndContentById(statusCode, "", pageEntity.getId());
+                siteRepo.updateStatusTimeAndLast_errorById(new java.util.Date(),
+                        "Read page code = " + statusCode,
+                        site.getId());
                 return null;
             }
-            pageRepo.save(new PageEntity(siteEntity, uri.getPath(),
-                    response.statusCode(), doc.html()));
-            siteRepo.updateStatusTimeAndLast_errorById(
-                    new java.util.Date(),
-                    "",
-                    siteEntity.getId());
+            pageRepo.updateCodeAndContentById(statusCode,doc.body().html(), pageEntity.getId());
+            siteRepo.updateStatusTimeAndLast_errorById(new java.util.Date(),
+                    null, site.getId());
 
-            elements = doc.select("a[href]");
+            elements = doc.select("a");
+            elements.stream().map(e -> e.absUrl("href")).forEach(link -> {
+                if (link.contains("#")) {
+                    log.debug("# on link: " + link);
+                    return;
+                }
+                URI linkURI = URI.create(link);
+                if (!linkURI.getScheme().startsWith("http")) {
+                    return;
+                }
+                if (!linkURI.getHost().equals(uri.getHost())) {
+                    return;
+                }
+                if (linkURI.getPath().equals(uri.getPath())) {
+                    return;
+                }
+                if(pageRepo.countBySiteAndPath(site, linkURI.getPath())>0) {
+                    return;
+                }
+                uriSet.add(linkURI);
+                log.debug("add " + link);
+            });
         } catch (IOException e) {
             log.error("Exception on execute connection to: " + uri);
             return uriSet;
         }
-
-        elements.stream().map(e -> e.absUrl("href")).forEach(link -> {
-            if (link.contains("#")) {
-                log.debug("# on link: " + link);
-                return;
-            }
-            URI linkURI = URI.create(link);
-            if (!linkURI.getScheme().startsWith("http")) {
-                return;
-            }
-            if (!linkURI.getHost().equals(uri.getHost())) {
-                return;
-            }
-            if (linkURI.getPath().equals(uri.getPath())) {
-                return;
-            }
-            if (pageRepo.countBySiteAndPath(siteEntity, linkURI.getPath()) > 0) {
-                return;
-            }
-            uriSet.add(linkURI);
-            log.debug("add " + link);
-        });
         return uriSet;
     }
 

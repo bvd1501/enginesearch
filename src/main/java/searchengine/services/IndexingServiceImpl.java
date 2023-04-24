@@ -24,64 +24,62 @@ import java.util.concurrent.Future;
 @RequiredArgsConstructor
 public class IndexingServiceImpl implements IndexingService{
     private static volatile boolean stopFlag = false;
+    private static volatile boolean runFlag = false;
+
     private final SitesList sites;
     private final SiteRepo siteRepo;
     private final PageRepo pageRepo;
     private final JsoupCfg jsoupCfg;
-    private static final ExecutorService taskSitesIndexing = Executors.newCachedThreadPool();
-    private static final List<Future<?>> futureList = new ArrayList<>();
+
+
 
     @Override
     public IndexingResponse getStartIndexing() {
-        if (isRunning()) {
+        if (isRunFlag()) {
             return new IndexingResponse(false, "Индексация уже запущена");
         }
+        setRunFlag(true);
         setStopFlag(false);
         sites.getSites().forEach(s->{
-            Future<?> future = taskSitesIndexing.submit(()->
-                    siteIndexing(s.getUrl(), s.getName()));
-            futureList.add(future);
+            Thread siteTask = new Thread(()->{
+                siteIndexing(s.getUrl(), s.getName());
+            });
+            siteTask.start();
+            log.info("Запуск индексации: " + s.getName());
         });
         log.info("Start indexing threads for all sites");
-        taskSitesIndexing.shutdown();
         return new IndexingResponse(true);
     }
 
     @Override
     public IndexingResponse getStopIndexing() {
-        if (!isRunning()) {
+        if (!isRunFlag()) {
             return new IndexingResponse(false, "Индексация не запущена");
         }
-        taskSitesIndexing.shutdownNow();
+        //taskSitesIndexing.shutdownNow();
         setStopFlag(true);
         log.info("Остановка индексации сайтов");
         return new IndexingResponse(true);
     }
 
-    public boolean isRunning() {
-        //Возвращаем true, если хоть один поток обработки сайтов еще работает
-        for (Future<?> futureItem : futureList) {
-            if (!futureItem.isDone()) {return true;}
-        }
-        return false;
-    }
-
-
     private void siteIndexing(String url, String name) {
         long startTime = System.currentTimeMillis();
         log.info("Start " + Thread.currentThread().getName() + " :" + name);
-
         siteRepo.deleteByUrlAndName(url, name);
-
         SiteEntity currentSite = siteRepo.save(new SiteEntity(url, name));
         URI uri = URI.create(url);
         if (uri.getPath().isEmpty()) { uri = URI.create(url + "/");}
-        PageIndexUtil pageIndexUtilTask = new PageIndexUtil(pageRepo, siteRepo, jsoupCfg, uri);
+        PageIndexUtil pageIndexUtilTask = new PageIndexUtil(pageRepo, siteRepo, jsoupCfg,
+                currentSite, uri);
         new ForkJoinPool().invoke(pageIndexUtilTask);
-
         currentSite.setStatus(StatusType.INDEXED);
+        if (isStopFlagSet()) {
+            currentSite.setStatus(StatusType.FAILED);
+            setStopFlag(false);
+        }
         currentSite.setStatusTime(new java.util.Date());
         siteRepo.save(currentSite);
+        setRunFlag(false);
         long result = pageRepo.countBySite(currentSite);
         log.info("Сайт " + name +
                 ", найдено страниц " + result +
@@ -96,5 +94,7 @@ public class IndexingServiceImpl implements IndexingService{
     public static boolean isStopFlagSet() {
         return stopFlag;
     }
+    public static void setRunFlag (boolean runFlagStatus) {runFlag = runFlagStatus;}
+    public static boolean isRunFlag() {return runFlag;}
 
 }

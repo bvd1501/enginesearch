@@ -20,10 +20,7 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="e80c2799-8815-46a3-ad40-c82a8b18bbf4" object-ref="schemas/search_engine/tables/site" />
-      <object connection-id="e80c2799-8815-46a3-ad40-c82a8b18bbf4" object-ref="schemas/search_engine/tables/page" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
     <filter-actions connection-id="e80c2799-8815-46a3-ad40-c82a8b18bbf4" dataset="search_engine.page" active-filter-id="EMPTY_FILTER" />
