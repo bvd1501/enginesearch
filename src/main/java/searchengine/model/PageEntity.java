@@ -26,7 +26,7 @@ public class PageEntity {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "site_id", nullable = false, foreignKey = @ForeignKey(name = "fk_site_page",
+    @JoinColumn(name = "site_id", nullable = false, foreignKey = @ForeignKey(name = "fk_site_id",
             value = ConstraintMode.CONSTRAINT,
             foreignKeyDefinition = "FOREIGN KEY (site_id) REFERENCES site(id) ON DELETE CASCADE"))
 //    @JoinColumn (name = "site_id", nullable = false)
