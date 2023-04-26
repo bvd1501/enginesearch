@@ -5,25 +5,19 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.lang.Nullable;
 import searchengine.config.JsoupCfg;
 import searchengine.model.PageEntity;
-import searchengine.model.SiteEntity;
 import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 
 @Getter
