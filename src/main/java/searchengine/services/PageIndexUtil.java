@@ -14,6 +14,7 @@ import searchengine.repo.SiteRepo;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -81,7 +82,7 @@ public class PageIndexUtil extends RecursiveAction {
     private HashSet<URL> readPage(PageEntity readingPage) {
         HashSet<URL> urlSet = new HashSet<>();
         try {
-            URL urlSite = new URL(readingPage.getSite().getUrl());
+            URL urlSite = URI.create(readingPage.getSite().getUrl()).toURL();
             Document doc = Jsoup
                     .connect(urlSite.getProtocol() + "://" +
                             urlSite.getHost() + readingPage.getPath())

@@ -13,7 +13,7 @@ import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+
 
 @Service
 @Slf4j
@@ -76,7 +76,8 @@ public class IndexingServiceImpl implements IndexingService {
 
         PageIndexUtil pageIndexUtilTask = new PageIndexUtil(pageRepo, siteRepo, jsoupCfg,
                 rootPage);
-        ForkJoinPool fjp = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+        ForkJoinPool fjp;
+        fjp = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
         fjp.invoke(pageIndexUtilTask);
         //pageIndexUtilTask.invoke();
 
