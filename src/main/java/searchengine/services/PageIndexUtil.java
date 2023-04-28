@@ -28,7 +28,7 @@ public class PageIndexUtil extends RecursiveAction {
     private final SiteRepo siteRepo;
     private final JsoupCfg jsoupCfg;
     private PageEntity page;
-    private Set<URL> childrenUrl;
+    private Set<URL> childUrl;
 
     public PageIndexUtil(PageRepo pageRepo, SiteRepo siteRepo, JsoupCfg jsoupCfg, PageEntity page) {
         this.pageRepo = pageRepo;
@@ -47,48 +47,44 @@ public class PageIndexUtil extends RecursiveAction {
         }
         /* Таймаут между запросами к страницам сайта */
         try {
-            Thread.sleep(110);
+            Thread.sleep(210);
         } catch (InterruptedException e) {
             e.printStackTrace();
             log.error("Error on sleep thread");
         }
 
-        childrenUrl = readPage(page);
+        childUrl = readPage(page);
 
-        if (childrenUrl == null) {
+        if (childUrl == null) {
             log.debug("Not found valid links on " + page.getSite().getName()
                     + ": " + page.getPath());
             return;
         }
-        log.debug("Found " + childrenUrl.size() + " valid links on " +
+        log.debug("Found " + childUrl.size() + " valid links on " +
                 page.getSite().getName() + ": " + page.getPath());
         ArrayList<PageIndexUtil> subTaskList = new ArrayList<>();
-        for (URL itemURL : childrenUrl) {
-            if (pageRepo.countBySiteAndPath(page.getSite(), itemURL.getPath()) > 0) {
-                continue;
+        for (URL itemURL : childUrl) {
+            PageEntity childPage;
+            synchronized (this) {
+                if (pageRepo.countBySiteAndPath(page.getSite(), itemURL.getPath()) > 0) {
+                    log.error("Already in base: " + page.getSite().getName() + " - " + page.getPath());
+                    continue;
+                }
+                childPage = pageRepo.save(new PageEntity(page.getSite(), itemURL.getPath()));
             }
-            subTaskList.add(new PageIndexUtil(pageRepo, siteRepo, jsoupCfg,
-                    new PageEntity(page.getSite(), itemURL.getPath())));
+            subTaskList.add(new PageIndexUtil(pageRepo, siteRepo, jsoupCfg, childPage));
         }
         invokeAll(subTaskList);
     }
 
     @Nullable
-    private HashSet<URL> readPage(PageEntity page) {
+    private HashSet<URL> readPage(PageEntity readingPage) {
         HashSet<URL> urlSet = new HashSet<>();
-        //synchronized (this) {
-            if (pageRepo.countBySiteAndPath(page.getSite(), page.getPath()) > 0) {
-                log.error("Already in base: " + page.getSite().getName() + " " + page.getPath());
-                return null;
-            }
-            pageRepo.save(page);
-       log.info("Save " + page.getSite().getName() + " " + page.getPath() + " id = " + page.getId());
-        //}
         try {
-            URL urlSite = new URL(page.getSite().getUrl());
+            URL urlSite = new URL(readingPage.getSite().getUrl());
             Document doc = Jsoup
                     .connect(urlSite.getProtocol() + "://" +
-                            urlSite.getHost() + page.getPath())
+                            urlSite.getHost() + readingPage.getPath())
                     .userAgent(jsoupCfg.getUserAgent())
                     .referrer(jsoupCfg.getReferrer())
                     .timeout(jsoupCfg.getTimeout())
@@ -97,15 +93,15 @@ public class PageIndexUtil extends RecursiveAction {
                     .get();
             int statusCode = doc.connection().response().statusCode();
             if ((statusCode != 200)) {
-                pageRepo.updateCodeAndContentById(statusCode, "", page.getId());
+                pageRepo.updateCodeAndContentById(statusCode, "", readingPage.getId());
                 siteRepo.updateStatusTimeAndLast_errorById(new java.util.Date(),
-                        "Read page code = " + statusCode,
-                        page.getSite().getId());
+                        "Error code " + statusCode,
+                        readingPage.getSite().getId());
                 return null;
             }
-            pageRepo.updateCodeAndContentById(statusCode, doc.html(), page.getId());
+            pageRepo.updateCodeAndContentById(statusCode, doc.html(), readingPage.getId());
             siteRepo.updateStatusTimeAndLast_errorById(new java.util.Date(),
-                    null, page.getSite().getId());
+                    null, readingPage.getSite().getId());
 
             Elements elements = doc.select("a");
 
@@ -124,7 +120,7 @@ public class PageIndexUtil extends RecursiveAction {
                 if (linkURL.getPath().isEmpty() ||
                         !linkURL.getProtocol().startsWith("http") ||
                         !linkURL.getHost().equals(urlSite.getHost()) ||
-                        linkURL.getPath().equals(page.getPath()) ||
+                        linkURL.getPath().equals(readingPage.getPath()) ||
                         linkURL.getPath().endsWith(".doc") ||
                         linkURL.getPath().endsWith(".docx") ||
                         linkURL.getPath().endsWith(".rtf") ||
@@ -144,10 +140,10 @@ public class PageIndexUtil extends RecursiveAction {
                 log.debug("add " + link);
             });
         } catch (MalformedURLException e) {
-            log.error("MalformedURLException link on site: " + page.getSite().getName());
+            log.error("MalformedURLException link on site: " + readingPage.getSite().getName());
             return null;
         } catch (IOException e) {
-            log.error("Exception on execute connection to: " + page.getSite().getName());
+            log.error("Exception on execute connection to: " + readingPage.getSite().getName());
             return null;
         }
         return urlSet;

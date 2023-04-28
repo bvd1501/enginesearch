@@ -13,6 +13,7 @@ import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Slf4j
@@ -34,16 +35,16 @@ public class IndexingServiceImpl implements IndexingService {
             return new IndexingResponse(false, "Индексация уже запущена");
         }
         stopFlag = false;
-        siteExecutor = Executors.newCachedThreadPool();
+        siteExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
         sites.getSites().forEach(s -> {
-//            Runnable siteTask = () -> siteIndexing(s.getUrl(), s.getName());
-//            siteExecutor.execute(siteTask);
-            siteExecutor.execute(new Thread(() -> {
-                //Thread.currentThread().setName("Executor-" + s.getName());
-                siteIndexing(s.getUrl(), s.getName());
-            }));
+            Runnable siteTask = () -> siteIndexing(s.getUrl(), s.getName());
+            siteExecutor.execute(siteTask);
+
+
         });
         log.info("Start indexing threads for all sites");
+
         siteExecutor.shutdown();
         return new IndexingResponse(true);
     }
@@ -54,31 +55,31 @@ public class IndexingServiceImpl implements IndexingService {
             return new IndexingResponse(false, "Индексация не запущена");
         }
         stopFlag = true;
-        siteExecutor.shutdownNow();
         try {
             siteExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
             log.error("Error while waiting for siteExecutor termination", e);
         }
+        //siteExecutor.shutdownNow();
         log.info("Stop site indexing");
-        stopFlag = false;
+        //stopFlag = false;
         return new IndexingResponse(true);
     }
 
 
     private void siteIndexing(String urlSite, String nameSite) {
         long startTime = System.currentTimeMillis();
-        log.info("Start " + Thread.currentThread().getName() + " :" + nameSite);
+        log.info("Start " + Thread.currentThread().getName() + " : " + nameSite);
         siteRepo.deleteByUrlAndName(urlSite, nameSite);
         SiteEntity currentSite = siteRepo.save(new SiteEntity(urlSite, nameSite));
-        PageEntity rootPage = new PageEntity(currentSite, "/");
+        PageEntity rootPage = pageRepo.save(new PageEntity(currentSite, "/"));
 
         PageIndexUtil pageIndexUtilTask = new PageIndexUtil(pageRepo, siteRepo, jsoupCfg,
                 rootPage);
-        ForkJoinPool fjp;
-        fjp = new ForkJoinPool();
+        ForkJoinPool fjp = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
         fjp.invoke(pageIndexUtilTask);
-//        pageIndexUtilTask.invoke();
+        //pageIndexUtilTask.invoke();
+
         currentSite.setStatus(StatusType.INDEXED);
         if (stopFlag) {
             currentSite.setStatus(StatusType.FAILED);
