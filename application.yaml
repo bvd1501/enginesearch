@@ -15,7 +15,7 @@ spring:
     hibernate:
       #ddl-auto: update
       ddl-auto: create-drop
-    #show-sql: true
+    show-sql: true
 
 logging:
   config: logback-spring.xml
@@ -27,10 +27,10 @@ indexing-settings:
     #  name: Лента.ру
     #- url: https://www.skillbox.ru
     #  name: Skillbox
-    #- url: https://www.playback.ru/
-    #  name: PlayBack.Ru
+    - url: https://www.playback.ru/
+      name: PlayBack.Ru
     - url: https://www.tretyakovgallery.ru/
-      name: Galllery
+      name: Gallery
     - url: https://www.lutherancathedral.ru/
       name: lutherancathedral.ru
     - url: https://clusterfly.ru
@@ -43,12 +43,12 @@ indexing-settings:
       name: ipfran
     - url: https://dimonvideo.ru/
       name: dimonvideo
-    #- url: https://nikoartgallery.com/
-    #  name: nikoartgallery
-    #- url: https://et-cetera.ru/mobile/
-    #  name: et-cetera.ru
-    #- url: https://dombulgakova.ru/
-    #  name: Bulgakov
+    - url: https://nikoartgallery.com/
+      name: nikoartgallery
+    - url: https://et-cetera.ru/mobile/
+      name: et-cetera.ru
+    - url: https://dombulgakova.ru/
+      name: Bulgakov
     - url: https://www.svetlovka.ru/
       name: svetlovka
 
@@ -57,7 +57,7 @@ jsoup-setting:
   #userAgent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0
   user-agent: BordoJavaSearchBot
   referrer: http://www.google.com
-  timeout: 6000
+  timeout: 10000
   ignoreHttpErrors: true
   #followRedirects: true
   followRedirects: false

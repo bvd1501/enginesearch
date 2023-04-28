@@ -76,12 +76,14 @@ public class PageIndexUtil extends RecursiveAction {
     @Nullable
     private HashSet<URL> readPage(PageEntity page) {
         HashSet<URL> urlSet = new HashSet<>();
-        synchronized (this) {
+        //synchronized (this) {
             if (pageRepo.countBySiteAndPath(page.getSite(), page.getPath()) > 0) {
+                log.error("Already in base: " + page.getSite().getName() + " " + page.getPath());
                 return null;
             }
             pageRepo.save(page);
-        }
+       log.info("Save " + page.getSite().getName() + " " + page.getPath() + " id = " + page.getId());
+        //}
         try {
             URL urlSite = new URL(page.getSite().getUrl());
             Document doc = Jsoup
@@ -119,16 +121,11 @@ public class PageIndexUtil extends RecursiveAction {
                     log.error("MalformedURLException on page: " + link);
                     return;
                 }
-                if (!linkURL.getProtocol().startsWith("http")) {
-                    return;
-                }
-                if (!linkURL.getHost().equals(urlSite.getHost())) {
-                    return;
-                }
-                if (linkURL.getPath().equals(page.getPath())) {
-                    return;
-                }
-                if (linkURL.getPath().endsWith(".doc") ||
+                if (linkURL.getPath().isEmpty() ||
+                        !linkURL.getProtocol().startsWith("http") ||
+                        !linkURL.getHost().equals(urlSite.getHost()) ||
+                        linkURL.getPath().equals(page.getPath()) ||
+                        linkURL.getPath().endsWith(".doc") ||
                         linkURL.getPath().endsWith(".docx") ||
                         linkURL.getPath().endsWith(".rtf") ||
                         linkURL.getPath().endsWith(".pptx") ||
@@ -141,9 +138,8 @@ public class PageIndexUtil extends RecursiveAction {
                         linkURL.getPath().endsWith(".xls") ||
                         linkURL.getPath().endsWith(".xlsx") ||
                         linkURL.getPath().contains("http") ||
-                        linkURL.getPath().contains("download")){
-                    return;
-                }
+                        linkURL.getPath().contains("download")
+                ) {return;}
                 urlSet.add(linkURL);
                 log.debug("add " + link);
             });

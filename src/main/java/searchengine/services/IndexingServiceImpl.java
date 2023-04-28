@@ -11,12 +11,13 @@ import searchengine.model.SiteEntity;
 import searchengine.model.StatusType;
 import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
+
 import java.util.concurrent.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class IndexingServiceImpl implements IndexingService{
+public class IndexingServiceImpl implements IndexingService {
     private final SitesList sites;
     private final SiteRepo siteRepo;
     private final PageRepo pageRepo;
@@ -34,15 +35,13 @@ public class IndexingServiceImpl implements IndexingService{
         }
         stopFlag = false;
         siteExecutor = Executors.newCachedThreadPool();
-        sites.getSites().forEach(s->{
+        sites.getSites().forEach(s -> {
 //            Runnable siteTask = () -> siteIndexing(s.getUrl(), s.getName());
 //            siteExecutor.execute(siteTask);
-            siteExecutor.execute(new Thread("Indexing-"+s.getName().toString()) {
-                @Override
-                public void run() {
-                    siteIndexing(s.getUrl(), s.getName());
-                }
-            });
+            siteExecutor.execute(new Thread(() -> {
+                //Thread.currentThread().setName("Executor-" + s.getName());
+                siteIndexing(s.getUrl(), s.getName());
+            }));
         });
         log.info("Start indexing threads for all sites");
         siteExecutor.shutdown();
@@ -54,7 +53,7 @@ public class IndexingServiceImpl implements IndexingService{
         if (siteExecutor == null) {
             return new IndexingResponse(false, "Индексация не запущена");
         }
-        stopFlag=true;
+        stopFlag = true;
         siteExecutor.shutdownNow();
         try {
             siteExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -76,7 +75,8 @@ public class IndexingServiceImpl implements IndexingService{
 
         PageIndexUtil pageIndexUtilTask = new PageIndexUtil(pageRepo, siteRepo, jsoupCfg,
                 rootPage);
-        ForkJoinPool fjp = new ForkJoinPool();
+        ForkJoinPool fjp;
+        fjp = new ForkJoinPool();
         fjp.invoke(pageIndexUtilTask);
 //        pageIndexUtilTask.invoke();
         currentSite.setStatus(StatusType.INDEXED);
