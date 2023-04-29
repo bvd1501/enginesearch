@@ -30,21 +30,17 @@ public class IndexingServiceImpl implements IndexingService {
 
     @Override
     public IndexingResponse getStartIndexing() {
-
         if ((siteExecutor != null) && (!siteExecutor.isShutdown())) {
             return new IndexingResponse(false, "Индексация уже запущена");
         }
         stopFlag = false;
-        siteExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
+        //siteExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        siteExecutor = Executors.newCachedThreadPool();
         sites.getSites().forEach(s -> {
             Runnable siteTask = () -> siteIndexing(s.getUrl(), s.getName());
             siteExecutor.execute(siteTask);
-
-
         });
         log.info("Start indexing threads for all sites");
-
         siteExecutor.shutdown();
         return new IndexingResponse(true);
     }
@@ -55,6 +51,7 @@ public class IndexingServiceImpl implements IndexingService {
             return new IndexingResponse(false, "Индексация не запущена");
         }
         stopFlag = true;
+        siteExecutor.shutdown();
         try {
             siteExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {

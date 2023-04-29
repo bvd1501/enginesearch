@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 
 @Getter
@@ -44,6 +45,7 @@ public class PageIndexUtil extends RecursiveAction {
     @Override
     protected void compute() {
         if (IndexingServiceImpl.stopFlag) {
+            ForkJoinPool.commonPool().shutdown();
             return;
         }
         /* Таймаут между запросами к страницам сайта */
