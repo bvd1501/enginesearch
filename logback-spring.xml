@@ -66,7 +66,7 @@
 
     <root level="ERROR">
         <appender-ref ref="console"/>
-<!--        <appender-ref ref="file_err"/>-->
+        <appender-ref ref="file_err"/>
     </root>
     <root level="INFO" additivity="false">
         <appender-ref ref="file_app"/>

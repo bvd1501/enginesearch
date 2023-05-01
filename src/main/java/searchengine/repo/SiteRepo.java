@@ -13,17 +13,25 @@ import java.util.Optional;
 
 @Repository
 public interface SiteRepo extends CrudRepository<SiteEntity, Integer> {
+    @Transactional
     @Modifying
-    @Query("update SiteEntity s set s.last_error = ?1, s.statusTime = ?2 where s.id = ?3")
-    int updateLast_errorAndStatusTimeById(String last_error, Date statusTime, Integer id);
-    Optional<SiteEntity> findByNameLike(String name);
-    long countByIdNotNull();
+    @Query("update SiteEntity s set s.statusTime = ?1, s.last_error = ?2 where s.url = ?3")
+    void updateStatusTimeAndLast_errorByUrl(Date statusTime, String last_error, String url);
+
+    @Transactional
+    @Modifying
+    @Query("update SiteEntity s set s.status = ?1, s.statusTime = ?2, s.last_error = ?3 where s.url = ?4")
+    void updateStatusAndStatusTimeAndLast_errorByUrl(StatusType status, Date statusTime, String last_error, String url);
+    @Transactional
+    @Modifying
+    @Query("update SiteEntity s set s.statusTime = ?1 where s.id = ?2")
+    int updateStatusTimeById(Date statusTime, Integer id);
+    SiteEntity findByUrl(String url);
+
     @Transactional
     @Modifying
     @Query("update SiteEntity s set s.statusTime = ?1, s.last_error = ?2 where s.id = ?3")
     void updateStatusTimeAndLast_errorById(Date statusTime, String last_error, Integer id);
-
-
 
     @Modifying
     @Transactional

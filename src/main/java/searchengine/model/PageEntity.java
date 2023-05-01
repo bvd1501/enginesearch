@@ -13,7 +13,6 @@ import javax.persistence.*;
 @Setter
 @Entity
 @NoArgsConstructor
-
 @Table(name = "page"
         , uniqueConstraints = {@UniqueConstraint(name = "idx_page_site", columnNames = {"path", "site_id"})}
         , indexes = {@Index(name = "idx_path", columnList = "path")}

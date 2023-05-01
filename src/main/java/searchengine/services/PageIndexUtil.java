@@ -25,10 +25,13 @@ import java.util.concurrent.RecursiveAction;
 @Getter
 @Setter
 @Slf4j
+//@Component
+//@Scope("singleton")
 public class PageIndexUtil extends RecursiveAction {
     private final PageRepo pageRepo;
     private final SiteRepo siteRepo;
     private final JsoupCfg jsoupCfg;
+
     private PageEntity page;
     private Set<URL> childUrl;
 
@@ -44,7 +47,7 @@ public class PageIndexUtil extends RecursiveAction {
      */
     @Override
     protected void compute() {
-        if (IndexingServiceImpl.stopFlag) {
+        if (IndexingServiceImplOld.stopFlag) {
             ForkJoinPool.commonPool().shutdown();
             return;
         }
