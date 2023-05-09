@@ -12,10 +12,8 @@ import searchengine.model.StatusType;
 import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.*;
 
 
 @Service
@@ -29,33 +27,50 @@ public class IndexingServiceImp implements IndexingService {
  
     public static volatile boolean stopFlag = false;
 
-    private static ForkJoinPool forkJoinPool = new ForkJoinPool(8);
-    //private ObjectFactory<PageIndexService> pageIndexServiceObjectFactory;
+    //private static ForkJoinPool siteFJP = new ForkJoinPool();
+    private ExecutorService siteExecutor;
+
 
     @Override
     public IndexingResponse getStartIndexing() {
-        if (!forkJoinPool.isQuiescent()) {
+//        if (!siteFJP.isQuiescent()) {
+//            log.info("Индексация уже запущена. Повторный запуск невозможен");
+//            return new IndexingResponse(false, "Индексация уже запущена");
+//        }
+        if (siteExecutor != null && !siteExecutor.isTerminated()) {
             log.info("Индексация уже запущена. Повторный запуск невозможен");
             return new IndexingResponse(false, "Индексация уже запущена");
         }
+        siteExecutor = Executors.newFixedThreadPool(4);
+
         log.info("Запускаем перебор сайтов из файла конфигурации");
         stopFlag = false;
-        forkJoinPool = new ForkJoinPool();
+        //siteFJP = new ForkJoinPool(sites.getSites().size());
         for (Site s : sites.getSites()) {
-            forkJoinPool.execute(() -> {
+//            siteFJP.execute(() -> {
+//                log.info("Начинаем обработку сайта " + s.getName());
+//                siteIndexing(s.getUrl(), s.getName());
+//                log.info("Закончили обрабатывать сайт " + s.getName());
+//            });
+            siteExecutor.execute(()->{
                 log.info("Начинаем обработку сайта " + s.getName());
                 siteIndexing(s.getUrl(), s.getName());
                 log.info("Закончили обрабатывать сайт " + s.getName());
             });
         }
-        forkJoinPool.shutdown();
+        //siteFJP.shutdown();
+        siteExecutor.shutdown();
         log.info("Все сайты отправлены на индексацию");
         return new IndexingResponse(true);
     }
 
     @Override
     public IndexingResponse getStopIndexing() {
-        if (forkJoinPool.isQuiescent()) {
+//        if (siteFJP.isQuiescent()) {
+//            log.info("Индексация не запущена - остановка не возможна");
+//            return new IndexingResponse(false, "Индексация не запущена");
+//        }
+        if (siteExecutor == null || (siteExecutor.isShutdown() && siteExecutor.isTerminated())) {
             log.info("Индексация не запущена - остановка не возможна");
             return new IndexingResponse(false, "Индексация не запущена");
         }
@@ -71,13 +86,13 @@ public class IndexingServiceImp implements IndexingService {
         siteRepo.deleteByUrlAndName(urlSiteString, nameSite);
         siteRepo.save(currentSite);
         try {
-//            siteRepo.deleteByUrlAndName(urlSiteString, nameSite);
-//            siteRepo.save(currentSite);
             URI uriSite = URI.create(urlSiteString);
             URI uriPage = URI.create(uriSite.getScheme() + "://" + uriSite.getHost() + "/");
             var pageIndexService = new PageIndexService(siteRepo,
                     pageRepo, jsoupCfg, currentSite.getId(), uriPage);
-            pageIndexService.invoke();
+            //pageIndexService.invoke();
+            ForkJoinPool pageFJP = new ForkJoinPool();
+            pageFJP.invoke(pageIndexService);
             currentSite.setStatus(StatusType.INDEXED);
             currentSite.setStatusTime(new java.util.Date());
             siteRepo.save(currentSite);

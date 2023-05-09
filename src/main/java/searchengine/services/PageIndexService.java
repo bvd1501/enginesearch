@@ -14,10 +14,8 @@ import searchengine.model.SiteEntity;
 import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
-import javax.print.Doc;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -43,7 +41,7 @@ public class PageIndexService extends RecursiveAction{
             throw new RuntimeException("Индексация прервана пользователем");
         }
 
-        Document doc = null;
+        Document doc;
         try {
             Thread.sleep(210);
             doc = readPage(uriPage.getScheme() + "://" + uriPage.getHost() + uriPage.getPath());
@@ -75,7 +73,7 @@ public class PageIndexService extends RecursiveAction{
                 .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
                 .ignoreContentType(true)
                 .get();
-        if (resultDoc == null) throw new IOException();
+        //if (resultDoc == null) throw new IOException();
         return resultDoc;
     }
 
@@ -114,8 +112,10 @@ public class PageIndexService extends RecursiveAction{
         Elements elements = inputDoc.select("a");
         for (Element element : elements) {
             String linkString = element.absUrl("href");
-            if (linkString.contains("#") || linkString.toLowerCase().contains("download") ||
-                    linkString.contains(" ") || linkString.toLowerCase().contains(".pdf") ||
+            if (linkString.contains("#") ||
+                    linkString.toLowerCase().contains("download") ||
+                    linkString.contains(" ") ||
+                    linkString.toLowerCase().contains(".pdf") ||
                     linkString.toLowerCase().contains(".jpg") ||
                     linkString.toLowerCase().contains(".jpeg") ||
                     linkString.toLowerCase().contains(".docx") ||
@@ -123,7 +123,8 @@ public class PageIndexService extends RecursiveAction{
             URI itemURI;
             try {
                 itemURI = new URI(linkString);
-                if(!itemURI.getScheme().equals(uriPage.getScheme())) continue;
+                //if(!itemURI.getScheme().equals(uriPage.getScheme())) continue;
+                if (!itemURI.getScheme().toLowerCase().contains("http")) continue;
                 if (!itemURI.getHost().equals(uriPage.getHost())) continue;
                 if (itemURI.getPath().equals(uriPage.getPath())) continue;
                 resultLinks.add(itemURI);
