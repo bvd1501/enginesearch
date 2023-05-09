@@ -12,6 +12,9 @@ import searchengine.model.StatusType;
 import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.concurrent.ForkJoinPool;
 
 
@@ -61,16 +64,19 @@ public class IndexingServiceImp implements IndexingService {
         return new IndexingResponse(true);
     }
 
-
-    private void siteIndexing(String urlSite, String nameSite) {
+    private void siteIndexing(String urlSiteString, String nameSite) {
         long startTime = System.currentTimeMillis();
         log.info("Start " + Thread.currentThread().getName() + " : " + nameSite);
-        SiteEntity currentSite = new SiteEntity(urlSite, nameSite);
+        SiteEntity currentSite = new SiteEntity(urlSiteString, nameSite);
+        siteRepo.deleteByUrlAndName(urlSiteString, nameSite);
+        siteRepo.save(currentSite);
         try {
-            siteRepo.deleteByUrlAndName(urlSite, nameSite);
-            siteRepo.save(currentSite);
-            PageIndexService pageIndexService = new PageIndexService(siteRepo,
-                    pageRepo, jsoupCfg, urlSite, "/");
+//            siteRepo.deleteByUrlAndName(urlSiteString, nameSite);
+//            siteRepo.save(currentSite);
+            URI uriSite = URI.create(urlSiteString);
+            URI uriPage = URI.create(uriSite.getScheme() + "://" + uriSite.getHost() + "/");
+            var pageIndexService = new PageIndexService(siteRepo,
+                    pageRepo, jsoupCfg, currentSite.getId(), uriPage);
             pageIndexService.invoke();
             currentSite.setStatus(StatusType.INDEXED);
             currentSite.setStatusTime(new java.util.Date());
@@ -80,10 +86,15 @@ public class IndexingServiceImp implements IndexingService {
                     ", найдено страниц " + result +
                     ", затрачено " + (System.currentTimeMillis() - startTime) + " мс");
         } catch (Exception e) {
-            currentSite = siteRepo.findByUrl(urlSite);
+            //если произошла ошибка и обход завершить не удалось, изменять
+            //статус на FAILED и вносить в поле last_error понятную
+            //информацию о произошедшей ошибке.
+            //currentSite = siteRepo.findByUrl(urlSiteString);
+            log.error("Exception при обработке сайта");
+            //stopFlag = true;
             currentSite.setStatus(StatusType.FAILED);
-            currentSite.setStatusTime(new java.util.Date());
             currentSite.setLast_error(e.getMessage());
+            currentSite.setStatusTime(new java.util.Date());
             siteRepo.save(currentSite);
         }
     }

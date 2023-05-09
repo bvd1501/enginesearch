@@ -15,7 +15,7 @@ spring:
     hibernate:
       #ddl-auto: update
       ddl-auto: create-drop
-    #show-sql: true
+    show-sql: true
 
 logging:
   config: logback-spring.xml
@@ -25,7 +25,7 @@ indexing-settings:
   sites:
     #- url: https://www.lenta.ru
     #  name: Лента.ру
-    #- url: https://www.skillbox.ru
+    #- url: https://skillbox.ru
     #  name: Skillbox
     - url: https://www.playback.ru/
       name: PlayBack.Ru
@@ -35,14 +35,14 @@ indexing-settings:
       name: lutherancathedral.ru
     - url: https://clusterfly.ru
       name: MQTTBroker
-    - url: https://volochek.life/
-      name: Volochek
-    - url: http://radiomv.ru/
+    #- url: https://volochek.life/
+    #  name: Volochek
+    - url: https://radiomv.ru/
       name: radiomv
     - url: https://ipfran.ru/
       name: ipfran
-    - url: https://dimonvideo.ru/
-      name: dimonvideo
+    #- url: https://dimonvideo.ru/
+    #  name: dimonvideo
     - url: https://nikoartgallery.com/
       name: nikoartgallery
     - url: https://et-cetera.ru/mobile/
@@ -59,7 +59,7 @@ jsoup-setting:
   referrer: http://www.google.com
   timeout: 6000
   ignoreHttpErrors: false
-  followRedirects: true
-  #followRedirects: false
+  #followRedirects: true
+  followRedirects: false
 
 ...

@@ -14,13 +14,14 @@ import searchengine.model.SiteEntity;
 import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
+import javax.print.Doc;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.RecursiveAction;
 
 @Component
@@ -31,107 +32,106 @@ public class PageIndexService extends RecursiveAction{
     private final SiteRepo siteRepo;
     private final PageRepo pageRepo;
     private final JsoupCfg jsoupCfg;
-    private final String urlSite;
-    private final String path;
+    private final Integer site_id;
+    private final URI uriPage;
 
 
     @Override
     protected void compute() {
         if (IndexingServiceImp.stopFlag) {
-            log.error("Отсанов индексации: " + urlSite + "  " + path);
+            log.error("Отсанов индексации: " + uriPage.toString());
             throw new RuntimeException("Индексация прервана пользователем");
-            //return;
         }
-        URL siteAddress;
-        try {
-            siteAddress = URI.create(urlSite).toURL();
-        } catch (MalformedURLException e) {
-            log.error("Неверный адрес сайта: " + urlSite);
-            throw new RuntimeException(e);
-            //return;
-        }
-        String pageAddress = siteAddress.getProtocol()
-                + "://" + siteAddress.getHost() + path;
+
+        Document doc = null;
         try {
             Thread.sleep(210);
-        } catch (InterruptedException e) {
-            log.error("Таймаут прерван: " + urlSite + "  " + path);
-            //return;
-            throw new RuntimeException(e);
-        }
-        Document doc;
-        SiteEntity siteEntity = siteRepo.findByUrl(urlSite);
-        if (siteEntity == null) {
+            doc = readPage(uriPage.getScheme() + "://" + uriPage.getHost() + uriPage.getPath());
+            savePage(doc);
+        } catch (Exception e) {
+            log.error("Ошибка чтения/сохранения страницы: " + uriPage.toString());
             return;
-        }
-        try {
-            doc = Jsoup
-                    .connect(pageAddress)
-                    .userAgent(jsoupCfg.getUserAgent())
-                    .referrer(jsoupCfg.getReferrer())
-                    .timeout(jsoupCfg.getTimeout())
-                    .followRedirects(jsoupCfg.isFollowRedirects())
-                    .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
-                    .ignoreContentType(true)
-                    .get();
-        } catch (IOException e) {
-            log.error("Ошибка чтения: " + urlSite + "  " + path + " - " + e.getMessage());
-            //throw new RuntimeException(e);
-            siteEntity.setLast_error("Ошибка чтения: " + urlSite + "  " + path);
-            siteEntity.setStatusTime(new java.util.Date());
-            siteRepo.save(siteEntity);
-            return;
+            //throw new RuntimeException("Индексация прервана");
         }
 
-        synchronized (this) {
-            if (pageRepo.findBySiteAndPath(siteEntity, path).isPresent()) {
-                return;
-            }
-            PageEntity pageEntity = new PageEntity(siteEntity, path);
-            pageEntity.setCode(doc.connection().response().statusCode());
-            pageEntity.setContent("");
-            //TODO Для startWith возможен NullPointerException
-            if ((pageEntity.getCode() == 200) && doc
-                    .connection().response().contentType().startsWith("text/html")) {
-                pageEntity.setContent(doc.html());
-            }
-            siteEntity.setStatusTime(new java.util.Date());
-
-            try {
-                siteRepo.save(siteEntity);
-                pageRepo.save(pageEntity);
-            } catch (org.springframework.dao.DataIntegrityViolationException e) {
-                log.error("Ошибка добавления записи в БД: " + urlSite + "  " + path);
-                return;
-            }
-        }
-
-        HashSet<String> links = new HashSet<>();
-        Elements elements = doc.select("a");
-        for (Element e : elements) {
-            String linkString = e.absUrl("href");
-            if (linkString.contains("#") || linkString.contains("download") ||
-                    linkString.contains(" ")) {
-                continue;
-            }
-            links.add(linkString);
-            log.debug("add " + linkString);
-        }
-
+        HashSet<URI> links = parsePage(doc);
         List<PageIndexService> subPageTasks = new ArrayList<>();
-        for (String itemLink : links) {
-            if (!itemLink.startsWith(urlSite) || itemLink.equals(pageAddress)
-            ) {
-                continue;
-            }
-            URI itemURI = URI.create(itemLink);
-            if (pageRepo.findBySiteAndPath(siteEntity, itemURI.getPath()).isEmpty()) {
-                PageIndexService subPageIndexService = new PageIndexService(
-                        siteRepo, pageRepo, jsoupCfg, urlSite, itemURI.getPath());
-                subPageTasks.add(subPageIndexService);
-            }
+        for (URI itemURI : links) {
+            if (pageRepo.findBySite_IdAndPath(site_id, itemURI.getPath()).isPresent()) continue;
+            PageIndexService subPageIndexService = new PageIndexService(siteRepo, pageRepo,
+                    jsoupCfg, site_id, itemURI);
+            subPageTasks.add(subPageIndexService);
         }
-        //log.info("Найдено " + subPageTasks.size() + "/" + links.size() + " ссылок");
         invokeAll(subPageTasks);
     }
+
+    private Document readPage(String pageAddress) throws IOException {
+        Document resultDoc = Jsoup
+                .connect(pageAddress)
+                .userAgent(jsoupCfg.getUserAgent())
+                .referrer(jsoupCfg.getReferrer())
+                .timeout(jsoupCfg.getTimeout())
+                .followRedirects(jsoupCfg.isFollowRedirects())
+                .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
+                .ignoreContentType(true)
+                .get();
+        if (resultDoc == null) throw new IOException();
+        return resultDoc;
+    }
+
+    private void savePage(Document readingDoc) {
+        Optional<SiteEntity> siteEntityOptional = siteRepo.findById(site_id);
+        if (!siteEntityOptional.isPresent()) {
+            log.error("Отсутствует в БД: " + uriPage.toString());
+            throw new RuntimeException("Сайт не найден в БД");
+        }
+        SiteEntity siteEntity = siteEntityOptional.get();
+        PageEntity pageEntity = new PageEntity(siteEntity, uriPage.getPath());
+
+        pageEntity.setCode(readingDoc.connection().response().statusCode());
+        if ((pageEntity.getCode() == 200) && readingDoc
+                .connection().response().contentType().startsWith("text/html")) {
+            pageEntity.setContent(readingDoc.html());
+        } else {
+            log.error("Ошибка чтения " + uriPage.toString() + " - " + pageEntity.getCode());
+        }
+        synchronized (pageRepo) {
+            try {
+                if (!pageRepo.findBySiteAndPath(pageEntity.getSite(), pageEntity.getPath()).isPresent()) {
+                    pageRepo.save(pageEntity);
+                    siteEntity.setStatusTime(new java.util.Date());
+                    siteRepo.save(siteEntity);
+                }
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            log.error("Ошибка при добавлении записи в БД: " + uriPage.toString() + "\n" +
+                    e.getMessage());
+            }
+        }
+    }
+
+    private HashSet<URI> parsePage(Document inputDoc) {
+        HashSet<URI> resultLinks = new HashSet<>();
+        Elements elements = inputDoc.select("a");
+        for (Element element : elements) {
+            String linkString = element.absUrl("href");
+            if (linkString.contains("#") || linkString.toLowerCase().contains("download") ||
+                    linkString.contains(" ") || linkString.toLowerCase().contains(".pdf") ||
+                    linkString.toLowerCase().contains(".jpg") ||
+                    linkString.toLowerCase().contains(".jpeg") ||
+                    linkString.toLowerCase().contains(".docx") ||
+                    linkString.toLowerCase().contains(".doc")) continue;
+            URI itemURI;
+            try {
+                itemURI = new URI(linkString);
+                if(!itemURI.getScheme().equals(uriPage.getScheme())) continue;
+                if (!itemURI.getHost().equals(uriPage.getHost())) continue;
+                if (itemURI.getPath().equals(uriPage.getPath())) continue;
+                resultLinks.add(itemURI);
+            } catch (Exception e) {
+                log.error("URI Exception: " + linkString);
+            }
+        }
+        return resultLinks;
+    }
+
 }

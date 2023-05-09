@@ -41,13 +41,13 @@ public class PageEntity {
     @Column(name = "code", nullable = false)
     private Integer code;
 
-    @Column(name = "content", nullable = false, columnDefinition = "MEDIUMTEXT")
+    @Column(name = "content", length = 16777215, nullable = false, columnDefinition = "mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci")
     private String content;
 
     public PageEntity(SiteEntity site, String path) {
         this.site = site;
         this.path = path;
         this.code = 0;
-        this.content = "";
+        this.content = " ";
     }
 }
