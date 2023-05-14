@@ -20,37 +20,38 @@ spring:
 logging:
   config: logback-spring.xml
 
+
 # example values
 indexing-settings:
   sites:
-    #- url: https://www.lenta.ru
-    #  name: Лента.ру
-    #- url: https://skillbox.ru
-    #  name: Skillbox
+    ##- url: https://www.lenta.ru
+    ##  name: Лента.ру
+    ##- url: https://skillbox.ru
+    ##  name: Skillbox
     - url: https://www.playback.ru/
       name: PlayBack.Ru
-    - url: https://www.tretyakovgallery.ru/
-      name: Gallery
-    - url: https://www.lutherancathedral.ru/
+    #- url: https://www.tretyakovgallery.ru/
+    #  name: Gallery
+    - url: https://lutherancathedral.ru/
       name: lutherancathedral.ru
-    - url: https://clusterfly.ru
-      name: MQTTBroker
-    #- url: https://volochek.life/
-    #  name: Volochek
-    - url: https://radiomv.ru/
+    #- url: https://clusterfly.ru
+    #  name: MQTTBroker
+    - url: https://volochek.life/
+      name: Volochek
+    - url: http://radiomv.ru/
       name: radiomv
-    - url: https://ipfran.ru/
-      name: ipfran
-    #- url: https://dimonvideo.ru/
-    #  name: dimonvideo
-    - url: https://nikoartgallery.com/
-      name: nikoartgallery
-    - url: https://et-cetera.ru/mobile/
-      name: et-cetera.ru
-    - url: https://dombulgakova.ru/
-      name: Bulgakov
-    - url: https://www.svetlovka.ru/
-      name: svetlovka
+    #- url: https://ipfran.ru/
+    #  name: ipfran
+    ##- url: https://dimonvideo.ru/
+    ##  name: dimonvideo
+    #- url: https://nikoartgallery.com/
+    #  name: nikoartgallery
+    #- url: https://et-cetera.ru/mobile/
+    #  name: et-cetera.ru
+    #- url: https://dombulgakova.ru/
+    #  name: Bulgakov
+    #- url: https://www.svetlovka.ru/
+    #  name: svetlovka
 
 
 jsoup-setting:
@@ -59,7 +60,7 @@ jsoup-setting:
   referrer: http://www.google.com
   timeout: 6000
   ignoreHttpErrors: false
-  #followRedirects: true
-  followRedirects: false
+  followRedirects: true
+  #followRedirects: false
 
 ...

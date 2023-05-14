@@ -51,25 +51,20 @@
         </encoder>
    </appender>
 
-    <logger name="org.hibernate.sql" level="DEBUG" additivity="false">
-        <appender-ref ref="file_sql"/>
-    </logger>
+<!--    <logger name="org.hibernate.sql" level="DEBUG" additivity="false">-->
+<!--        <appender-ref ref="file_sql"/>-->
+<!--    </logger>-->
 <!--    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE">-->
 <!--        <appender-ref ref="file_sql"/>-->
 <!--    </logger>-->
 
-    <logger name="searchengine.services">
-<!--        <appender-ref ref="console"/>-->
-        <appender-ref ref="file_err"/>
-    </logger>
-
-    <root level="ERROR">
+   <root level="ERROR" additivity="false">
         <appender-ref ref="console"/>
         <appender-ref ref="file_err"/>
     </root>
-    <root level="INFO" additivity="false">
+   <root level="INFO" additivity="false">
         <appender-ref ref="file_app"/>
         <appender-ref ref="console"/>
-    </root>
+   </root>
 
   </configuration>
