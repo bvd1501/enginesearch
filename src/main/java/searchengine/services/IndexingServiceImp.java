@@ -16,6 +16,7 @@ import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
 import java.net.URI;
+import java.net.URL;
 import java.util.concurrent.*;
 
 
@@ -91,19 +92,15 @@ public class IndexingServiceImp implements IndexingService {
         siteRepo.deleteByUrlAndName(urlSiteString, nameSite);
         siteRepo.save(currentSite);
         try {
-            URI uriSite = URI.create(urlSiteString);
-            URI uriPage = URI.create(uriSite.getScheme() + "://" + uriSite.getHost() + "/");
-            Connection connection = Jsoup.connect(uriPage.toString())
-                    .userAgent(jsoupCfg.getUserAgent())
-                    .referrer(jsoupCfg.getReferrer())
-                    .timeout(jsoupCfg.getTimeout())
-                    .followRedirects(jsoupCfg.isFollowRedirects())
-                    .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
-                    .ignoreContentType(true);
+            URL urlSite = URI.create(urlSiteString).toURL();
+            URL urlPage = URI.create(urlSite.getProtocol() + "://" +
+                    urlSite.getHost() + "/").toURL();
+//            URI uriSite = URI.create(urlSiteString);
+//            URI uriPage = URI.create(uriSite.getScheme() + "://" + uriSite.getHost() + "/");
             var pageIndexService = new PageIndexService(siteRepo,
-                    pageRepo, jsoupCfg, currentSite.getId(), uriPage, connection);
-            //pageIndexService.invoke();
-            ForkJoinPool pageFJP = new ForkJoinPool();
+                    pageRepo, jsoupCfg, currentSite.getId(), urlPage);
+            //pageIndexService.invoke(); //все сайты в общем FJP - CommonPool
+            ForkJoinPool pageFJP = new ForkJoinPool(); // каждый сайт в своем FJP.
             pageFJP.invoke(pageIndexService);
             currentSite.setStatus(StatusType.INDEXED);
             long result = pageRepo.countBySite(currentSite);
@@ -111,7 +108,7 @@ public class IndexingServiceImp implements IndexingService {
             currentSite.setLast_error("OK. Found " + result + " pages in " + resultTime + "min");
             log.info("Сайт " + nameSite +
                     ", найдено страниц " + result +
-                    ", затрачено " + resultTime + " мс");
+                    ", затрачено " + resultTime + " мин");
             currentSite.setStatusTime(new java.util.Date());
             siteRepo.save(currentSite);
         } catch (Exception e) {

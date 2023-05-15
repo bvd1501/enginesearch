@@ -34,8 +34,9 @@ public class PageIndexService extends RecursiveAction{
     private final PageRepo pageRepo;
     private final JsoupCfg jsoupCfg;
     private final Integer site_id;
-    private final URI uriPage;
-    private final Connection connection;
+    //private final URI uriPage;
+    private final URL urlPage;
+
 
 
     @Override
@@ -45,47 +46,38 @@ public class PageIndexService extends RecursiveAction{
             if (IndexingServiceImp.stopFlag) {
                 throw new RuntimeException("Индексация прервана пользователем");            }
             Thread.sleep(110);
-            doc = readPage(uriPage.getScheme() + "://" + uriPage.getHost() + uriPage.getPath());
+            doc = readPage(urlPage);
             if (doc == null) return;
         } catch (IOException e) {
-            log.error("Ошибка чтения страницы: " + uriPage.toString() + "\n" +
+            log.error("Ошибка чтения страницы: " + urlPage.toString() + "\n" +
                     e.getMessage());
             return;
         } catch (InterruptedException e) {
-            log.error("Отсанов индексации: " + uriPage.toString());
+            log.error("Отсанов индексации: " + urlPage.toString());
             throw new RuntimeException("Индексация прервана");
         }
-        HashSet<URI> links = parsePage(doc);
+        HashSet<URL> links = parsePage(doc);
         List<PageIndexService> subPageTasks = new ArrayList<>();
-        Connection subConnection = Jsoup.connect(uriPage.toString())
-                .userAgent(jsoupCfg.getUserAgent())
-                .referrer(jsoupCfg.getReferrer())
-                .timeout(jsoupCfg.getTimeout())
-                .followRedirects(jsoupCfg.isFollowRedirects())
-                .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
-                .ignoreContentType(true);
-        for (URI itemURI : links) {
-            if (pageRepo.findBySite_IdAndPath(site_id, itemURI.getPath()).isPresent()) continue;
+        for (URL itemURL : links) {
+            if (pageRepo.findBySite_IdAndPath(site_id, itemURL.getPath()).isPresent()) continue;
             PageIndexService subPageIndexService = new PageIndexService(siteRepo, pageRepo,
-                    jsoupCfg, site_id, itemURI, subConnection);
+                    jsoupCfg, site_id, itemURL);
             subPageTasks.add(subPageIndexService);
         }
         invokeAll(subPageTasks);
     }
 
-    private Document readPage(String pageAddress) throws IOException {
+    private Document readPage(URL pageAddress) throws IOException {
         try {
-//            Document resultDoc = Jsoup
-//                    .connect(pageAddress)
-//                    .userAgent(jsoupCfg.getUserAgent())
-//                    .referrer(jsoupCfg.getReferrer())
-//                    .timeout(jsoupCfg.getTimeout())
-//                    .followRedirects(jsoupCfg.isFollowRedirects())
-//                    .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
-//                    .ignoreContentType(true)
-//                    .get();
-            Document resultDoc = connection.url(pageAddress).get();
-
+            Document resultDoc = Jsoup
+                    .connect(pageAddress.toString())
+                    .userAgent(jsoupCfg.getUserAgent())
+                    .referrer(jsoupCfg.getReferrer())
+                    .timeout(jsoupCfg.getTimeout())
+                    .followRedirects(jsoupCfg.isFollowRedirects())
+                    .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
+                    .ignoreContentType(true)
+                    .get();
             Integer statusCode = resultDoc.connection().response().statusCode();
             String content = "";
             if ((statusCode == 200) && (resultDoc.connection().response().contentType().startsWith("text/html"))) {
@@ -94,8 +86,8 @@ public class PageIndexService extends RecursiveAction{
             savePage(statusCode, content);
             return resultDoc;
         } catch (HttpStatusException e) {
-            log.error("Ошибка чтения: " + pageAddress + "code=" + e.getStatusCode());
-            savePage(e.getStatusCode(), " ");
+            log.error("Ошибка чтения: " + pageAddress + " code=" + e.getStatusCode());
+            savePage(e.getStatusCode(), "");
             return null;
         }
     }
@@ -103,11 +95,11 @@ public class PageIndexService extends RecursiveAction{
     private void savePage(Integer pageStatusCode, String pageContent) throws RuntimeException {
         Optional<SiteEntity> siteEntityOptional = siteRepo.findById(site_id);
         if (!siteEntityOptional.isPresent()) {
-            log.error("Отсутствует в БД: " + uriPage.toString());
+            log.error("Отсутствует в БД: " + urlPage.toString());
             throw new RuntimeException("Сайт не найден в БД");
         }
         SiteEntity siteEntity = siteEntityOptional.get();
-        PageEntity pageEntity = new PageEntity(siteEntity, uriPage.getPath());
+        PageEntity pageEntity = new PageEntity(siteEntity, urlPage.getPath());
         pageEntity.setCode(pageStatusCode);
         pageEntity.setContent(pageContent);
         synchronized (pageRepo) {
@@ -118,37 +110,38 @@ public class PageIndexService extends RecursiveAction{
                     siteRepo.save(siteEntity);
                 }
             } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            log.error("Ошибка при добавлении записи в БД: " + uriPage.toString() + "\n" +
+            log.error("Ошибка при добавлении записи в БД: " + urlPage.toString() + "\n" +
                     e.getMessage());
             }
         }
     }
 
-    private HashSet<URI> parsePage(Document inputDoc) {
-        HashSet<URI> resultLinks = new HashSet<>();
+    private HashSet<URL> parsePage(Document inputDoc) {
+        HashSet<URL> resultLinks = new HashSet<>();
         Elements elements = inputDoc.select("a");
         for (Element element : elements) {
             String linkString = element.absUrl("href").toLowerCase();
             if (linkString.contains("#") ||
+                    !linkString.startsWith("http") ||
                     linkString.contains("download") ||
                     linkString.contains(" ") ||
+                    linkString.contains("%20") ||
                     linkString.contains(".pdf") ||
                     linkString.contains(".jpg") ||
                     linkString.contains(".jpeg") ||
                     linkString.contains(".docx") ||
                     linkString.contains(".doc")) continue;
-            URI itemURI;
             try {
-                itemURI = URI.create(linkString);
-                if (!itemURI.getScheme().contains("http")) continue;
-                String siteDomen = uriPage.getHost().startsWith("www.")
-                        ? uriPage.getHost().substring(4) : uriPage.getHost();
-                String pageDomen = itemURI.getHost().startsWith("www.")
-                        ? itemURI.getHost().substring(4) : itemURI.getHost();
-                if (!siteDomen.equals(pageDomen)) continue;
-                if (itemURI.getPath().equals(uriPage.getPath())) continue;
-                itemURI = URI.create(itemURI.getScheme() + "://" + itemURI.getHost() + itemURI.getPath());
-                resultLinks.add(itemURI);
+                URL newURL = URI.create(linkString).toURL();
+                String siteHost = urlPage.getHost().startsWith("www.")
+                        ? urlPage.getHost().substring(4) : urlPage.getHost();
+                String pageHost = newURL.getHost().startsWith("www.")
+                        ? newURL.getHost().substring(4) : newURL.getHost();
+                if (!siteHost.equals(pageHost)) continue;
+                if (newURL.getPath().contains("http")) continue;
+                if (newURL.getPath().equals(urlPage.getPath())) continue;
+                newURL = URI.create(newURL.getProtocol() + "://" + newURL.getHost() + newURL.getPath()).toURL();
+                resultLinks.add(newURL);
             } catch (Exception e) {
                 log.error("URI Exception: " + e.getMessage() + " on " + linkString);
             }
