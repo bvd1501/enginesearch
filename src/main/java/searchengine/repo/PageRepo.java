@@ -11,6 +11,7 @@ import searchengine.model.SiteEntity;
 import java.util.Optional;
 
 public interface PageRepo extends CrudRepository<PageEntity, Integer> {
+
     @Query("select p from PageEntity p where p.site.id = ?1 and p.path = ?2")
     Optional<PageEntity> findBySite_IdAndPath(Integer id, String path);
 

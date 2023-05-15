@@ -95,7 +95,7 @@ public class IndexingServiceImp implements IndexingService {
 //            URI uriSite = URI.create(urlSiteString);
 //            URI uriPage = URI.create(uriSite.getScheme() + "://" + uriSite.getHost() + "/");
             var pageIndexService = new PageIndexService(siteRepo,
-                    pageRepo, jsoupCfg, currentSite.getId(), urlPage);
+                    pageRepo, jsoupCfg, currentSite, urlPage);
             //pageIndexService.invoke(); //все сайты в общем FJP - CommonPool
             ForkJoinPool pageFJP = new ForkJoinPool(); // каждый сайт в своем FJP.
             pageFJP.invoke(pageIndexService);

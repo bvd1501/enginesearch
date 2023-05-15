@@ -8,6 +8,7 @@ import searchengine.model.SiteEntity;
 
 @Repository
 public interface SiteRepo extends CrudRepository<SiteEntity, Integer> {
+
   
 
     @Modifying

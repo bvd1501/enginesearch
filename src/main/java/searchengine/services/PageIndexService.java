@@ -2,7 +2,6 @@ package searchengine.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,9 +17,7 @@ import searchengine.repo.SiteRepo;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.RecursiveAction;
 
@@ -32,41 +29,57 @@ public class PageIndexService extends RecursiveAction{
     private final SiteRepo siteRepo;
     private final PageRepo pageRepo;
     private final JsoupCfg jsoupCfg;
-    private final Integer site_id;
+    //private final Integer site_id;
+    private final SiteEntity siteEntity;
     //private final URI uriPage;
     private final URL urlPage;
 
 
 
     @Override
-    protected void compute() {//
-        Document doc;
+    protected void compute() {
+        PageEntity pageEntity = new PageEntity(siteEntity, urlPage.getPath());
+        Document pageDoc = null;
         try {
             if (IndexingServiceImp.stopFlag) {
-                throw new RuntimeException("Индексация прервана пользователем");            }
+                throw new RuntimeException("Индексация прервана пользователем");
+            }
+            //int randomTime = (int) Math.random() * 5000;
+            //Thread.sleep(100 + randomTime);
             Thread.sleep(110);
-            doc = readPage(urlPage);
-            if (doc == null) return;
-        } catch (IOException e) {
-            log.error("Ошибка чтения страницы: " + urlPage.toString() + "\n" +
+            pageDoc = readPage(urlPage);
+            if (pageDoc == null) return;
+            pageEntity.setCode(pageDoc.connection().response().statusCode());
+            if (pageEntity.getCode() == 200) {
+                pageEntity.setContent(pageDoc.html());
+            }
+            synchronized (pageRepo) {
+                Optional<PageEntity> pageEntityOptional =
+                    pageRepo.findBySiteAndPath(siteEntity, urlPage.getPath());
+                if (pageEntityOptional.isPresent()) return;
+                pageRepo.save(pageEntity);
+                siteEntity.setStatusTime(new java.util.Date());
+                siteRepo.save(siteEntity);
+            }
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            log.error("Ошибка при добавлении записи в БД: " + urlPage + "\n" +
                     e.getMessage());
-            return;
         } catch (InterruptedException e) {
-            log.error("Отсанов индексации: " + urlPage.toString());
+            log.error("Отсанов индексации: " + urlPage);
             throw new RuntimeException("Индексация прервана");
         }
-        HashSet<URL> links = parsePage(doc);
-        List<PageIndexService> subPageTasks = new ArrayList<>();
+        assert pageDoc != null;
+        HashSet<URL> links = getValidLinks(pageDoc);
+        HashSet<PageIndexService> subPageTasks = new HashSet<>();
         for (URL itemURL : links) {
-            if (pageRepo.findBySite_IdAndPath(site_id, itemURL.getPath()).isPresent()) continue;
             PageIndexService subPageIndexService = new PageIndexService(siteRepo, pageRepo,
-                    jsoupCfg, site_id, itemURL);
+                    jsoupCfg, siteEntity, itemURL);
             subPageTasks.add(subPageIndexService);
         }
         invokeAll(subPageTasks);
     }
 
-    private Document readPage(URL pageAddress) throws IOException {
+    private Document readPage(URL pageAddress) {
         try {
             Document resultDoc = Jsoup
                     .connect(pageAddress.toString())
@@ -77,45 +90,20 @@ public class PageIndexService extends RecursiveAction{
                     .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
                     .ignoreContentType(true)
                     .get();
-            Integer statusCode = resultDoc.connection().response().statusCode();
-            String content = "";
-            if ((statusCode == 200) && (resultDoc.connection().response().contentType().startsWith("text/html"))) {
-                content = resultDoc.html();
-            }
-            savePage(statusCode, content);
+            if (!resultDoc.connection().response().contentType().startsWith("text/html")) return null;
             return resultDoc;
-        } catch (HttpStatusException e) {
+        } catch (org.jsoup.HttpStatusException e) {
             log.error("Ошибка чтения: " + pageAddress + " code=" + e.getStatusCode());
-            savePage(e.getStatusCode(), "");
-            return null;
+        } catch (NullPointerException e) {
+            log.error("Ошибка определения типа контента: " + pageAddress + " - " + e.getMessage());
+        } catch (IOException e) {
+            log.error("Ошибка чтения: " + pageAddress + " - " + e.getMessage());
         }
+        return null;
     }
 
-    private void savePage(Integer pageStatusCode, String pageContent) throws RuntimeException {
-        Optional<SiteEntity> siteEntityOptional = siteRepo.findById(site_id);
-        if (!siteEntityOptional.isPresent()) {
-            log.error("Отсутствует в БД: " + urlPage.toString());
-            throw new RuntimeException("Сайт не найден в БД");
-        }
-        SiteEntity siteEntity = siteEntityOptional.get();
-        PageEntity pageEntity = new PageEntity(siteEntity, urlPage.getPath());
-        pageEntity.setCode(pageStatusCode);
-        pageEntity.setContent(pageContent);
-        synchronized (pageRepo) {
-            try {
-                if (!pageRepo.findBySiteAndPath(pageEntity.getSite(), pageEntity.getPath()).isPresent()) {
-                    pageRepo.save(pageEntity);
-                    siteEntity.setStatusTime(new java.util.Date());
-                    siteRepo.save(siteEntity);
-                }
-            } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            log.error("Ошибка при добавлении записи в БД: " + urlPage + "\n" +
-                    e.getMessage());
-            }
-        }
-    }
 
-    private HashSet<URL> parsePage(Document inputDoc) {
+    private HashSet<URL> getValidLinks(Document inputDoc) {
         HashSet<URL> resultLinks = new HashSet<>();
         Elements elements = inputDoc.select("a");
         for (Element element : elements) {
@@ -147,5 +135,4 @@ public class PageIndexService extends RecursiveAction{
         }
         return resultLinks;
     }
-
 }
