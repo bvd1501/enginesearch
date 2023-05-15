@@ -2,9 +2,6 @@ package searchengine.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Connection;
-import org.jsoup.HttpStatusException;
-import org.jsoup.Jsoup;
 import org.springframework.stereotype.Service;
 import searchengine.config.JsoupCfg;
 import searchengine.config.Site;

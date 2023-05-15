@@ -2,7 +2,6 @@ package searchengine.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Connection;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -110,7 +109,7 @@ public class PageIndexService extends RecursiveAction{
                     siteRepo.save(siteEntity);
                 }
             } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            log.error("Ошибка при добавлении записи в БД: " + urlPage.toString() + "\n" +
+            log.error("Ошибка при добавлении записи в БД: " + urlPage + "\n" +
                     e.getMessage());
             }
         }
