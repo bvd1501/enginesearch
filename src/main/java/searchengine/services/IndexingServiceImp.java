@@ -83,7 +83,7 @@ public class IndexingServiceImp implements IndexingService {
 
     private void siteIndexing(String urlSiteString, String nameSite) {
         long startTime = System.currentTimeMillis();
-        Thread.currentThread().setName("thread-"+nameSite);
+        Thread.currentThread().setName("thread-" + nameSite);
         log.info("Start " + Thread.currentThread().getName() + " : " + nameSite);
         SiteEntity currentSite = new SiteEntity(urlSiteString, nameSite);
         siteRepo.deleteByUrlAndName(urlSiteString, nameSite);
@@ -99,27 +99,28 @@ public class IndexingServiceImp implements IndexingService {
             //pageIndexService.invoke(); //все сайты в общем FJP - CommonPool
             ForkJoinPool pageFJP = new ForkJoinPool(); // каждый сайт в своем FJP.
             pageFJP.invoke(pageIndexService);
-            currentSite.setStatus(StatusType.INDEXED);
             long result = pageRepo.countBySite(currentSite);
-            long resultTime = (System.currentTimeMillis() - startTime)/60000;
-            currentSite.setLast_error("OK. Found " + result + " pages in " + resultTime + "min");
+            long resultTime = (System.currentTimeMillis() - startTime) / 60000;
+            saveSite(currentSite, StatusType.INDEXED, "OK. Found " + result + " pages in " + resultTime + "min");
             log.info("Сайт " + nameSite +
                     ", найдено страниц " + result +
                     ", затрачено " + resultTime + " мин");
-            currentSite.setStatusTime(new java.util.Date());
-            siteRepo.save(currentSite);
-        } catch (Exception e) {
+        }catch (Exception e) {
             //если произошла ошибка и обход завершить не удалось, изменять
             //статус на FAILED и вносить в поле last_error понятную
             //информацию о произошедшей ошибке.
             //currentSite = siteRepo.findByUrl(urlSiteString);
             log.error("Exception при обработке сайта: " + e.getMessage());
             //stopFlag = true;
-            currentSite.setStatus(StatusType.FAILED);
-            currentSite.setLast_error(e.getMessage());
-            currentSite.setStatusTime(new java.util.Date());
-            siteRepo.save(currentSite);
+            saveSite(currentSite, StatusType.FAILED, e.getLocalizedMessage());
         }
+    }
+
+    private void saveSite(SiteEntity siteEntity, StatusType statusType, String last_error) {
+        siteEntity.setStatus(statusType);
+        siteEntity.setLast_error(last_error);
+        siteEntity.setStatusTime(new java.util.Date());
+        siteRepo.save(siteEntity);
     }
 
 }

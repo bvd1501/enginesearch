@@ -2,6 +2,7 @@ package searchengine.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -29,46 +30,19 @@ public class PageIndexService extends RecursiveAction{
     private final SiteRepo siteRepo;
     private final PageRepo pageRepo;
     private final JsoupCfg jsoupCfg;
-    //private final Integer site_id;
     private final SiteEntity siteEntity;
-    //private final URI uriPage;
     private final URL urlPage;
-
-
 
     @Override
     protected void compute() {
-        PageEntity pageEntity = new PageEntity(siteEntity, urlPage.getPath());
-        Document pageDoc = null;
-        try {
-            if (IndexingServiceImp.stopFlag) {
-                throw new RuntimeException("Индексация прервана пользователем");
-            }
-            //int randomTime = (int) Math.random() * 5000;
-            //Thread.sleep(100 + randomTime);
-            Thread.sleep(110);
-            pageDoc = readPage(urlPage);
-            if (pageDoc == null) return;
-            pageEntity.setCode(pageDoc.connection().response().statusCode());
-            if (pageEntity.getCode() == 200) {
-                pageEntity.setContent(pageDoc.html());
-            }
-            synchronized (pageRepo) {
-                Optional<PageEntity> pageEntityOptional =
-                    pageRepo.findBySiteAndPath(siteEntity, urlPage.getPath());
-                if (pageEntityOptional.isPresent()) return;
-                pageRepo.save(pageEntity);
-                siteEntity.setStatusTime(new java.util.Date());
-                siteRepo.save(siteEntity);
-            }
-        } catch (org.springframework.dao.DataIntegrityViolationException e) {
-            log.error("Ошибка при добавлении записи в БД: " + urlPage + "\n" +
-                    e.getMessage());
-        } catch (InterruptedException e) {
-            log.error("Отсанов индексации: " + urlPage);
-            throw new RuntimeException("Индексация прервана");
+        //После завершения данного метода страница с переданным адресом
+        // гарантированно д.б. в базе либо вся индексация д.б. остановлена!!!!
+        //Иначе возможно зацикливание
+        if (IndexingServiceImp.stopFlag) {
+            throw new RuntimeException("Индексация остановлена пользователем");
         }
-        assert pageDoc != null;
+        Document pageDoc = readPage(urlPage);
+        if (pageDoc == null) return;
         HashSet<URL> links = getValidLinks(pageDoc);
         HashSet<PageIndexService> subPageTasks = new HashSet<>();
         for (URL itemURL : links) {
@@ -80,8 +54,13 @@ public class PageIndexService extends RecursiveAction{
     }
 
     private Document readPage(URL pageAddress) {
+        int readTimeout = 500 + (int) (Math.random() * 4501);
+        Document resultDoc = null;
+        String pageContent="";
+        int pageStatusCode;
         try {
-            Document resultDoc = Jsoup
+            Thread.sleep(readTimeout);
+            resultDoc = Jsoup
                     .connect(pageAddress.toString())
                     .userAgent(jsoupCfg.getUserAgent())
                     .referrer(jsoupCfg.getReferrer())
@@ -90,16 +69,20 @@ public class PageIndexService extends RecursiveAction{
                     .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
                     .ignoreContentType(true)
                     .get();
-            if (!resultDoc.connection().response().contentType().startsWith("text/html")) return null;
-            return resultDoc;
-        } catch (org.jsoup.HttpStatusException e) {
+            pageStatusCode = resultDoc.connection().response().statusCode();
+            if (pageStatusCode == 200) pageContent = resultDoc.html();
+        } catch (HttpStatusException e) {
             log.error("Ошибка чтения: " + pageAddress + " code=" + e.getStatusCode());
-        } catch (NullPointerException e) {
-            log.error("Ошибка определения типа контента: " + pageAddress + " - " + e.getMessage());
+            pageStatusCode = e.getStatusCode();
         } catch (IOException e) {
             log.error("Ошибка чтения: " + pageAddress + " - " + e.getMessage());
+            pageStatusCode = 500;
+        } catch (InterruptedException ex) {
+            if (IndexingServiceImp.stopFlag) {resultDoc = null;}
+            pageStatusCode = 500;
         }
-        return null;
+        savePage(pageStatusCode, pageContent);
+        return resultDoc;
     }
 
 
@@ -116,6 +99,8 @@ public class PageIndexService extends RecursiveAction{
                     linkString.contains(".pdf") ||
                     linkString.contains(".jpg") ||
                     linkString.contains(".jpeg") ||
+                    linkString.contains(".png") ||
+                    linkString.contains(".svg") ||
                     linkString.contains(".docx") ||
                     linkString.contains(".doc")) continue;
             try {
@@ -134,5 +119,26 @@ public class PageIndexService extends RecursiveAction{
             }
         }
         return resultLinks;
+    }
+
+    private void savePage(int statusCode, String content) throws RuntimeException {
+        PageEntity pageEntity = new PageEntity(siteEntity, urlPage.getPath());
+        pageEntity.setCode(statusCode);
+        pageEntity.setContent(content);
+        synchronized (pageRepo) {
+            try {
+                Optional<PageEntity> pageEntityOptional =
+                        pageRepo.findBySiteAndPath(siteEntity, urlPage.getPath());
+                if (pageEntityOptional.isPresent()) return;
+                pageRepo.save(pageEntity);
+                siteEntity.setStatusTime(new java.util.Date());
+                siteRepo.save(siteEntity);
+            } catch (Exception e) {
+                log.error("Ошибка при добавлении записи в БД: " + urlPage + "\n" +
+                        e.getMessage());
+                throw new RuntimeException("Ошибка при добавлении записи в БД: " + urlPage + "\n" +
+                        e.getMessage());
+            }
+        }
     }
 }
