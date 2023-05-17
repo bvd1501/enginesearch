@@ -99,6 +99,7 @@ public class IndexingServiceImp implements IndexingService {
             //pageIndexService.invoke(); //все сайты в общем FJP - CommonPool
             ForkJoinPool pageFJP = new ForkJoinPool(); // каждый сайт в своем FJP.
             pageFJP.invoke(pageIndexService);
+            pageFJP.shutdown();
             long result = pageRepo.countBySite(currentSite);
             long resultTime = (System.currentTimeMillis() - startTime) / 60000;
             saveSite(currentSite, StatusType.INDEXED, "OK. Found " + result + " pages in " + resultTime + "min");
@@ -112,7 +113,7 @@ public class IndexingServiceImp implements IndexingService {
             //currentSite = siteRepo.findByUrl(urlSiteString);
             log.error("Exception при обработке сайта: " + e.getMessage());
             //stopFlag = true;
-            saveSite(currentSite, StatusType.FAILED, e.getLocalizedMessage());
+            saveSite(currentSite, StatusType.FAILED, e.getMessage());
         }
     }
 

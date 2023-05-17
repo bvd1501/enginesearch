@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import searchengine.config.JsoupCfg;
 import searchengine.model.PageEntity;
@@ -16,8 +18,7 @@ import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.concurrent.RecursiveAction;
@@ -26,12 +27,15 @@ import java.util.concurrent.RecursiveAction;
 @Scope("prototype")
 @RequiredArgsConstructor
 @Slf4j
-public class PageIndexService extends RecursiveAction{
+public class PageIndexService extends RecursiveAction {
     private final SiteRepo siteRepo;
     private final PageRepo pageRepo;
     private final JsoupCfg jsoupCfg;
     private final SiteEntity siteEntity;
     private final URL urlPage;
+    private static final int MAX_ATTEMPTS = 7;
+    private static final int TIMEOUT_BASE = 100; // 100 ms
+    private static final int TIMEOUT_MULTIPLIER = 2;
 
     @Override
     protected void compute() {
@@ -41,6 +45,7 @@ public class PageIndexService extends RecursiveAction{
         if (IndexingServiceImp.stopFlag) {
             throw new RuntimeException("Индексация остановлена пользователем");
         }
+        if (pageRepo.findBySiteAndPath(siteEntity, urlPage.getPath()).isPresent()) return;
         Document pageDoc = readPage(urlPage);
         if (pageDoc == null) return;
         HashSet<URL> links = getValidLinks(pageDoc);
@@ -54,34 +59,41 @@ public class PageIndexService extends RecursiveAction{
     }
 
     private Document readPage(URL pageAddress) {
-        int readTimeout = 500 + (int) (Math.random() * 4501);
+        int attempts = 0;
+        int timeout = TIMEOUT_BASE;
         Document resultDoc = null;
-        String pageContent="";
-        int pageStatusCode;
-        try {
-            Thread.sleep(readTimeout);
-            resultDoc = Jsoup
-                    .connect(pageAddress.toString())
-                    .userAgent(jsoupCfg.getUserAgent())
-                    .referrer(jsoupCfg.getReferrer())
-                    .timeout(jsoupCfg.getTimeout())
-                    .followRedirects(jsoupCfg.isFollowRedirects())
-                    .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
-                    .ignoreContentType(true)
-                    .get();
-            pageStatusCode = resultDoc.connection().response().statusCode();
-            if (pageStatusCode == 200) pageContent = resultDoc.html();
-        } catch (HttpStatusException e) {
-            log.error("Ошибка чтения: " + pageAddress + " code=" + e.getStatusCode());
-            pageStatusCode = e.getStatusCode();
-        } catch (IOException e) {
-            log.error("Ошибка чтения: " + pageAddress + " - " + e.getMessage());
-            pageStatusCode = 500;
-        } catch (InterruptedException ex) {
-            if (IndexingServiceImp.stopFlag) {resultDoc = null;}
-            pageStatusCode = 500;
+        int responseCode = HttpURLConnection.HTTP_OK;
+        String content = "";
+        while (attempts < MAX_ATTEMPTS) {
+            try {
+                resultDoc = Jsoup
+                        .connect(pageAddress.toString())
+                        .userAgent(jsoupCfg.getUserAgent())
+                        .referrer(jsoupCfg.getReferrer())
+                        .timeout(jsoupCfg.getTimeout())
+                        .followRedirects(jsoupCfg.isFollowRedirects())
+                        .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
+                        .ignoreContentType(true)
+                        .get();
+                responseCode = resultDoc.connection().response().statusCode();
+                content = resultDoc.html();
+                break;
+            } catch (HttpStatusException e) {
+                responseCode = e.getStatusCode();
+                if ((responseCode != 429) || attempts>MAX_ATTEMPTS) break;
+                attempts++;
+                timeout *= TIMEOUT_MULTIPLIER;
+                try {
+                    Thread.sleep(timeout);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException("Индексация остановлена пользователем");
+                }
+            } catch (IOException e) {
+                log.error("Неизвестная ошибка: " + urlPage + " - " + e.getMessage());
+                throw new RuntimeException(e.getMessage());
+            }
         }
-        savePage(pageStatusCode, pageContent);
+        savePage(responseCode, content);
         return resultDoc;
     }
 
@@ -114,8 +126,8 @@ public class PageIndexService extends RecursiveAction{
                 if (newURL.getPath().equals(urlPage.getPath())) continue;
                 newURL = URI.create(newURL.getProtocol() + "://" + newURL.getHost() + newURL.getPath()).toURL();
                 resultLinks.add(newURL);
-            } catch (Exception e) {
-                log.error("URI Exception: " + e.getMessage() + " on " + linkString);
+            } catch (MalformedURLException | IllegalArgumentException e) {
+                log.error("Неверная ссылка: " + e.getMessage() + " - " + linkString);
             }
         }
         return resultLinks;
