@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
-import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -33,8 +32,8 @@ public class PageIndexService extends RecursiveAction {
     private final JsoupCfg jsoupCfg;
     private final SiteEntity siteEntity;
     private final URL urlPage;
-    private static final int MAX_ATTEMPTS = 7;
-    private static final int TIMEOUT_BASE = 100; // 100 ms
+    private static final int MAX_ATTEMPTS = 4;
+    private static final int TIMEOUT_BASE = 510; // 510 ms
     private static final int TIMEOUT_MULTIPLIER = 2;
 
     @Override
@@ -71,26 +70,32 @@ public class PageIndexService extends RecursiveAction {
                         .userAgent(jsoupCfg.getUserAgent())
                         .referrer(jsoupCfg.getReferrer())
                         .timeout(jsoupCfg.getTimeout())
-                        .followRedirects(jsoupCfg.isFollowRedirects())
-                        .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
-                        .ignoreContentType(true)
+                        //.followRedirects(jsoupCfg.isFollowRedirects())
+                        //.ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
+                        //.ignoreContentType(true)
                         .get();
                 responseCode = resultDoc.connection().response().statusCode();
                 content = resultDoc.html();
                 break;
             } catch (HttpStatusException e) {
                 responseCode = e.getStatusCode();
-                if ((responseCode != 429) || attempts>MAX_ATTEMPTS) break;
+                if (responseCode != 429) break;
                 attempts++;
-                timeout *= TIMEOUT_MULTIPLIER;
                 try {
                     Thread.sleep(timeout);
                 } catch (InterruptedException ex) {
-                    throw new RuntimeException("Индексация остановлена пользователем");
+                    if (IndexingServiceImp.stopFlag) {
+                        throw new RuntimeException("Индексация остановлена пользователем");
+                    }
+                    savePage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "");
+                    return null;
                 }
+                timeout *= TIMEOUT_MULTIPLIER;
             } catch (IOException e) {
-                log.error("Неизвестная ошибка: " + urlPage + " - " + e.getMessage());
-                throw new RuntimeException(e.getMessage());
+                log.error(urlPage + " - " + e.getMessage());
+                savePage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "");
+                return null;
+                //throw new RuntimeException(e.getMessage());
             }
         }
         savePage(responseCode, content);
@@ -127,7 +132,7 @@ public class PageIndexService extends RecursiveAction {
                 newURL = URI.create(newURL.getProtocol() + "://" + newURL.getHost() + newURL.getPath()).toURL();
                 resultLinks.add(newURL);
             } catch (MalformedURLException | IllegalArgumentException e) {
-                log.error("Неверная ссылка: " + e.getMessage() + " - " + linkString);
+                //log.error("Неверная ссылка: " + e.getMessage() + " - " + linkString);
             }
         }
         return resultLinks;
@@ -148,6 +153,7 @@ public class PageIndexService extends RecursiveAction {
             } catch (Exception e) {
                 log.error("Ошибка при добавлении записи в БД: " + urlPage + "\n" +
                         e.getMessage());
+                IndexingServiceImp.stopFlag = true;
                 throw new RuntimeException("Ошибка при добавлении записи в БД: " + urlPage + "\n" +
                         e.getMessage());
             }

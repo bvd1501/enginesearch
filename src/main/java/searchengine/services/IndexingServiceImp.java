@@ -42,8 +42,8 @@ public class IndexingServiceImp implements IndexingService {
             log.info("Индексация уже запущена. Повторный запуск невозможен");
             return new IndexingResponse(false, "Индексация уже запущена");
         }
-        siteExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        //siteExecutor = Executors.newFixedThreadPool(sites.getSites().size());
+        //siteExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        siteExecutor = Executors.newFixedThreadPool(sites.getSites().size());
 
         log.info("Запускаем перебор сайтов из файла конфигурации");
         stopFlag = false;
@@ -88,6 +88,7 @@ public class IndexingServiceImp implements IndexingService {
         SiteEntity currentSite = new SiteEntity(urlSiteString, nameSite);
         siteRepo.deleteByUrlAndName(urlSiteString, nameSite);
         siteRepo.save(currentSite);
+        ForkJoinPool pageFJP = new ForkJoinPool(); // каждый сайт в своем FJP.
         try {
             URL urlSite = URI.create(urlSiteString).toURL();
             URL urlPage = URI.create(urlSite.getProtocol() + "://" +
@@ -97,7 +98,6 @@ public class IndexingServiceImp implements IndexingService {
             var pageIndexService = new PageIndexService(siteRepo,
                     pageRepo, jsoupCfg, currentSite, urlPage);
             //pageIndexService.invoke(); //все сайты в общем FJP - CommonPool
-            ForkJoinPool pageFJP = new ForkJoinPool(); // каждый сайт в своем FJP.
             pageFJP.invoke(pageIndexService);
             pageFJP.shutdown();
             long result = pageRepo.countBySite(currentSite);
@@ -110,9 +110,8 @@ public class IndexingServiceImp implements IndexingService {
             //если произошла ошибка и обход завершить не удалось, изменять
             //статус на FAILED и вносить в поле last_error понятную
             //информацию о произошедшей ошибке.
-            //currentSite = siteRepo.findByUrl(urlSiteString);
-            log.error("Exception при обработке сайта: " + e.getMessage());
-            //stopFlag = true;
+            pageFJP.shutdownNow();
+            log.error("Ошибка при обработке сайта: " + e.getMessage());
             saveSite(currentSite, StatusType.FAILED, e.getMessage());
         }
     }
