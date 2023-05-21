@@ -8,7 +8,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.context.annotation.Scope;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import searchengine.config.JsoupCfg;
 import searchengine.model.PageEntity;
@@ -32,7 +31,6 @@ public class PageIndexService extends RecursiveAction {
     private final JsoupCfg jsoupCfg;
     private final SiteEntity siteEntity;
     private final URL urlPage;
-    private static final int MAX_ATTEMPTS = 4;
     private static final int TIMEOUT_BASE = 510; // 510 ms
     private static final int TIMEOUT_MULTIPLIER = 2;
 
@@ -58,42 +56,44 @@ public class PageIndexService extends RecursiveAction {
     }
 
     private Document readPage(URL pageAddress) {
-        int attempts = 0;
         int timeout = TIMEOUT_BASE;
         Document resultDoc = null;
         int responseCode = HttpURLConnection.HTTP_OK;
         String content = "";
-        while (attempts < MAX_ATTEMPTS) {
+        while (timeout < jsoupCfg.getTimeout()) {
             try {
                 resultDoc = Jsoup
                         .connect(pageAddress.toString())
                         .userAgent(jsoupCfg.getUserAgent())
                         .referrer(jsoupCfg.getReferrer())
                         .timeout(jsoupCfg.getTimeout())
-                        //.followRedirects(jsoupCfg.isFollowRedirects())
-                        //.ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
+                        .followRedirects(jsoupCfg.isFollowRedirects())
+                        .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
                         //.ignoreContentType(true)
                         .get();
                 responseCode = resultDoc.connection().response().statusCode();
                 content = resultDoc.html();
                 break;
+
+            } catch (SocketTimeoutException e) {
+                savePage(HttpURLConnection.HTTP_GATEWAY_TIMEOUT, "");
+                return null;
             } catch (HttpStatusException e) {
                 responseCode = e.getStatusCode();
                 if (responseCode != 429) break;
-                attempts++;
                 try {
                     Thread.sleep(timeout);
                 } catch (InterruptedException ex) {
                     if (IndexingServiceImp.stopFlag) {
                         throw new RuntimeException("Индексация остановлена пользователем");
                     }
-                    savePage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "");
+                    savePage(HttpURLConnection.HTTP_INTERNAL_ERROR, "");
                     return null;
                 }
                 timeout *= TIMEOUT_MULTIPLIER;
             } catch (IOException e) {
                 log.error(urlPage + " - " + e.getMessage());
-                savePage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "");
+                savePage(HttpURLConnection.HTTP_INTERNAL_ERROR, "");
                 return null;
                 //throw new RuntimeException(e.getMessage());
             }
