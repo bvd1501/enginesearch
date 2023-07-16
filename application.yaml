@@ -15,41 +15,49 @@ spring:
     hibernate:
       #ddl-auto: update
       ddl-auto: create-drop
-    show-sql: true
+    #show-sql: true
 
+#logging:
+#  config: logback-spring.xml
 logging:
-  config: logback-spring.xml
+  level:
+    org.springframework.web: debug
+    org.hibernate: error
+  pattern:
+    console: "%highlight(%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n)"
+    file: "%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n"
+  file.name: "logs/app.log"
 
 
 # example values
 indexing-settings:
   sites:
-    - url: https://www.skillbox.ru
-      name: skillbox
-    - url: https://www.playback.ru/
-      name: PlayBack.Ru
-    - url: https://www.tretyakovgallery.ru/
-      name: Gallery
+   # - url: https://www.skillbox.ru
+   #   name: skillbox
+   # - url: https://www.playback.ru/
+   #   name: PlayBack.Ru
+   # - url: https://www.tretyakovgallery.ru/
+   #   name: Gallery
     - url: https://lutherancathedral.ru/
       name: lutherancathedral.ru
     - url: https://clusterfly.ru
       name: MQTTBroker
-    - url: https://volochek.life/
-      name: Volochek
-    - url: http://radiomv.ru/
-      name: radiomv
-    - url: https://ipfran.ru/
-      name: ipfran
+   # - url: https://volochek.life/
+   #   name: Volochek
+   #- url: http://radiomv.ru/
+   #   name: radiomv
+   # - url: https://ipfran.ru/
+   #   name: ipfran
     #- url: https://dimonvideo.ru/
     #  name: dimonvideo
     - url: https://nikoartgallery.com/
       name: nikoartgallery
-    - url: https://et-cetera.ru/mobile/
-      name: et-cetera.ru
-    - url: https://dombulgakova.ru/
-      name: Bulgakov
-    - url: https://www.svetlovka.ru/
-      name: svetlovka
+    #- url: https://et-cetera.ru/mobile/
+    #  name: et-cetera.ru
+    #- url: https://dombulgakova.ru/
+    #  name: Bulgakov
+    #- url: https://www.svetlovka.ru/
+    #  name: svetlovka
 
 
 jsoup-setting:

@@ -1,0 +1,23 @@
+2023-07-16 20:38:23 INFO  - Starting Application using Java 20 on bmpc with PID 5873 (/home/boris/Soft_project/enginesearch/target/classes started by boris in /home/boris/Soft_project/enginesearch)
+2023-07-16 20:38:23 INFO  - No active profile set, falling back to 1 default profile: "default"
+2023-07-16 20:38:24 INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-07-16 20:38:25 INFO  - Finished Spring Data repository scanning in 69 ms. Found 2 JPA repository interfaces.
+2023-07-16 20:38:25 INFO  - Tomcat initialized with port(s): 8083 (http)
+2023-07-16 20:38:25 INFO  - Starting service [Tomcat]
+2023-07-16 20:38:25 INFO  - Starting Servlet engine: [Apache Tomcat/9.0.64]
+2023-07-16 20:38:26 INFO  - Initializing Spring embedded WebApplicationContext
+2023-07-16 20:38:26 INFO  - Root WebApplicationContext: initialization completed in 2152 ms
+2023-07-16 20:38:26 INFO  - HikariPool-1 - Starting...
+2023-07-16 20:38:26 INFO  - HikariPool-1 - Start completed.
+2023-07-16 20:38:27 INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-07-16 20:38:29 WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-07-16 20:38:29 DEBUG - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2023-07-16 20:38:29 INFO  - Adding welcome page template: index
+2023-07-16 20:38:29 DEBUG - 6 mappings in 'requestMappingHandlerMapping'
+2023-07-16 20:38:29 DEBUG - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2023-07-16 20:38:29 DEBUG - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2023-07-16 20:38:29 INFO  - Tomcat started on port(s): 8083 (http) with context path ''
+2023-07-16 20:38:29 INFO  - Started Application in 6.721 seconds (JVM running for 7.363)
+2023-07-16 20:39:33 INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-07-16 20:39:33 INFO  - HikariPool-1 - Shutdown initiated...
+2023-07-16 20:39:33 INFO  - HikariPool-1 - Shutdown completed.

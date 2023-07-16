@@ -27,40 +27,23 @@ public class IndexingServiceImp implements IndexingService {
     private final JsoupCfg jsoupCfg;
  
     public static volatile boolean stopFlag = false;
-
-    //private static ForkJoinPool siteFJP = new ForkJoinPool();
     private ExecutorService siteExecutor;
 
 
     @Override
     public IndexingResponse getStartIndexing() {
-//        if (!siteFJP.isQuiescent()) {
-//            log.info("Индексация уже запущена. Повторный запуск невозможен");
-//            return new IndexingResponse(false, "Индексация уже запущена");
-//        }
         if (siteExecutor != null && !siteExecutor.isTerminated()) {
             log.info("Индексация уже запущена. Повторный запуск невозможен");
             return new IndexingResponse(false, "Индексация уже запущена");
         }
-        //siteExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         siteExecutor = Executors.newFixedThreadPool(sites.getSites().size());
-
         log.info("Запускаем перебор сайтов из файла конфигурации");
         stopFlag = false;
-        //siteFJP = new ForkJoinPool(sites.getSites().size());
         for (Site s : sites.getSites()) {
-//            siteFJP.execute(() -> {
-//                log.info("Начинаем обработку сайта " + s.getName());
-//                siteIndexing(s.getUrl(), s.getName());
-//                log.info("Закончили обрабатывать сайт " + s.getName());
-//            });
             siteExecutor.execute(()->{
-                //log.info("Начинаем обработку сайта " + s.getName());
                 siteIndexing(s.getUrl(), s.getName());
-                //log.info("Закончили обрабатывать сайт " + s.getName());
             });
         }
-        //siteFJP.shutdown();
         siteExecutor.shutdown();
         log.info("Все сайты отправлены на индексацию");
         return new IndexingResponse(true);
@@ -68,10 +51,6 @@ public class IndexingServiceImp implements IndexingService {
 
     @Override
     public IndexingResponse getStopIndexing() {
-//        if (siteFJP.isQuiescent()) {
-//            log.info("Индексация не запущена - остановка не возможна");
-//            return new IndexingResponse(false, "Индексация не запущена");
-//        }
         if (siteExecutor == null || (siteExecutor.isShutdown() && siteExecutor.isTerminated())) {
             log.info("Индексация не запущена - остановка не возможна");
             return new IndexingResponse(false, "Индексация не запущена");
@@ -79,6 +58,11 @@ public class IndexingServiceImp implements IndexingService {
         log.info("Принудительная остановка индексации пользователем");
         stopFlag = true;
         return new IndexingResponse(true);
+    }
+
+    @Override
+    public boolean getStopStatus() {
+        return stopFlag;
     }
 
     private void siteIndexing(String urlSiteString, String nameSite) {
