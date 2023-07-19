@@ -1,7 +1,8 @@
 package searchengine.services;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import searchengine.config.JsoupCfg;
 import searchengine.config.Site;
@@ -19,30 +20,37 @@ import java.util.concurrent.*;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class IndexingServiceImp implements IndexingService {
     private final SitesList sites;
     private final SiteRepo siteRepo;
     private final PageRepo pageRepo;
-    private final JsoupCfg jsoupCfg;
+    //private final JsoupCfg jsoupCfg;
+    private final ApplicationContext applicationContext;
  
-    public static volatile boolean stopFlag = false;
+    //public static volatile boolean stopFlag = false;
+    public static boolean stopFlag;// = false;
     private ExecutorService siteExecutor;
 
+    @Autowired
+    public IndexingServiceImp(ApplicationContext applicationContext, SitesList sites, SiteRepo siteRepo, PageRepo pageRepo) {
+        this.applicationContext = applicationContext;
+        this.sites = sites;
+        this.siteRepo = siteRepo;
+        this.pageRepo = pageRepo;
+        //this.jsoupCfg = jsoupCfg;
+        this.stopFlag = false;
+    }
 
     @Override
     public IndexingResponse getStartIndexing() {
-        if (siteExecutor != null && !siteExecutor.isTerminated()) {
+        if (isRunning()) {
             log.info("Индексация уже запущена. Повторный запуск невозможен");
             return new IndexingResponse(false, "Индексация уже запущена");
         }
         siteExecutor = Executors.newFixedThreadPool(sites.getSites().size());
-        log.info("Запускаем перебор сайтов из файла конфигурации");
         stopFlag = false;
         for (Site s : sites.getSites()) {
-            siteExecutor.execute(()->{
-                siteIndexing(s.getUrl(), s.getName());
-            });
+            siteExecutor.execute(()->{siteIndexing(s.getUrl(), s.getName());});
         }
         siteExecutor.shutdown();
         log.info("Все сайты отправлены на индексацию");
@@ -51,7 +59,7 @@ public class IndexingServiceImp implements IndexingService {
 
     @Override
     public IndexingResponse getStopIndexing() {
-        if (siteExecutor == null || (siteExecutor.isShutdown() && siteExecutor.isTerminated())) {
+        if (!isRunning()) {
             log.info("Индексация не запущена - остановка не возможна");
             return new IndexingResponse(false, "Индексация не запущена");
         }
@@ -60,28 +68,32 @@ public class IndexingServiceImp implements IndexingService {
         return new IndexingResponse(true);
     }
 
+    private boolean isRunning() {
+        // так же тестировался вариант:
+        // !(siteExecutor == null || (siteExecutor.isShutdown() && siteExecutor.isTerminated()))
+        return siteExecutor != null && !siteExecutor.isTerminated();
+    }
+
     @Override
-    public boolean getStopStatus() {
+    public boolean isStopFlag() {
         return stopFlag;
     }
 
+
     private void siteIndexing(String urlSiteString, String nameSite) {
         long startTime = System.currentTimeMillis();
-        Thread.currentThread().setName("thread-" + nameSite);
-        log.info("Start " + Thread.currentThread().getName() + " : " + nameSite);
+        //Thread.currentThread().setName("thread-" + nameSite);
+        log.info("Start indexing: " + nameSite);
         SiteEntity currentSite = new SiteEntity(urlSiteString, nameSite);
         siteRepo.deleteByUrlAndName(urlSiteString, nameSite);
         siteRepo.save(currentSite);
         ForkJoinPool pageFJP = new ForkJoinPool(); // каждый сайт в своем FJP.
         try {
             URL urlSite = URI.create(urlSiteString).toURL();
-            URL urlPage = URI.create(urlSite.getProtocol() + "://" +
-                    urlSite.getHost() + "/").toURL();
-//            URI uriSite = URI.create(urlSiteString);
-//            URI uriPage = URI.create(uriSite.getScheme() + "://" + uriSite.getHost() + "/");
-            var pageIndexService = new PageIndexService(siteRepo,
-                    pageRepo, jsoupCfg, currentSite, urlPage);
-            //pageIndexService.invoke(); //все сайты в общем FJP - CommonPool
+            URL urlPage = URI.create(urlSite.getProtocol() + "://" + urlSite.getHost() + "/").toURL();
+//            var pageIndexService = new PageIndexService(siteRepo,
+//                    pageRepo, jsoupCfg, currentSite, urlPage);
+            var pageIndexService = applicationContext.getBean(PageIndexService.class);
             pageFJP.invoke(pageIndexService);
             pageFJP.shutdown();
             long result = pageRepo.countBySite(currentSite);
@@ -91,9 +103,6 @@ public class IndexingServiceImp implements IndexingService {
                     ", найдено страниц " + result +
                     ", затрачено " + resultTime + " мин");
         }catch (Exception e) {
-            //если произошла ошибка и обход завершить не удалось, изменять
-            //статус на FAILED и вносить в поле last_error понятную
-            //информацию о произошедшей ошибке.
             pageFJP.shutdownNow();
             log.error("Ошибка при обработке сайта: " + e.getMessage());
             saveSite(currentSite, StatusType.FAILED, e.getMessage());

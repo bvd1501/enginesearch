@@ -1,6 +1,5 @@
 package searchengine.services;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -23,7 +22,7 @@ import java.util.concurrent.RecursiveAction;
 
 @Component
 @Scope("prototype")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @Slf4j
 public class PageIndexService extends RecursiveAction {
     private final SiteRepo siteRepo;
@@ -33,6 +32,12 @@ public class PageIndexService extends RecursiveAction {
     private final URL urlPage;
     private static final int TIMEOUT_BASE = 510; // 510 ms
     private static final int TIMEOUT_MULTIPLIER = 2;
+
+    public PageIndexService(SiteRepo siteRepo, PageRepo pageRepo, JsoupCfg jsoupCfg) {
+        this.siteRepo = siteRepo;
+        this.pageRepo = pageRepo;
+        this.jsoupCfg = jsoupCfg;
+    }
 
     @Override
     protected void compute() {
