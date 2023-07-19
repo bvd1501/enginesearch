@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import searchengine.config.JsoupCfg;
 import searchengine.config.Site;
 import searchengine.config.SitesList;
 import searchengine.dto.indexing.IndexingResponse;
@@ -20,24 +19,25 @@ import java.util.concurrent.*;
 
 @Service
 @Slf4j
-public class IndexingServiceImp implements IndexingService {
+public class SiteIndexingServiceImp implements SiteIndexingService {
+    private final ApplicationContext context;
     private final SitesList sites;
     private final SiteRepo siteRepo;
     private final PageRepo pageRepo;
-    //private final JsoupCfg jsoupCfg;
-    private final ApplicationContext applicationContext;
- 
-    //public static volatile boolean stopFlag = false;
-    public static boolean stopFlag;// = false;
+//
+    public final PageIndexServiceFactory pageIndexServiceFactory;
+
+    private static boolean stopFlag;// volatile, = false;
+
     private ExecutorService siteExecutor;
 
     @Autowired
-    public IndexingServiceImp(ApplicationContext applicationContext, SitesList sites, SiteRepo siteRepo, PageRepo pageRepo) {
-        this.applicationContext = applicationContext;
-        this.sites = sites;
-        this.siteRepo = siteRepo;
-        this.pageRepo = pageRepo;
-        //this.jsoupCfg = jsoupCfg;
+    public SiteIndexingServiceImp(ApplicationContext context) {
+        this.context = context;
+        this.pageIndexServiceFactory = context.getBean(PageIndexServiceFactory.class);
+        this.sites = context.getBean(SitesList.class);
+        this.siteRepo = context.getBean(SiteRepo.class);
+        this.pageRepo = context.getBean(PageRepo.class);
         this.stopFlag = false;
     }
 
@@ -48,9 +48,9 @@ public class IndexingServiceImp implements IndexingService {
             return new IndexingResponse(false, "Индексация уже запущена");
         }
         siteExecutor = Executors.newFixedThreadPool(sites.getSites().size());
-        stopFlag = false;
+        resetStopFlag();
         for (Site s : sites.getSites()) {
-            siteExecutor.execute(()->{siteIndexing(s.getUrl(), s.getName());});
+            siteExecutor.execute(()-> siteIndexing(s.getUrl(), s.getName()));
         }
         siteExecutor.shutdown();
         log.info("Все сайты отправлены на индексацию");
@@ -64,7 +64,7 @@ public class IndexingServiceImp implements IndexingService {
             return new IndexingResponse(false, "Индексация не запущена");
         }
         log.info("Принудительная остановка индексации пользователем");
-        stopFlag = true;
+        setStopFlag();
         return new IndexingResponse(true);
     }
 
@@ -79,34 +79,46 @@ public class IndexingServiceImp implements IndexingService {
         return stopFlag;
     }
 
+    @Override
+    public void resetStopFlag() {
+        stopFlag = false;
+    }
+
+    @Override
+    public void setStopFlag() {
+        stopFlag = true;
+    }
+
 
     private void siteIndexing(String urlSiteString, String nameSite) {
         long startTime = System.currentTimeMillis();
-        //Thread.currentThread().setName("thread-" + nameSite);
-        log.info("Start indexing: " + nameSite);
-        SiteEntity currentSite = new SiteEntity(urlSiteString, nameSite);
-        siteRepo.deleteByUrlAndName(urlSiteString, nameSite);
-        siteRepo.save(currentSite);
+        SiteEntity currentSite = preStartSiteIndexing(urlSiteString, nameSite);
         ForkJoinPool pageFJP = new ForkJoinPool(); // каждый сайт в своем FJP.
         try {
             URL urlSite = URI.create(urlSiteString).toURL();
             URL urlPage = URI.create(urlSite.getProtocol() + "://" + urlSite.getHost() + "/").toURL();
-//            var pageIndexService = new PageIndexService(siteRepo,
-//                    pageRepo, jsoupCfg, currentSite, urlPage);
-            var pageIndexService = applicationContext.getBean(PageIndexService.class);
+            var pageIndexService = pageIndexServiceFactory.create(currentSite, urlPage);
             pageFJP.invoke(pageIndexService);
             pageFJP.shutdown();
             long result = pageRepo.countBySite(currentSite);
             long resultTime = (System.currentTimeMillis() - startTime) / 60000;
             saveSite(currentSite, StatusType.INDEXED, "OK. Found " + result + " pages in " + resultTime + "min");
-            log.info("Сайт " + nameSite +
-                    ", найдено страниц " + result +
-                    ", затрачено " + resultTime + " мин");
+            log.info(nameSite + " - found " + result + " pages in " + resultTime + "min");
         }catch (Exception e) {
             pageFJP.shutdownNow();
-            log.error("Ошибка при обработке сайта: " + e.getMessage());
+            log.error("Error in site indexing: " + e.getMessage());
             saveSite(currentSite, StatusType.FAILED, e.getMessage());
         }
+    }
+
+
+    private SiteEntity preStartSiteIndexing(String urlSiteString, String nameSite) {
+        //Thread.currentThread().setName("thread-" + nameSite);
+        log.info("Start indexing site: " + nameSite);
+        siteRepo.deleteByUrlAndName(urlSiteString, nameSite);
+        SiteEntity currentSite = new SiteEntity(urlSiteString, nameSite);
+        saveSite(currentSite, StatusType.INDEXING, "Just started indexing");
+        return currentSite;
     }
 
     private void saveSite(SiteEntity siteEntity, StatusType statusType, String last_error) {

@@ -6,6 +6,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import searchengine.config.JsoupCfg;
@@ -18,46 +20,56 @@ import java.io.IOException;
 import java.net.*;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.RecursiveAction;
 
 @Component
 @Scope("prototype")
-//@RequiredArgsConstructor
 @Slf4j
 public class PageIndexService extends RecursiveAction {
+    private final ApplicationContext context;
+    private final SiteIndexingService siteIndexingService;
     private final SiteRepo siteRepo;
     private final PageRepo pageRepo;
     private final JsoupCfg jsoupCfg;
-    private final SiteEntity siteEntity;
-    private final URL urlPage;
+
+    private final SiteEntity site;
+    private final URL page;
     private static final int TIMEOUT_BASE = 510; // 510 ms
     private static final int TIMEOUT_MULTIPLIER = 2;
 
-    public PageIndexService(SiteRepo siteRepo, PageRepo pageRepo, JsoupCfg jsoupCfg) {
-        this.siteRepo = siteRepo;
-        this.pageRepo = pageRepo;
-        this.jsoupCfg = jsoupCfg;
+    @Autowired
+    public PageIndexService(ApplicationContext context, SiteEntity site, URL page) {
+        this.context = context;
+        this.siteRepo = context.getBean(SiteRepo.class);
+        this.pageRepo = context.getBean(PageRepo.class);
+        this.jsoupCfg = context.getBean(JsoupCfg.class);
+        this.siteIndexingService = context.getBean(SiteIndexingService.class);
+        this.site = site;
+        this.page = page;
     }
+
+
 
     @Override
     protected void compute() {
-        //После завершения данного метода страница с переданным адресом
-        // гарантированно д.б. в базе либо вся индексация д.б. остановлена!!!!
-        //Иначе возможно зацикливание
-        if (IndexingServiceImp.stopFlag) {
-            throw new RuntimeException("Индексация остановлена пользователем");
-        }
-        if (pageRepo.findBySiteAndPath(siteEntity, urlPage.getPath()).isPresent()) return;
-        Document pageDoc = readPage(urlPage);
+        checkStopByUser();
+        if (pageRepo.findBySiteAndPath(site, page.getPath()).isPresent()) return;
+        Document pageDoc = readPage(page);
         if (pageDoc == null) return;
         HashSet<URL> links = getValidLinks(pageDoc);
-        HashSet<PageIndexService> subPageTasks = new HashSet<>();
+        Set<PageIndexService> subPageTasks = new HashSet<>();
         for (URL itemURL : links) {
-            PageIndexService subPageIndexService = new PageIndexService(siteRepo, pageRepo,
-                    jsoupCfg, siteEntity, itemURL);
+            PageIndexService subPageIndexService = new PageIndexService(context, site, itemURL);
             subPageTasks.add(subPageIndexService);
         }
         invokeAll(subPageTasks);
+    }
+
+    private void checkStopByUser() {
+        if (siteIndexingService.isStopFlag()) {
+            throw new RuntimeException("Indexing stopped by user");
+        }
     }
 
     private Document readPage(URL pageAddress) {
@@ -89,15 +101,13 @@ public class PageIndexService extends RecursiveAction {
                 try {
                     Thread.sleep(timeout);
                 } catch (InterruptedException ex) {
-                    if (IndexingServiceImp.stopFlag) {
-                        throw new RuntimeException("Индексация остановлена пользователем");
-                    }
+                    checkStopByUser();
                     savePage(HttpURLConnection.HTTP_INTERNAL_ERROR, "");
                     return null;
                 }
                 timeout *= TIMEOUT_MULTIPLIER;
             } catch (IOException e) {
-                log.error(urlPage + " - " + e.getMessage());
+                log.error(pageAddress + " - " + e.getMessage());
                 savePage(HttpURLConnection.HTTP_INTERNAL_ERROR, "");
                 return null;
                 //throw new RuntimeException(e.getMessage());
@@ -127,13 +137,13 @@ public class PageIndexService extends RecursiveAction {
                     linkString.contains(".doc")) continue;
             try {
                 URL newURL = URI.create(linkString).toURL();
-                String siteHost = urlPage.getHost().startsWith("www.")
-                        ? urlPage.getHost().substring(4) : urlPage.getHost();
+                String siteHost = page.getHost().startsWith("www.")
+                        ? page.getHost().substring(4) : page.getHost();
                 String pageHost = newURL.getHost().startsWith("www.")
                         ? newURL.getHost().substring(4) : newURL.getHost();
                 if (!siteHost.equals(pageHost)) continue;
                 if (newURL.getPath().contains("http")) continue;
-                if (newURL.getPath().equals(urlPage.getPath())) continue;
+                if (newURL.getPath().equals(page.getPath())) continue;
                 newURL = URI.create(newURL.getProtocol() + "://" + newURL.getHost() + newURL.getPath()).toURL();
                 resultLinks.add(newURL);
             } catch (MalformedURLException | IllegalArgumentException e) {
@@ -144,23 +154,20 @@ public class PageIndexService extends RecursiveAction {
     }
 
     private void savePage(int statusCode, String content) throws RuntimeException {
-        PageEntity pageEntity = new PageEntity(siteEntity, urlPage.getPath());
+        PageEntity pageEntity = new PageEntity(site, page.getPath());
         pageEntity.setCode(statusCode);
         pageEntity.setContent(content);
         synchronized (pageRepo) {
             try {
-                Optional<PageEntity> pageEntityOptional =
-                        pageRepo.findBySiteAndPath(siteEntity, urlPage.getPath());
+                Optional<PageEntity> pageEntityOptional = pageRepo.findBySiteAndPath(site, page.getPath());
                 if (pageEntityOptional.isPresent()) return;
                 pageRepo.save(pageEntity);
-                siteEntity.setStatusTime(new java.util.Date());
-                siteRepo.save(siteEntity);
+                site.setStatusTime(new java.util.Date());
+                siteRepo.save(site);
             } catch (Exception e) {
-                log.error("Ошибка при добавлении записи в БД: " + urlPage + "\n" +
-                        e.getMessage());
-                IndexingServiceImp.stopFlag = true;
-                throw new RuntimeException("Ошибка при добавлении записи в БД: " + urlPage + "\n" +
-                        e.getMessage());
+                log.error("Error adding record: " + page + "\n" + e.getMessage());
+                siteIndexingService.setStopFlag();
+                throw new RuntimeException("Error adding record: " + page + "\n" + e.getMessage());
             }
         }
     }
