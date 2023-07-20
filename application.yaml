@@ -68,5 +68,10 @@ jsoup-setting:
   ignoreHttpErrors: false
   followRedirects: true
   #followRedirects: false
+  timeoutBase: 10
+  timeoutDelta: 250
+  timeoutFactor: 2
+
+
 
 ...

@@ -35,8 +35,7 @@ public class PageIndexService extends RecursiveAction {
 
     private final SiteEntity site;
     private final URL page;
-    private static final int TIMEOUT_BASE = 510; // 510 ms
-    private static final int TIMEOUT_MULTIPLIER = 2;
+
 
     @Autowired
     public PageIndexService(ApplicationContext context, SiteEntity site, URL page) {
@@ -55,7 +54,7 @@ public class PageIndexService extends RecursiveAction {
     protected void compute() {
         checkStopByUser();
         if (pageRepo.findBySiteAndPath(site, page.getPath()).isPresent()) return;
-        Document pageDoc = readPage(page);
+        Document pageDoc = readPage();
         if (pageDoc == null) return;
         HashSet<URL> links = getValidLinks(pageDoc);
         Set<PageIndexService> subPageTasks = new HashSet<>();
@@ -72,51 +71,41 @@ public class PageIndexService extends RecursiveAction {
         }
     }
 
-    private Document readPage(URL pageAddress) {
-        int timeout = TIMEOUT_BASE;
-        Document resultDoc = null;
-        int responseCode = HttpURLConnection.HTTP_OK;
-        String content = "";
-        while (timeout < jsoupCfg.getTimeout()) {
-            try {
-                resultDoc = Jsoup
-                        .connect(pageAddress.toString())
-                        .userAgent(jsoupCfg.getUserAgent())
-                        .referrer(jsoupCfg.getReferrer())
-                        .timeout(jsoupCfg.getTimeout())
-                        .followRedirects(jsoupCfg.isFollowRedirects())
-                        .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
-                        //.ignoreContentType(true)
-                        .get();
-                responseCode = resultDoc.connection().response().statusCode();
-                content = resultDoc.html();
-                break;
 
-            } catch (SocketTimeoutException e) {
-                savePage(HttpURLConnection.HTTP_GATEWAY_TIMEOUT, "");
-                return null;
+    private Document readPage() {
+        int timeout = jsoupCfg.getTimeoutBase();
+        Document resultDoc = null;
+        while (timeout<jsoupCfg.getTimeout()) {
+            try {
+                Thread.sleep(timeout);
+                resultDoc = connectToPage();
+                savePage(resultDoc.connection().response().statusCode(), resultDoc.html());
             } catch (HttpStatusException e) {
-                responseCode = e.getStatusCode();
-                if (responseCode != 429) break;
-                try {
-                    Thread.sleep(timeout);
-                } catch (InterruptedException ex) {
-                    checkStopByUser();
-                    savePage(HttpURLConnection.HTTP_INTERNAL_ERROR, "");
-                    return null;
-                }
-                timeout *= TIMEOUT_MULTIPLIER;
-            } catch (IOException e) {
-                log.error(pageAddress + " - " + e.getMessage());
+                savePage(e.getStatusCode(), "");
+                timeout = (timeout + jsoupCfg.getTimeoutDelta())*jsoupCfg.getTimeoutFactor();
+                continue;
+            } catch (InterruptedException | IOException e) {
+                log.error(page.getPath() + "..." + e.getMessage());
+                checkStopByUser();
                 savePage(HttpURLConnection.HTTP_INTERNAL_ERROR, "");
-                return null;
-                //throw new RuntimeException(e.getMessage());
             }
+            break;
         }
-        savePage(responseCode, content);
         return resultDoc;
     }
 
+    private Document connectToPage() throws IOException {
+        return Jsoup
+                    .connect(page.toString())
+                    .userAgent(jsoupCfg.getUserAgent())
+                    .referrer(jsoupCfg.getReferrer())
+                    .timeout(jsoupCfg.getTimeout())
+                    .followRedirects(jsoupCfg.isFollowRedirects())
+                    .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
+                    //.ignoreContentType(true)
+                    .get();
+
+    }
 
     private HashSet<URL> getValidLinks(Document inputDoc) {
         HashSet<URL> resultLinks = new HashSet<>();
@@ -171,4 +160,5 @@ public class PageIndexService extends RecursiveAction {
             }
         }
     }
+
 }
