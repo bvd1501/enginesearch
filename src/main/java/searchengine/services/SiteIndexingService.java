@@ -1,6 +1,8 @@
 package searchengine.services;
 
 import searchengine.dto.indexing.IndexingResponse;
+import searchengine.model.SiteEntity;
+import searchengine.model.StatusType;
 
 public interface SiteIndexingService {
     IndexingResponse getStartIndexing();
@@ -8,5 +10,6 @@ public interface SiteIndexingService {
     boolean isStopFlag();
     void resetStopFlag();
     void setStopFlag();
+    void saveSite(SiteEntity siteEntity, StatusType statusType, String last_error);
 
 }

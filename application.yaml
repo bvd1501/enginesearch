@@ -32,14 +32,14 @@ logging:
 # example values
 indexing-settings:
   sites:
-   # - url: https://www.skillbox.ru
-   #   name: skillbox
-   # - url: https://www.playback.ru/
-   #   name: PlayBack.Ru
-   # - url: https://www.tretyakovgallery.ru/
-   #   name: Gallery
-    - url: https://lutherancathedral.ru/
-      name: lutherancathedral.ru
+    #- url: https://www.skillbox.ru
+    #  name: skillbox
+    - url: https://www.playback.ru/
+      name: PlayBack.Ru
+    - url: https://www.tretyakovgallery.ru/
+      name: Gallery
+    #- url: https://lutherancathedral.ru/
+    #  name: lutherancathedral.ru
     - url: https://clusterfly.ru
       name: MQTTBroker
    # - url: https://volochek.life/
@@ -48,14 +48,14 @@ indexing-settings:
    #   name: radiomv
    # - url: https://ipfran.ru/
    #   name: ipfran
-    #- url: https://dimonvideo.ru/
-    #  name: dimonvideo
-    - url: https://nikoartgallery.com/
-      name: nikoartgallery
+    - url: https://dimonvideo.ru/
+      name: dimonvideo
+    #- url: https://nikoartgallery.com/
+    #  name: nikoartgallery
     #- url: https://et-cetera.ru/mobile/
     #  name: et-cetera.ru
-    #- url: https://dombulgakova.ru/
-    #  name: Bulgakov
+    - url: https://dombulgakova.ru/
+      name: Bulgakov
     #- url: https://www.svetlovka.ru/
     #  name: svetlovka
 
@@ -68,7 +68,7 @@ jsoup-setting:
   ignoreHttpErrors: false
   followRedirects: true
   #followRedirects: false
-  timeoutBase: 10
+  timeoutBase: 4
   timeoutDelta: 250
   timeoutFactor: 2
 

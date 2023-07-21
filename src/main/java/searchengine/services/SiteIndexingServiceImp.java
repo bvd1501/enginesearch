@@ -9,7 +9,6 @@ import searchengine.config.SitesList;
 import searchengine.dto.indexing.IndexingResponse;
 import searchengine.model.SiteEntity;
 import searchengine.model.StatusType;
-import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
 import java.net.URI;
@@ -23,8 +22,6 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
     private final ApplicationContext context;
     private final SitesList sites;
     private final SiteRepo siteRepo;
-    private final PageRepo pageRepo;
-//
     public final PageIndexServiceFactory pageIndexServiceFactory;
 
     private static boolean stopFlag;// volatile, = false;
@@ -34,10 +31,9 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
     @Autowired
     public SiteIndexingServiceImp(ApplicationContext context) {
         this.context = context;
-        this.pageIndexServiceFactory = context.getBean(PageIndexServiceFactory.class);
-        this.sites = context.getBean(SitesList.class);
-        this.siteRepo = context.getBean(SiteRepo.class);
-        this.pageRepo = context.getBean(PageRepo.class);
+        this.pageIndexServiceFactory = this.context.getBean(PageIndexServiceFactory.class);
+        this.sites = this.context.getBean(SitesList.class);
+        this.siteRepo = this.context.getBean(SiteRepo.class);
         this.stopFlag = false;
     }
 
@@ -89,6 +85,19 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
         stopFlag = true;
     }
 
+    @Override
+    public void saveSite(SiteEntity siteEntity, StatusType statusType, String last_error) {
+        if (isStopFlag()) {
+            statusType = StatusType.FAILED;
+            last_error = "Stop by user";
+            log.error(siteEntity.getName() + " - stop by user");
+        }
+        siteEntity.setStatus(statusType);
+        siteEntity.setLast_error(last_error);
+        siteEntity.setStatusTime(new java.util.Date());
+        siteRepo.save(siteEntity);
+    }
+
 
     private void siteIndexing(String urlSiteString, String nameSite) {
         long startTime = System.currentTimeMillis();
@@ -100,10 +109,9 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
             var pageIndexService = pageIndexServiceFactory.create(currentSite, urlPage);
             pageFJP.invoke(pageIndexService);
             pageFJP.shutdown();
-            long result = pageRepo.countBySite(currentSite);
             long resultTime = (System.currentTimeMillis() - startTime) / 60000;
-            saveSite(currentSite, StatusType.INDEXED, "OK. Found " + result + " pages in " + resultTime + "min");
-            log.info(nameSite + " - found " + result + " pages in " + resultTime + "min");
+            log.info(nameSite + " - elapsed time=" + resultTime + "min");
+            saveSite(currentSite, StatusType.INDEXED, null);
         }catch (Exception e) {
             pageFJP.shutdownNow();
             log.error("Error in site indexing: " + e.getMessage());
@@ -117,15 +125,11 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
         log.info("Start indexing site: " + nameSite);
         siteRepo.deleteByUrlAndName(urlSiteString, nameSite);
         SiteEntity currentSite = new SiteEntity(urlSiteString, nameSite);
-        saveSite(currentSite, StatusType.INDEXING, "Just started indexing");
+        saveSite(currentSite, StatusType.INDEXING, null);
         return currentSite;
     }
 
-    private void saveSite(SiteEntity siteEntity, StatusType statusType, String last_error) {
-        siteEntity.setStatus(statusType);
-        siteEntity.setLast_error(last_error);
-        siteEntity.setStatusTime(new java.util.Date());
-        siteRepo.save(siteEntity);
-    }
+
+
 
 }
