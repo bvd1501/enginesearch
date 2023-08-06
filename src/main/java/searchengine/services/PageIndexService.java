@@ -35,29 +35,35 @@ public class PageIndexService extends RecursiveAction {
     private final JsoupCfg jsoupCfg;
 
     private final SiteEntity site;
-    private final URL page;
-
+    private final URL pageURL;
+    private final PageEntity page;
 
 
 
 
     @Autowired
-    public PageIndexService(ApplicationContext context, SiteEntity site, URL page) {
+    public PageIndexService(ApplicationContext context, SiteEntity site, URL pageURL) {
         this.context = context;
         this.pageRepo = context.getBean(PageRepo.class);
         this.jsoupCfg = context.getBean(JsoupCfg.class);
         this.siteIndexingService = context.getBean(SiteIndexingService.class);
         this.site = site;
-        this.page = page;
+        this.pageURL = pageURL;
+        this.page = new PageEntity(site, pageURL.getPath());
     }
 
 
     @Override
     protected void compute() {
         if (siteIndexingService.isStopFlag()) return;
-        if (pageRepo.findBySiteAndPath(site, page.getPath()).isPresent()) return;
-        Document pageDoc = readPage();
+        synchronized (pageRepo) {
+            if (pageRepo.findBySiteAndPath(site, pageURL.getPath()).isPresent()) return;
+            pageRepo.save(page);
+        }
+        Document pageDoc = pageReader();
         if (pageDoc == null) return;
+        pageRepo.save(page);
+        siteIndexingService.saveSite(site, StatusType.INDEXING, null);
         //TODO запуск лемантизатора для индексации содержимого страницы (в отдельном потоке???)
         HashSet<URL> links = getValidLinks(pageDoc);
         Set<PageIndexService> subPageTasks = new HashSet<>();
@@ -68,30 +74,26 @@ public class PageIndexService extends RecursiveAction {
         invokeAll(subPageTasks);
     }
 
-    private void checkStopByUser() {
-        if (siteIndexingService.isStopFlag()) {
-            throw new RuntimeException("Indexing stopped by user");
-        }
-    }
 
 
-    private Document readPage() {
+    private Document pageReader() {
         int timeout = jsoupCfg.getTimeoutBase();
         Document resultDoc = null;
         do {
             try {
                 Thread.sleep(timeout);
                 resultDoc = connectToPage();
-                savePage(resultDoc.connection().response().statusCode(), resultDoc.html());
+                page.setCode(resultDoc.connection().response().statusCode());
+                page.setContent(resultDoc.html());
                 timeout = jsoupCfg.getTimeout();
             } catch (InterruptedException | IOException e) {
                 log.error(e.getMessage());
                 if (!(e instanceof HttpStatusException)) {
                     checkStopByUser();
-                    savePage(HttpURLConnection.HTTP_INTERNAL_ERROR, "");
+                    page.setCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
                     timeout = jsoupCfg.getTimeout();
                 } else {
-                    savePage(((HttpStatusException) e).getStatusCode(), "");
+                    page.setCode(((HttpStatusException) e).getStatusCode());
                     timeout = (timeout + jsoupCfg.getTimeoutDelta())*jsoupCfg.getTimeoutFactor();
                 }
             }
@@ -101,7 +103,7 @@ public class PageIndexService extends RecursiveAction {
 
     private Document connectToPage() throws IOException {
         return Jsoup
-                    .connect(page.toString())
+                    .connect(pageURL.toString())
                     .userAgent(jsoupCfg.getUserAgent())
                     .referrer(jsoupCfg.getReferrer())
                     .timeout(jsoupCfg.getTimeout())
@@ -120,9 +122,9 @@ public class PageIndexService extends RecursiveAction {
             if (!linkString.startsWith("http") || badLinkFlag) continue;
             try {
                 URL childLinkURL = URI.create(linkString).toURL();
-                String siteHost = page.getHost().startsWith("www.") ? page.getHost().substring(4) : page.getHost();
+                String siteHost = pageURL.getHost().startsWith("www.") ? pageURL.getHost().substring(4) : pageURL.getHost();
                 String pageHost = childLinkURL.getHost().startsWith("www.") ? childLinkURL.getHost().substring(4) : childLinkURL.getHost();
-                badLinkFlag = (!siteHost.equals(pageHost)) || (childLinkURL.getPath().contains("http")) || (childLinkURL.getPath().equals(page.getPath()));
+                badLinkFlag = (!siteHost.equals(pageHost)) || (childLinkURL.getPath().contains("http")) || (childLinkURL.getPath().equals(pageURL.getPath()));
                 if (!badLinkFlag) {
                     childLinkURL = URI.create(childLinkURL.getProtocol() + "://" + childLinkURL.getHost() + childLinkURL.getPath()).toURL();
                     resultLinks.add(childLinkURL);
@@ -133,14 +135,20 @@ public class PageIndexService extends RecursiveAction {
     }
 
     private void savePage(int statusCode, String content) {
-        PageEntity pageEntity = new PageEntity(site, page.getPath());
+        PageEntity pageEntity = new PageEntity(site, pageURL.getPath());
         pageEntity.setCode(statusCode);
-        pageEntity.setContent(content);
+       pageEntity.setContent(content);
         synchronized (pageRepo) {
-            Optional<PageEntity> pageEntityOptional = pageRepo.findBySiteAndPath(site, page.getPath());
+            Optional<PageEntity> pageEntityOptional = pageRepo.findBySiteAndPath(site, pageURL.getPath());
             if (pageEntityOptional.isPresent()) return;
             pageRepo.save(pageEntity);
             siteIndexingService.saveSite(site, StatusType.INDEXING, null);
+        }
+    }
+
+    private void checkStopByUser() {
+        if (siteIndexingService.isStopFlag()) {
+            throw new RuntimeException("Indexing stopped by user");
         }
     }
 

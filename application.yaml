@@ -58,6 +58,8 @@ indexing-settings:
       name: Bulgakov
     #- url: https://www.svetlovka.ru/
     #  name: svetlovka
+    - url: https://dom.gosuslugi.ru/
+      name: ГИСЖКХ
 
 
 jsoup-setting:
