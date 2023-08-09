@@ -9,6 +9,7 @@ import searchengine.config.SitesList;
 import searchengine.dto.indexing.IndexingResponse;
 import searchengine.model.SiteEntity;
 import searchengine.model.StatusType;
+import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
 import java.net.URI;
@@ -22,6 +23,7 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
     private final ApplicationContext context;
     private final SitesList sites;
     private final SiteRepo siteRepo;
+    private final PageRepo pageRepo;
     public final PageIndexServiceFactory pageIndexServiceFactory;
 
     private static boolean stopFlag;// volatile, = false;
@@ -34,6 +36,7 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
         this.pageIndexServiceFactory = this.context.getBean(PageIndexServiceFactory.class);
         this.sites = this.context.getBean(SitesList.class);
         this.siteRepo = this.context.getBean(SiteRepo.class);
+        this.pageRepo = this.context.getBean(PageRepo.class);
         this.stopFlag = false;
     }
 
@@ -110,7 +113,7 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
             pageFJP.invoke(pageIndexService);
             pageFJP.shutdown();
             long resultTime = (System.currentTimeMillis() - startTime) / 60000;
-            log.info(nameSite + " - elapsed time=" + resultTime + "min");
+            log.info(nameSite + " - " + resultTime + "min / " + pageRepo.countBySite(currentSite));
             saveSite(currentSite, StatusType.INDEXED, null);
         }catch (Exception e) {
             pageFJP.shutdownNow();

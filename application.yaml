@@ -21,7 +21,7 @@ spring:
 #  config: logback-spring.xml
 logging:
   level:
-    org.springframework.web: debug
+    org.springframework.web: info
     org.hibernate: error
   pattern:
     console: "%highlight(%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n)"
@@ -32,32 +32,32 @@ logging:
 # example values
 indexing-settings:
   sites:
-    #- url: https://www.skillbox.ru
-    #  name: skillbox
+    - url: https://www.skillbox.ru
+      name: skillbox
     - url: https://www.playback.ru/
       name: PlayBack.Ru
     - url: https://www.tretyakovgallery.ru/
       name: Gallery
-    #- url: https://lutherancathedral.ru/
-    #  name: lutherancathedral.ru
+    - url: https://lutherancathedral.ru/
+      name: lutherancathedral.ru
     - url: https://clusterfly.ru
       name: MQTTBroker
-   # - url: https://volochek.life/
-   #   name: Volochek
-   #- url: http://radiomv.ru/
-   #   name: radiomv
-   # - url: https://ipfran.ru/
-   #   name: ipfran
-    - url: https://dimonvideo.ru/
-      name: dimonvideo
-    #- url: https://nikoartgallery.com/
-    #  name: nikoartgallery
-    #- url: https://et-cetera.ru/mobile/
-    #  name: et-cetera.ru
+    - url: https://volochek.life/
+      name: Volochek
+    - url: http://radiomv.ru/
+      name: radiomv
+    - url: https://ipfran.ru/
+      name: ipfran
+   # - url: https://dimonvideo.ru/
+   #   name: dimonvideo
+    - url: https://nikoartgallery.com/
+      name: nikoartgallery
+    - url: https://et-cetera.ru/mobile/
+      name: et-cetera.ru
     - url: https://dombulgakova.ru/
       name: Bulgakov
-    #- url: https://www.svetlovka.ru/
-    #  name: svetlovka
+    - url: https://www.svetlovka.ru/
+      name: svetlovka
     - url: https://dom.gosuslugi.ru/
       name: ГИСЖКХ
 

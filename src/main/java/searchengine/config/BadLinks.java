@@ -5,9 +5,9 @@ import lombok.Getter;
 
 @Getter
 public enum BadLinks {
-    SPACE1(" "),
-    SPACE2("%20"),
-    LATTICE("#"),
+    //SPACE1(" "),
+    //SPACE2("%20"),
+    //LATTICE("#"),
     DOWNLOAD("download"),
     PDF(".pdf"),
     JPG(".jpg"),

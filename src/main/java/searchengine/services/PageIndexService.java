@@ -1,15 +1,18 @@
 package searchengine.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.cache.spi.support.AbstractNaturalIdDataAccess;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.CombiningEvaluator;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.view.UrlBasedViewResolver;
 import searchengine.config.BadLinks;
 import searchengine.config.JsoupCfg;
 import searchengine.model.PageEntity;
@@ -18,6 +21,7 @@ import searchengine.model.StatusType;
 import searchengine.repo.PageRepo;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -56,16 +60,16 @@ public class PageIndexService extends RecursiveAction {
     @Override
     protected void compute() {
         if (siteIndexingService.isStopFlag()) return;
+        Document pageDoc = pageReader();
         synchronized (pageRepo) {
             if (pageRepo.findBySiteAndPath(site, pageURL.getPath()).isPresent()) return;
             pageRepo.save(page);
         }
-        Document pageDoc = pageReader();
-        if (pageDoc == null) return;
-        pageRepo.save(page);
         siteIndexingService.saveSite(site, StatusType.INDEXING, null);
+        if (pageDoc == null) return;
         //TODO запуск лемантизатора для индексации содержимого страницы (в отдельном потоке???)
         HashSet<URL> links = getValidLinks(pageDoc);
+        pageDoc = null;
         Set<PageIndexService> subPageTasks = new HashSet<>();
         for (URL itemURL : links) {
             PageIndexService subPageIndexService = new PageIndexService(context, site, itemURL);
@@ -87,14 +91,14 @@ public class PageIndexService extends RecursiveAction {
                 page.setContent(resultDoc.html());
                 timeout = jsoupCfg.getTimeout();
             } catch (InterruptedException | IOException e) {
-                log.error(e.getMessage());
-                if (!(e instanceof HttpStatusException)) {
+                if ((e instanceof HttpStatusException) && ((HttpStatusException) e).getStatusCode()==429) {
+                    log.error("Ошибка 429: " + e.getMessage() + ", повторное чтение");
+                    page.setCode(((HttpStatusException) e).getStatusCode());
+                    timeout = (timeout + jsoupCfg.getTimeoutDelta())*jsoupCfg.getTimeoutFactor();
+                } else {
                     checkStopByUser();
                     page.setCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
                     timeout = jsoupCfg.getTimeout();
-                } else {
-                    page.setCode(((HttpStatusException) e).getStatusCode());
-                    timeout = (timeout + jsoupCfg.getTimeoutDelta())*jsoupCfg.getTimeoutFactor();
                 }
             }
         } while (timeout<jsoupCfg.getTimeout());
@@ -118,18 +122,17 @@ public class PageIndexService extends RecursiveAction {
         Elements elements = inputDoc.select("a");
         for (Element element : elements) {
             String linkString = element.absUrl("href").toLowerCase();
-            boolean badLinkFlag = EnumSet.allOf(BadLinks.class).stream().anyMatch(enumElement -> linkString.contains(enumElement.toString()));
-            if (!linkString.startsWith("http") || badLinkFlag) continue;
+            String finalLinkString = (linkString.indexOf('{')>0) ? linkString.substring(0, linkString.indexOf('{')) : linkString;
+            if (EnumSet.allOf(BadLinks.class).stream().anyMatch(enumElement -> finalLinkString.contains(enumElement.toString())) ||
+                !finalLinkString.startsWith("http") || finalLinkString.equals("")) continue;
             try {
-                URL childLinkURL = URI.create(linkString).toURL();
+                URL childLinkURL = URI.create(finalLinkString).toURL();
+                childLinkURL = URI.create(childLinkURL.getProtocol() + "://" + childLinkURL.getHost() + childLinkURL.getPath()).toURL();
                 String siteHost = pageURL.getHost().startsWith("www.") ? pageURL.getHost().substring(4) : pageURL.getHost();
                 String pageHost = childLinkURL.getHost().startsWith("www.") ? childLinkURL.getHost().substring(4) : childLinkURL.getHost();
-                badLinkFlag = (!siteHost.equals(pageHost)) || (childLinkURL.getPath().contains("http")) || (childLinkURL.getPath().equals(pageURL.getPath()));
-                if (!badLinkFlag) {
-                    childLinkURL = URI.create(childLinkURL.getProtocol() + "://" + childLinkURL.getHost() + childLinkURL.getPath()).toURL();
-                    resultLinks.add(childLinkURL);
-                }
-            } catch (MalformedURLException | IllegalArgumentException e) { log.error(e.getMessage());}
+                if ((!siteHost.equals(pageHost)) || (pageRepo.findBySiteAndPath(site, childLinkURL.getPath()).isPresent())) continue;
+                resultLinks.add(childLinkURL);
+            } catch (MalformedURLException | IllegalArgumentException e) { log.error("ValidationError: " + e.getMessage() + " :: " + pageURL.toString());}
         }
         return resultLinks;
     }
