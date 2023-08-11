@@ -14,7 +14,9 @@ public enum BadLinks {
     JPEG(".jpeg"),
     PNG(".png"),
     SVG(".svg"),
-    DOC(".doc");
+    DOC(".doc"),
+    HTTP ("%20http"),
+    PARENTHESIS ("{");
 
     private final String title;
 

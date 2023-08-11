@@ -104,19 +104,20 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
 
     private void siteIndexing(String urlSiteString, String nameSite) {
         long startTime = System.currentTimeMillis();
+        Thread.currentThread().setName("th." + nameSite);
         SiteEntity currentSite = preStartSiteIndexing(urlSiteString, nameSite);
-        ForkJoinPool pageFJP = new ForkJoinPool(); // каждый сайт в своем FJP.
+        ForkJoinPool sitePool = new ForkJoinPool(); // каждый сайт в своем FJP
         try {
             URL urlSite = URI.create(urlSiteString).toURL();
             URL urlPage = URI.create(urlSite.getProtocol() + "://" + urlSite.getHost() + "/").toURL();
-            var pageIndexService = pageIndexServiceFactory.create(currentSite, urlPage);
-            pageFJP.invoke(pageIndexService);
-            pageFJP.shutdown();
+            var pageIndexService = pageIndexServiceFactory.create(currentSite, urlPage, sitePool);
+            sitePool.execute(pageIndexService);
+            sitePool.awaitQuiescence(24, TimeUnit.HOURS);
             long resultTime = (System.currentTimeMillis() - startTime) / 60000;
             log.info(nameSite + " - " + resultTime + "min / " + pageRepo.countBySite(currentSite));
             saveSite(currentSite, StatusType.INDEXED, null);
         }catch (Exception e) {
-            pageFJP.shutdownNow();
+            sitePool.shutdownNow();
             log.error("Error in site indexing: " + e.getMessage());
             saveSite(currentSite, StatusType.FAILED, e.getMessage());
         }
