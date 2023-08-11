@@ -114,7 +114,7 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
             sitePool.execute(pageIndexService);
             sitePool.awaitQuiescence(24, TimeUnit.HOURS);
             long resultTime = (System.currentTimeMillis() - startTime) / 60000;
-            log.info(nameSite + " - " + resultTime + "min / " + pageRepo.countBySite(currentSite));
+            log.info(nameSite + " - " + resultTime + " min / " + pageRepo.countBySite(currentSite) + " pages");
             saveSite(currentSite, StatusType.INDEXED, null);
         }catch (Exception e) {
             sitePool.shutdownNow();

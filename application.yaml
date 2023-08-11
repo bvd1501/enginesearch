@@ -34,30 +34,30 @@ indexing-settings:
   sites:
     #- url: https://www.skillbox.ru
     #  name: skillbox
-    #- url: https://www.playback.ru/
-    #  name: PlayBack.Ru
-    #- url: https://www.tretyakovgallery.ru/
-    #  name: Gallery
+    - url: https://www.playback.ru/
+      name: PlayBack.Ru
+    - url: https://www.tretyakovgallery.ru/
+      name: Gallery
     - url: https://lutherancathedral.ru/
       name: lutherancathedral.ru
     - url: https://clusterfly.ru
       name: MQTTBroker
     - url: https://volochek.life/
       name: Volochek
-    #- url: http://radiomv.ru/
-    #  name: radiomv
-    #- url: https://ipfran.ru/
-    #  name: ipfran
+    - url: http://radiomv.ru/
+      name: radiomv
+    - url: https://ipfran.ru/
+      name: ipfran
     #- url: https://dimonvideo.ru/
     #  name: dimonvideo
     #- url: https://nikoartgallery.com/
     #  name: nikoartgallery
-    #- url: https://et-cetera.ru/mobile/
-    #  name: et-cetera.ru
+    - url: https://et-cetera.ru/mobile/
+      name: et-cetera.ru
     #- url: https://dombulgakova.ru/
     #  name: Bulgakov
-    #- url: https://www.svetlovka.ru/
-    #  name: svetlovka
+    - url: https://www.svetlovka.ru/
+      name: svetlovka
     - url: https://dom.gosuslugi.ru/
       name: ГИСЖКХ
 
@@ -66,11 +66,11 @@ jsoup-setting:
   #userAgent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0
   user-agent: BordoJavaSearchBot
   referrer: http://www.google.com
-  timeout: 8000
+  timeout: 3000
   ignoreHttpErrors: false
   followRedirects: true
   #followRedirects: false
-  timeoutMin: 500
+  #timeoutMin: 500
   timeoutMax: 4000
   #timeoutBase: 4
   #timeoutDelta: 250

@@ -1,7 +1,7 @@
 package searchengine.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.HttpStatusException;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.*;
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 
@@ -36,7 +35,7 @@ public class PageIndexService extends RecursiveAction {
 
     private final SiteEntity site;
     private final URL pageURL;
-    private final PageEntity page;
+
     private final ForkJoinPool siteFJPool;
 
 
@@ -48,62 +47,48 @@ public class PageIndexService extends RecursiveAction {
         this.siteIndexingService = context.getBean(SiteIndexingService.class);
         this.site = site;
         this.pageURL = pageURL;
-        this.page = new PageEntity(site, pageURL.getPath());
         this.siteFJPool = siteFJPool;
     }
 
 
     @Override
     protected void compute() {
-        if (siteIndexingService.isStopFlag()) return;
-        if (pageRepo.findBySiteAndPath(site, pageURL.getPath()).isPresent()) return;
-        Document pageDoc = pageReader();
-        synchronized (pageRepo) {
-            if (pageRepo.findBySiteAndPath(site, pageURL.getPath()).isPresent()) return;
-            pageRepo.save(page);
-        }
-        siteIndexingService.saveSite(site, StatusType.INDEXING, null);
-        if (pageDoc == null) return;
-        //TODO запуск лемантизатора для индексации содержимого страницы (в отдельном потоке???)
-        HashSet<URL> links = getValidLinks(pageDoc);
-        for (URL itemURL : links) {
-            PageIndexService subPageIndexService = new PageIndexService(context, site, itemURL, siteFJPool);
-            siteFJPool.execute(subPageIndexService);
-        }
-    }
-
-
-    private Document pageReader() {
-        int timeout = (int) (Math.random() * jsoupCfg.getTimeoutMax());
-        Document resultDoc = null;
+        if (siteIndexingService.isStopFlag()) {return;}
         try {
-            Thread.sleep(timeout);
-            resultDoc = connectToPage();
-            page.setCode(resultDoc.connection().response().statusCode());
-            page.setContent(resultDoc.html());
-        } catch (InterruptedException | IOException e) {
-            if (e instanceof HttpStatusException) {
-                log.error("HTTP ERROR: " + e.getMessage());
-                page.setCode(((HttpStatusException) e).getStatusCode());
-            } else {
-                checkStopByUser();
-                page.setCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
+            Thread.sleep((int) (Math.random() * jsoupCfg.getTimeoutMax()) + 1);
+            //if (siteIndexingService.isStopFlag()) {return;}
+            Connection.Response response = connector(pageURL);
+            synchronized (pageRepo) {
+                if (pageRepo.findBySiteAndPath(site, pageURL.getPath()).isPresent()) return;
+                pageRepo.save(new PageEntity(site, pageURL.getPath(), response.statusCode(), response.body()));
+                siteIndexingService.saveSite(site, StatusType.INDEXING, "");
             }
+            if (response.statusCode() != 200) return;
+            //TODO запуск лемантизатора для индексации содержимого страницы (в отдельном потоке???)
+            HashSet<URL> links = getValidLinks(response.parse());
+            for (URL itemURL : links) {
+                siteFJPool.execute(new PageIndexService(context, site, itemURL, siteFJPool));
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Internal error on timeout");
         }
-        return resultDoc;
     }
 
-    private Document connectToPage() throws IOException {
+
+
+    private Connection.Response connector(URL pageAddress) throws IOException {
         return Jsoup
-                .connect(pageURL.toString())
+                .connect(pageAddress.toString())
                 .userAgent(jsoupCfg.getUserAgent())
                 .referrer(jsoupCfg.getReferrer())
                 .timeout(jsoupCfg.getTimeout())
                 .followRedirects(jsoupCfg.isFollowRedirects())
                 .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
                 //.ignoreContentType(true)
-                .get();
+                .execute();
     }
+
+
 
     private HashSet<URL> getValidLinks(Document inputDoc) {
         HashSet<URL> resultLinks = new HashSet<>();
@@ -128,11 +113,5 @@ public class PageIndexService extends RecursiveAction {
         return resultLinks;
     }
 
-
-    private void checkStopByUser() {
-        if (siteIndexingService.isStopFlag()) {
-            throw new RuntimeException("Indexing stopped by user");
-        }
-    }
 
 }

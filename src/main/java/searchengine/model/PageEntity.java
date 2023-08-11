@@ -48,5 +48,12 @@ public class PageEntity {
         this.content = " ";
     }
 
+    public PageEntity(SiteEntity site, String path, Integer code, String content) {
+        this.site = site;
+        this.path = path;
+        this.code = code;
+        this.content = content;
+    }
+
 
 }
