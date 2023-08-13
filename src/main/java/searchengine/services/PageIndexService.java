@@ -98,10 +98,10 @@ public class PageIndexService extends RecursiveAction {
         Elements elements = inputDoc.select("a");
         for (Element element : elements) {
             String finalLinkString = element.absUrl("href").toLowerCase().replaceAll(" ", "%20");
-            if (!finalLinkString.startsWith(site.getUrl())) continue;
+            if (!finalLinkString.startsWith(site.getUrl()) || !finalLinkString.startsWith("http")) continue;
             //String finalLinkString = (linkString.indexOf('{') > 0) ? linkString.substring(0, linkString.indexOf('{')) : linkString;
-            if (EnumSet.allOf(BadLinks.class).stream().anyMatch(enumElement -> finalLinkString.contains(enumElement.toString())) ||
-                    !finalLinkString.startsWith("http") || finalLinkString.isEmpty()) continue;
+            if (EnumSet.allOf(BadLinks.class).stream().anyMatch(enumElement ->
+                    finalLinkString.contains(enumElement.toString()))) {continue;}
             try {
                 URL childLinkURL = URI.create(finalLinkString).toURL();
                 childLinkURL = URI.create(childLinkURL.getProtocol() + "://" + childLinkURL.getHost() + childLinkURL.getPath()).toURL();
@@ -109,7 +109,7 @@ public class PageIndexService extends RecursiveAction {
                 //String pageHost = childLinkURL.getHost().startsWith("www.") ? childLinkURL.getHost().substring(4) : childLinkURL.getHost();
 //                if ((!siteHost.equals(pageHost)) || (pageRepo.findBySiteAndPath(site, childLinkURL.getPath()).isPresent()))
 //                    continue;
-                if (!pageRepo.findBySiteAndPath(site, childLinkURL.getPath()).isPresent())  {resultLinks.add(childLinkURL);}
+                if (pageRepo.findBySiteAndPath(site, childLinkURL.getPath()).isEmpty())  {resultLinks.add(childLinkURL);}
             } catch (MalformedURLException | IllegalArgumentException e) {
                 log.error("ValidationError: " + e.getMessage() + " :: " + pageURL.toString());
             }
