@@ -55,7 +55,7 @@ public class PageIndexService extends RecursiveAction {
     protected void compute() {
         if (siteIndexingService.isStopFlag()) {return;}
         try {
-            Thread.sleep((int) (Math.random() * jsoupCfg.getTimeoutMax()) + 1);
+            Thread.sleep(jsoupCfg.getTimeoutMin());
             //if (siteIndexingService.isStopFlag()) {return;}
             Connection.Response response = connector(pageURL);
             synchronized (pageRepo) {

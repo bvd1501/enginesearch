@@ -36,20 +36,20 @@ indexing-settings:
     #  name: skillbox
     - url: https://www.playback.ru/
       name: PlayBack.Ru
-    - url: https://www.tretyakovgallery.ru/
-      name: Gallery
+    #- url: https://www.tretyakovgallery.ru/
+    #  name: Gallery
     - url: https://lutherancathedral.ru/
       name: lutherancathedral.ru
     - url: https://clusterfly.ru
       name: MQTTBroker
     - url: https://volochek.life/
       name: Volochek
-    - url: http://radiomv.ru/
-      name: radiomv
+    #- url: http://radiomv.ru/
+    #  name: radiomv
     - url: https://ipfran.ru/
       name: ipfran
-    #- url: https://dimonvideo.ru/
-    #  name: dimonvideo
+    - url: https://dimonvideo.ru/
+      name: dimonvideo
     #- url: https://nikoartgallery.com/
     #  name: nikoartgallery
     - url: https://et-cetera.ru/mobile/
@@ -70,8 +70,8 @@ jsoup-setting:
   ignoreHttpErrors: false
   followRedirects: true
   #followRedirects: false
-  #timeoutMin: 500
-  timeoutMax: 4000
+  timeoutMin: 100
+  timeoutMax: 2000
   #timeoutBase: 4
   #timeoutDelta: 250
   #timeoutFactor: 2
