@@ -111,7 +111,7 @@ public class PageIndexService extends RecursiveAction {
 //                    continue;
                 if (pageRepo.findBySiteAndPath(site, childLinkURL.getPath()).isEmpty())  {resultLinks.add(childLinkURL);}
             } catch (MalformedURLException | IllegalArgumentException e) {
-                log.error("ValidationError: " + e.getMessage() + " :: " + pageURL.toString());
+                log.error("extractorLinks: " + e.getMessage());
             }
         }
         return resultLinks;
