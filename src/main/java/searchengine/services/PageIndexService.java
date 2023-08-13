@@ -55,9 +55,9 @@ public class PageIndexService extends RecursiveAction {
     protected void compute() {
         if (siteIndexingService.isStopFlag()) {return;}
         try {
-            Thread.sleep(jsoupCfg.getTimeoutMin());
-            //if (siteIndexingService.isStopFlag()) {return;}
-            Connection.Response response = connector(pageURL);
+//            Thread.sleep(jsoupCfg.getTimeoutMin());
+            Connection.Response response = connector(pageURL, false);
+            if (response.statusCode() == 429) {response = connector(pageURL, true);}
             synchronized (pageRepo) {
                 if (pageRepo.findBySiteAndPath(site, pageURL.getPath()).isPresent()) return;
                 pageRepo.save(new PageEntity(site, pageURL.getPath(), response.statusCode(), response.body()));
@@ -65,7 +65,7 @@ public class PageIndexService extends RecursiveAction {
             }
             if (response.statusCode() != 200) return;
             //TODO запуск лемантизатора для индексации содержимого страницы (в отдельном потоке???)
-            HashSet<URL> links = getValidLinks(response.parse());
+            HashSet<URL> links = linkExtractor(response.parse());
             for (URL itemURL : links) {
                 siteFJPool.execute(new PageIndexService(context, site, itemURL, siteFJPool));
             }
@@ -76,7 +76,10 @@ public class PageIndexService extends RecursiveAction {
 
 
 
-    private Connection.Response connector(URL pageAddress) throws IOException {
+    private Connection.Response connector(URL pageAddress, boolean sleepFlag) throws IOException, InterruptedException {
+        if (sleepFlag) {
+            Thread.sleep(jsoupCfg.getTimeoutMax());
+        }
         return Jsoup
                 .connect(pageAddress.toString())
                 .userAgent(jsoupCfg.getUserAgent())
@@ -90,22 +93,23 @@ public class PageIndexService extends RecursiveAction {
 
 
 
-    private HashSet<URL> getValidLinks(Document inputDoc) {
+    private HashSet<URL> linkExtractor(Document inputDoc) {
         HashSet<URL> resultLinks = new HashSet<>();
         Elements elements = inputDoc.select("a");
         for (Element element : elements) {
             String finalLinkString = element.absUrl("href").toLowerCase().replaceAll(" ", "%20");
+            if (!finalLinkString.startsWith(site.getUrl())) continue;
             //String finalLinkString = (linkString.indexOf('{') > 0) ? linkString.substring(0, linkString.indexOf('{')) : linkString;
             if (EnumSet.allOf(BadLinks.class).stream().anyMatch(enumElement -> finalLinkString.contains(enumElement.toString())) ||
                     !finalLinkString.startsWith("http") || finalLinkString.isEmpty()) continue;
             try {
                 URL childLinkURL = URI.create(finalLinkString).toURL();
                 childLinkURL = URI.create(childLinkURL.getProtocol() + "://" + childLinkURL.getHost() + childLinkURL.getPath()).toURL();
-                String siteHost = pageURL.getHost().startsWith("www.") ? pageURL.getHost().substring(4) : pageURL.getHost();
-                String pageHost = childLinkURL.getHost().startsWith("www.") ? childLinkURL.getHost().substring(4) : childLinkURL.getHost();
-                if ((!siteHost.equals(pageHost)) || (pageRepo.findBySiteAndPath(site, childLinkURL.getPath()).isPresent()))
-                    continue;
-                resultLinks.add(childLinkURL);
+                //String siteHost = pageURL.getHost().startsWith("www.") ? pageURL.getHost().substring(4) : pageURL.getHost();
+                //String pageHost = childLinkURL.getHost().startsWith("www.") ? childLinkURL.getHost().substring(4) : childLinkURL.getHost();
+//                if ((!siteHost.equals(pageHost)) || (pageRepo.findBySiteAndPath(site, childLinkURL.getPath()).isPresent()))
+//                    continue;
+                if (!pageRepo.findBySiteAndPath(site, childLinkURL.getPath()).isPresent())  {resultLinks.add(childLinkURL);}
             } catch (MalformedURLException | IllegalArgumentException e) {
                 log.error("ValidationError: " + e.getMessage() + " :: " + pageURL.toString());
             }
