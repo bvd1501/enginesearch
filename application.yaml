@@ -34,11 +34,11 @@ indexing-settings:
   sites:
     #- url: https://www.skillbox.ru
     #  name: skillbox
-    - url: https://www.playback.ru/
-      name: PlayBack.Ru
-    #- url: https://www.tretyakovgallery.ru/
-    #  name: Gallery
-    - url: https://www.lutherancathedral.ru/
+    #- url: https://www.playback.ru/
+    #  name: PlayBack.Ru
+    - url: https://www.tretyakovgallery.ru/
+      name: Gallery
+    - url: https://lutherancathedral.ru/
       name: lutherancathedral.ru
     - url: https://clusterfly.ru
       name: MQTTBroker
@@ -69,8 +69,8 @@ jsoup-setting:
   timeout: 30000
   ignoreHttpErrors: true
   followRedirects: false
-  timeoutMin: 150
-  timeoutMax: 5000
+  timeoutMin: 10
+  timeoutMax: 2000
   #timeoutBase: 4
   #timeoutDelta: 250
   #timeoutFactor: 2

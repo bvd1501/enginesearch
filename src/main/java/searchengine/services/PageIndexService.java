@@ -54,10 +54,9 @@ public class PageIndexService extends RecursiveAction {
     @Override
     protected void compute() {
         if (siteIndexingService.isStopFlag()) {return;}
+
         try {
-//            Thread.sleep(jsoupCfg.getTimeoutMin());
-            Connection.Response response = connector(pageURL, false);
-            if (response.statusCode() == 429) {response = connector(pageURL, true);}
+            Connection.Response response = connector(pageURL);
             synchronized (pageRepo) {
                 if (pageRepo.findBySiteAndPath(site, pageURL.getPath()).isPresent()) return;
                 pageRepo.save(new PageEntity(site, pageURL.getPath(), response.statusCode(), response.body()));
@@ -75,11 +74,9 @@ public class PageIndexService extends RecursiveAction {
     }
 
 
-
-    private Connection.Response connector(URL pageAddress, boolean sleepFlag) throws IOException, InterruptedException {
-        if (sleepFlag) {
-            Thread.sleep(jsoupCfg.getTimeoutMax());
-        }
+    private Connection.Response connector(URL pageAddress) throws IOException, InterruptedException {
+        int timeout = jsoupCfg.getTimeoutMin() + (int) (Math.random()*(jsoupCfg.getTimeoutMax()-jsoupCfg.getTimeoutMin()));
+        Thread.sleep(timeout);
         return Jsoup
                 .connect(pageAddress.toString())
                 .userAgent(jsoupCfg.getUserAgent())
@@ -97,24 +94,31 @@ public class PageIndexService extends RecursiveAction {
         HashSet<URL> resultLinks = new HashSet<>();
         Elements elements = inputDoc.select("a");
         for (Element element : elements) {
-            String finalLinkString = element.absUrl("href").toLowerCase().replaceAll(" ", "%20");
-            if (!finalLinkString.startsWith(site.getUrl()) || !finalLinkString.startsWith("http")) continue;
-            //String finalLinkString = (linkString.indexOf('{') > 0) ? linkString.substring(0, linkString.indexOf('{')) : linkString;
-            if (EnumSet.allOf(BadLinks.class).stream().anyMatch(enumElement ->
-                    finalLinkString.contains(enumElement.toString()))) {continue;}
+            String linkString = element.absUrl("href").toLowerCase().replaceAll(" ", "%20");
+            if (!linkChecker(linkString)) {continue;}
             try {
-                URL childLinkURL = URI.create(finalLinkString).toURL();
+                URL childLinkURL = URI.create(linkString).toURL();
                 childLinkURL = URI.create(childLinkURL.getProtocol() + "://" + childLinkURL.getHost() + childLinkURL.getPath()).toURL();
-                //String siteHost = pageURL.getHost().startsWith("www.") ? pageURL.getHost().substring(4) : pageURL.getHost();
-                //String pageHost = childLinkURL.getHost().startsWith("www.") ? childLinkURL.getHost().substring(4) : childLinkURL.getHost();
-//                if ((!siteHost.equals(pageHost)) || (pageRepo.findBySiteAndPath(site, childLinkURL.getPath()).isPresent()))
-//                    continue;
+
                 if (pageRepo.findBySiteAndPath(site, childLinkURL.getPath()).isEmpty())  {resultLinks.add(childLinkURL);}
             } catch (MalformedURLException | IllegalArgumentException e) {
                 log.error("extractorLinks: " + e.getMessage());
             }
         }
         return resultLinks;
+    }
+
+    private boolean linkChecker(String link) {
+        String finalLink = link;
+        if (EnumSet.allOf(BadLinks.class).stream().anyMatch(enumElement ->
+                finalLink.contains(enumElement.toString()))) {return false;}
+        if (!link.startsWith(pageURL.getProtocol())) {return false;}
+        String site = pageURL.getHost();
+        String siteHost = site.startsWith("www.") ? site.substring(4) : site;
+        link = link.substring(pageURL.getProtocol().length()+3);
+        String linkHost = link.startsWith("www.") ? link.substring(4) : link;
+        if (!siteHost.equals(linkHost)) {return false;}
+        return true;
     }
 
 

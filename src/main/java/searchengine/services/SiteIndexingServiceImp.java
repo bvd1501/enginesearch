@@ -112,7 +112,9 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
             URL urlPage = URI.create(urlSite.getProtocol() + "://" + urlSite.getHost() + "/").toURL();
             var pageIndexService = pageIndexServiceFactory.create(currentSite, urlPage, sitePool);
             sitePool.execute(pageIndexService);
-            sitePool.awaitQuiescence(24, TimeUnit.HOURS);
+            sitePool.awaitQuiescence(600, TimeUnit.SECONDS);
+            //setStopFlag();
+            //sitePool.shutdown();
             long resultTime = (System.currentTimeMillis() - startTime) / 60000;
             log.info(nameSite + " - " + resultTime + " min / " + pageRepo.countBySite(currentSite) + " pages");
             saveSite(currentSite, StatusType.INDEXED, null);
@@ -125,7 +127,6 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
 
 
     private SiteEntity preStartSiteIndexing(String urlSiteString, String nameSite) {
-        //Thread.currentThread().setName("thread-" + nameSite);
         log.info("Start indexing site: " + nameSite);
         siteRepo.deleteByUrlAndName(urlSiteString, nameSite);
         SiteEntity currentSite = new SiteEntity(urlSiteString, nameSite);
