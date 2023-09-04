@@ -1,6 +1,7 @@
 package searchengine.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,8 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
     private final SitesList sites;
     private final SiteRepo siteRepo;
     private final PageRepo pageRepo;
-    public final PageIndexServiceFactory pageIndexServiceFactory;
-
+    //public final PageIndexServiceFactory pageIndexServiceFactory;
+    //private final ObjectFactory<PageIndexService> pageIndexServiceObjectFactory;
     private static boolean stopFlag;// volatile, = false;
 
     private ExecutorService siteExecutor;
@@ -33,7 +34,8 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
     @Autowired
     public SiteIndexingServiceImp(ApplicationContext context) {
         this.context = context;
-        this.pageIndexServiceFactory = this.context.getBean(PageIndexServiceFactory.class);
+        //this.pageIndexServiceFactory = this.context.getBean(PageIndexServiceFactory.class);
+        //this.pageIndexServiceObjectFactory = pageIndexServiceObjectFactory;
         this.sites = this.context.getBean(SitesList.class);
         this.siteRepo = this.context.getBean(SiteRepo.class);
         this.pageRepo = this.context.getBean(PageRepo.class);
@@ -106,21 +108,19 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
         long startTime = System.currentTimeMillis();
         Thread.currentThread().setName("th." + nameSite);
         SiteEntity currentSite = preStartSiteIndexing(urlSiteString, nameSite);
-        ForkJoinPool sitePool = new ForkJoinPool(); // каждый сайт в своем FJP
+        ForkJoinPool sitePool = new ForkJoinPool(Runtime.getRuntime().availableProcessors()-1);
+        //ForkJoinPool sitePool = ForkJoinPool.commonPool();
         try {
             URL urlSite = URI.create(urlSiteString).toURL();
-            URL urlPage = URI.create(urlSite.getProtocol() + "://" + urlSite.getHost() + "/").toURL();
-            var pageIndexService = pageIndexServiceFactory.create(currentSite, urlPage, sitePool);
-            sitePool.execute(pageIndexService);
-            sitePool.awaitQuiescence(600, TimeUnit.SECONDS);
-            //setStopFlag();
+            var pageIndexService = context.getBean(PageIndexService.class, context, currentSite, urlSite);
+            sitePool.invoke(pageIndexService);
             //sitePool.shutdown();
             long resultTime = (System.currentTimeMillis() - startTime) / 60000;
             log.info(nameSite + " - " + resultTime + " min / " + pageRepo.countBySite(currentSite) + " pages");
             saveSite(currentSite, StatusType.INDEXED, null);
         }catch (Exception e) {
             sitePool.shutdownNow();
-            log.error("Error in site indexing: " + e.getMessage());
+            log.error(nameSite + " error indexing: " + e.getMessage());
             saveSite(currentSite, StatusType.FAILED, e.getMessage());
         }
     }
