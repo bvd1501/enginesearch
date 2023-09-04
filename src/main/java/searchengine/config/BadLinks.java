@@ -5,8 +5,8 @@ import lombok.Getter;
 
 @Getter
 public enum BadLinks {
-    //SPACE1(" "),
-    //SPACE2("%20"),
+    SPACE1(" "),
+    SPACE2("%20"),
     LATTICE("#"),
     DOWNLOAD("download"),
     WEBP(".webp"),
@@ -21,7 +21,10 @@ public enum BadLinks {
     PPT (".ppt"),
     XLS (".xls"),
     HTTP ("%20http"),
+    SQUARE_BRACKET("["),
+    QUOTES("\""),
     PARENTHESIS ("{");
+
 
 
 

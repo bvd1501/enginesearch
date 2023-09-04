@@ -87,7 +87,8 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
         Thread.currentThread().setName("th." + nameSite);
         SiteEntity currentSite = preStartSiteIndexing(urlSite, nameSite);
         //ForkJoinPool sitePool = new ForkJoinPool(Runtime.getRuntime().availableProcessors()-1);
-        ForkJoinPool sitePool = ForkJoinPool.commonPool();
+        ForkJoinPool sitePool = new ForkJoinPool();
+        //ForkJoinPool sitePool = ForkJoinPool.commonPool();
         try {
             //URI uriSite = URI.create(urlSite);
             var pageIndexService = context.getBean(PageIndexService.class, context, currentSite, urlSite);

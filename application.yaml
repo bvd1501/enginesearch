@@ -50,8 +50,8 @@ indexing-settings:
       name: ipfran
     - url: https://dimonvideo.ru/
       name: dimonvideo
-    - url: https://nikoartgallery.com/
-      name: nikoartgallery
+    #- url: https://nikoartgallery.com/
+    #  name: nikoartgallery
     - url: https://et-cetera.ru/mobile/
       name: et-cetera.ru
     #- url: https://dombulgakova.ru/

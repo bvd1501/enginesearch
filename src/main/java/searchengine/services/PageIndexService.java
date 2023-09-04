@@ -93,7 +93,8 @@ public class PageIndexService extends RecursiveAction {
         HashSet<PageIndexService> resultPageServices = new HashSet<>();
         Elements elements = inputDoc.select("a");
         for (Element element : elements) {
-            String link = element.absUrl("href").toLowerCase().replaceAll(" ", "%20");
+            //String link = element.absUrl("href").toLowerCase().replaceAll(" ", "%20");
+            String link = element.absUrl("href").toLowerCase();
             if (!link.startsWith(site.getUrl()) || !isLinkValid(link)) {continue;}
             try {
                 URI fullLinkURI = URI.create(link);
@@ -105,7 +106,7 @@ public class PageIndexService extends RecursiveAction {
                     resultPageServices.add(context.getBean(PageIndexService.class, context, site, cleanLink));
                     }
             } catch (IllegalArgumentException e) {
-                log.error(link + "->" + e.getMessage());
+                log.error(e.getMessage());
             }
         }
         return resultPageServices;
