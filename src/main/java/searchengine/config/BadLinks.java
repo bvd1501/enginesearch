@@ -22,7 +22,6 @@ public enum BadLinks {
     XLS (".xls"),
     HTTP ("%20http"),
     SQUARE_BRACKET("["),
-    QUOTES("/\"http"),
     PARENTHESIS ("{");
 
 
