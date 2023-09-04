@@ -57,7 +57,7 @@ public class PageIndexService extends RecursiveAction {
             //TODO запуск лемантизатора для индексации содержимого страницы (в отдельном потоке???)
             ForkJoinTask.invokeAll(pageHandler(response.parse()));
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Internal error on timeout");
+            throw new RuntimeException("Bad connect to page");
         }
     }
 
@@ -74,7 +74,7 @@ public class PageIndexService extends RecursiveAction {
     }
 
     private Connection.Response connector() throws IOException, InterruptedException {
-        int timeout = jsoupCfg.getTimeoutMin() + (int) (Math.random()*(jsoupCfg.getTimeoutMax()-jsoupCfg.getTimeoutMin()));
+        long timeout = jsoupCfg.getTimeoutMin() + (long) (Math.random()*(jsoupCfg.getTimeoutMax()-jsoupCfg.getTimeoutMin()));
         Thread.sleep(timeout);
         return Jsoup
                 .connect(pageAddress)

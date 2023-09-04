@@ -99,7 +99,7 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
             saveSite(currentSite, StatusType.INDEXED, null);
         }catch (Exception e) {
             sitePool.shutdownNow();
-            log.error(nameSite + " error indexing: " + e.getMessage());
+            log.error(nameSite + e.getMessage());
             saveSite(currentSite, StatusType.FAILED, e.getMessage());
         }
     }
