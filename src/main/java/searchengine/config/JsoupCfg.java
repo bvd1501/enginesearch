@@ -13,11 +13,9 @@ public class JsoupCfg {
         private String userAgent;
         private String referrer;
         private Integer timeout;
+        private  boolean ignoreContentType;
         private boolean ignoreHttpErrors;
         private boolean followRedirects;
         private Integer timeoutMin;
         private Integer timeoutMax;
-        //private Integer timeoutBase;
-        //private Integer timeoutDelta;
-        //private Integer timeoutFactor;
 }

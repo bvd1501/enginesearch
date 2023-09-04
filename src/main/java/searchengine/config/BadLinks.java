@@ -9,27 +9,26 @@ public enum BadLinks {
     SPACE2("%20"),
     LATTICE("#"),
     DOWNLOAD("download"),
-    WEBP(".webp"),
-    PDF(".pdf"),
-    EPS(".eps"),
-    JPG(".jpg"),
-    JPEG(".jpeg"),
-    PNG(".png"),
-    GIF(".gif"),
-    SVG(".svg"),
-    DOC(".doc"),
-    PPT (".ppt"),
-    XLS (".xls"),
+    //WEBP(".webp"),
+    //PDF(".pdf"),
+    //EPS(".eps"),
+    //JPG(".jpg"),
+    //JPEG(".jpeg"),
+    //PNG(".png"),
+    //GIF(".gif"),
+    //SVG(".svg"),
+    //DOC(".doc"),
+    //PPT (".ppt"),
+    //XLS (".xls"),
+    //ZIP (".zip"),
+    //RAR (".rar"),
+    QUOTES ("\""),
+    QUOTES2 ("%5c%22"),
     HTTP ("%20http"),
     SQUARE_BRACKET("["),
     PARENTHESIS ("{");
 
-
-
-
-
     private final String title;
-
 
     BadLinks (String title) {
         this.title = title;

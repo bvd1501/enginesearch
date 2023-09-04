@@ -67,13 +67,12 @@ jsoup-setting:
   user-agent: BordoJavaSearchBot
   referrer: http://www.google.com
   timeout: 10000
+  ignoreContentType: false
   ignoreHttpErrors: true
   followRedirects: false
   timeoutMin: 10
-  timeoutMax: 1000
-  #timeoutBase: 4
-  #timeoutDelta: 250
-  #timeoutFactor: 2
+  timeoutMax: 500
+
 
 
 

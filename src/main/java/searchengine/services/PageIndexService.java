@@ -3,6 +3,7 @@ package searchengine.services;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -53,18 +54,23 @@ public class PageIndexService extends RecursiveAction {
         if (siteIndexingService.isStopFlag()) {return;}
         try {
             Connection.Response response = connector();
-            if (!savePage(response) || response.statusCode()!=200) return;
+            boolean isSaved = savePage(response);
+            if (!isSaved || response.statusCode()!=200) return;
             //TODO запуск лемантизатора для индексации содержимого страницы (в отдельном потоке???)
             ForkJoinTask.invokeAll(pageHandler(response.parse()));
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Bad connect to page");
+            if (e instanceof UnsupportedMimeTypeException) {
+                //log.error("UnsupportedMimeTypeException on " + pageAddress);
+                return;}
+            //siteIndexingService.saveSite(site, StatusType.FAILED, e.getMessage());
+            //log.error(site.getName() + " -> " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
 
     private boolean savePage(Connection.Response response) {
         String pathPage = "/" + URI.create(site.getUrl()).relativize(URI.create(pageAddress));
-        //log.info("page:" + pageAddress + "....path:" + pathPage);
         synchronized (pageRepo) {
             if (pageRepo.findBySiteAndPath(site, pathPage).isPresent()) return false;
             pageRepo.save(new PageEntity(site, pathPage, response.statusCode(), response.body()));
@@ -83,7 +89,7 @@ public class PageIndexService extends RecursiveAction {
                 .timeout(jsoupCfg.getTimeout())
                 .followRedirects(jsoupCfg.isFollowRedirects())
                 .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
-                //.ignoreContentType(true)
+                .ignoreContentType(jsoupCfg.isIgnoreContentType())
                 .execute();
     }
 
@@ -100,13 +106,11 @@ public class PageIndexService extends RecursiveAction {
                 URI fullLinkURI = URI.create(link);
                 String cleanLink = fullLinkURI.getScheme() + "://" + fullLinkURI.getRawAuthority() + fullLinkURI.getPath();
                 String pathLink = "/" + URI.create(site.getUrl()).relativize(URI.create(cleanLink));
-                //log.info("handlerLog: link=" + cleanLink);
-                //log.info("==========: path=" + pathLink);
                 if (pageRepo.findBySiteAndPath(site, pathLink).isEmpty())  {
                     resultPageServices.add(context.getBean(PageIndexService.class, context, site, cleanLink));
                     }
             } catch (IllegalArgumentException e) {
-                log.error(e.getMessage());
+                log.error(e.getMessage() + " :: " + link);
             }
         }
         return resultPageServices;

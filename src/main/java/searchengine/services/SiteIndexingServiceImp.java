@@ -86,21 +86,18 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
         long startTime = System.currentTimeMillis();
         Thread.currentThread().setName("th." + nameSite);
         SiteEntity currentSite = preStartSiteIndexing(urlSite, nameSite);
-        //ForkJoinPool sitePool = new ForkJoinPool(Runtime.getRuntime().availableProcessors()-1);
         ForkJoinPool sitePool = new ForkJoinPool();
-        //ForkJoinPool sitePool = ForkJoinPool.commonPool();
         try {
-            //URI uriSite = URI.create(urlSite);
             var pageIndexService = context.getBean(PageIndexService.class, context, currentSite, urlSite);
             sitePool.invoke(pageIndexService);
-            //sitePool.shutdown();
             long resultTime = (System.currentTimeMillis() - startTime) / 60000;
             log.info(nameSite + " - " + resultTime + " min / " + pageRepo.countBySite(currentSite) + " pages");
             saveSite(currentSite, StatusType.INDEXED, null);
         }catch (Exception e) {
-            sitePool.shutdownNow();
-            log.error(nameSite + e.getMessage());
             saveSite(currentSite, StatusType.FAILED, e.getMessage());
+            log.error(nameSite + " => " + e.getMessage());
+            //sitePool.shutdown();
+            sitePool.shutdownNow();
         }
     }
 
@@ -123,7 +120,10 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
         siteEntity.setStatus(statusType);
         siteEntity.setLast_error(last_error);
         siteEntity.setStatusTime(new java.util.Date());
+        //synchronized (siteRepo) {
         siteRepo.save(siteEntity);
+        //}
+
     }
 
 
