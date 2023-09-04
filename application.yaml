@@ -44,18 +44,18 @@ indexing-settings:
       name: MQTTBroker
     #- url: https://volochek.life/
     #  name: Volochek
-    - url: http://radiomv.ru/
-      name: radiomv
+    #- url: http://radiomv.ru/
+    #  name: radiomv
     - url: https://ipfran.ru/
       name: ipfran
-    #- url: https://dimonvideo.ru/
-    #  name: dimonvideo
+    - url: https://dimonvideo.ru/
+      name: dimonvideo
     - url: https://nikoartgallery.com/
       name: nikoartgallery
     - url: https://et-cetera.ru/mobile/
       name: et-cetera.ru
-    - url: https://dombulgakova.ru/
-      name: Bulgakov
+    #- url: https://dombulgakova.ru/
+    #  name: Bulgakov
     - url: https://www.svetlovka.ru/
       name: svetlovka
     - url: https://dom.gosuslugi.ru/
@@ -66,7 +66,7 @@ jsoup-setting:
   #userAgent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0
   user-agent: BordoJavaSearchBot
   referrer: http://www.google.com
-  timeout: 30000
+  timeout: 10000
   ignoreHttpErrors: true
   followRedirects: false
   timeoutMin: 10
