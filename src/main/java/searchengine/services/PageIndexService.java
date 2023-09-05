@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import searchengine.config.BadLinks;
 import searchengine.config.JsoupCfg;
 import searchengine.model.PageEntity;
@@ -60,7 +61,6 @@ public class PageIndexService extends RecursiveAction {
             ForkJoinTask.invokeAll(pageHandler(response.parse()));
         } catch (IOException | InterruptedException e) {
             if (e instanceof UnsupportedMimeTypeException) {
-                //log.error("UnsupportedMimeTypeException on " + pageAddress);
                 return;}
             //siteIndexingService.saveSite(site, StatusType.FAILED, e.getMessage());
             //log.error(site.getName() + " -> " + e.getMessage());
@@ -69,6 +69,7 @@ public class PageIndexService extends RecursiveAction {
     }
 
 
+    @Transactional
     private boolean savePage(Connection.Response response) {
         String pathPage = "/" + URI.create(site.getUrl()).relativize(URI.create(pageAddress));
         synchronized (pageRepo) {

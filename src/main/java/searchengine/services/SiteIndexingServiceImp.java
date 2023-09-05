@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import searchengine.config.Site;
 import searchengine.config.SitesList;
 import searchengine.dto.indexing.IndexingResponse;
@@ -11,6 +12,7 @@ import searchengine.model.SiteEntity;
 import searchengine.model.StatusType;
 import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
+
 import java.util.concurrent.*;
 
 
@@ -94,14 +96,14 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
             log.info(nameSite + " - " + resultTime + " min / " + pageRepo.countBySite(currentSite) + " pages");
             saveSite(currentSite, StatusType.INDEXED, null);
         }catch (Exception e) {
-            saveSite(currentSite, StatusType.FAILED, e.getMessage());
-            log.error(nameSite + " => " + e.getMessage());
-            //sitePool.shutdown();
             sitePool.shutdownNow();
+            //sitePool.awaitTermination(15, TimeUnit.SECONDS);
+            saveSite(currentSite, StatusType.FAILED, e.getMessage());
+            log.info(currentSite.getName() + " " + currentSite.getStatus() + " " + currentSite.getLast_error());
         }
     }
 
-
+    @Transactional
     private SiteEntity preStartSiteIndexing(String urlSite, String nameSite) {
         log.info("Start indexing site: " + nameSite);
         siteRepo.deleteByUrlAndName(urlSite, nameSite);
@@ -111,18 +113,19 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
     }
 
     @Override
+    @Transactional
     public void saveSite(SiteEntity siteEntity, StatusType statusType, String last_error) {
         if (isStopFlag()) {
             statusType = StatusType.FAILED;
             last_error = "Stop by user";
-            log.error(siteEntity.getName() + " - stop by user");
+            //log.error(siteEntity.getName() + " - stop by user");
         }
         siteEntity.setStatus(statusType);
         siteEntity.setLast_error(last_error);
         siteEntity.setStatusTime(new java.util.Date());
-        //synchronized (siteRepo) {
-        siteRepo.save(siteEntity);
-        //}
+        synchronized (siteRepo) {
+            siteRepo.save(siteEntity);
+        }
 
     }
 
