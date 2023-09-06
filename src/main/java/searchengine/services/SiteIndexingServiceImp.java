@@ -13,6 +13,7 @@ import searchengine.model.StatusType;
 import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
+import java.util.Optional;
 import java.util.concurrent.*;
 
 
@@ -44,9 +45,9 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
             return new IndexingResponse(false, "Индексация уже запущена");
         }
         siteExecutor = Executors.newFixedThreadPool(sites.getSites().size());
-        resetStopFlag();
+        stopFlag = false;
         for (Site s : sites.getSites()) {
-            siteExecutor.execute(()-> siteIndexing(s.getUrl(), s.getName()));
+            siteExecutor.execute(()-> startIndex(s.getUrl(), s.getName()));
         }
         siteExecutor.shutdown();
         log.info("Все сайты отправлены на индексацию");
@@ -60,7 +61,7 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
             return new IndexingResponse(false, "Индексация не запущена");
         }
         log.info("Принудительная остановка индексации пользователем");
-        setStopFlag();
+        stopFlag = true;
         return new IndexingResponse(true);
     }
 
@@ -73,60 +74,48 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
     public boolean isStopFlag() {
         return stopFlag;
     }
-    @Override
-    public void resetStopFlag() {
-        stopFlag = false;
-    }
-    @Override
-    public void setStopFlag() {
-        stopFlag = true;
-    }
 
-
-
-    private void siteIndexing(String urlSite, String nameSite) {
+    private void startIndex(String urlSite, String nameSite) {
         long startTime = System.currentTimeMillis();
         Thread.currentThread().setName("th." + nameSite);
-        SiteEntity currentSite = preStartSiteIndexing(urlSite, nameSite);
+        SiteEntity currentSite = createSiteForIndexing(urlSite, nameSite);
         ForkJoinPool sitePool = new ForkJoinPool();
-        try {
-            var pageIndexService = context.getBean(PageIndexService.class, context, currentSite, urlSite);
-            sitePool.invoke(pageIndexService);
-            long resultTime = (System.currentTimeMillis() - startTime) / 60000;
-            log.info(nameSite + " - " + resultTime + " min / " + pageRepo.countBySite(currentSite) + " pages");
-            saveSite(currentSite, StatusType.INDEXED, null);
-        }catch (Exception e) {
-            sitePool.shutdownNow();
-            //sitePool.awaitTermination(15, TimeUnit.SECONDS);
-            saveSite(currentSite, StatusType.FAILED, e.getMessage());
-            log.info(currentSite.getName() + " " + currentSite.getStatus() + " " + currentSite.getLast_error());
-        }
+        var pageIndexService = context.getBean(PageIndexService.class, context, currentSite, urlSite);
+        sitePool.invoke(pageIndexService);
+        sitePool.shutdownNow();
+        long countPages = refreshSite(currentSite);
+        long resultTime = (System.currentTimeMillis() - startTime) / 60000;
+        log.info(nameSite + " - " + resultTime + " min / " + countPages + " pages");
     }
 
+
+
+    private long refreshSite(SiteEntity site) {
+        Optional<SiteEntity> updateSite = siteRepo.findById(site.getId());
+        if (!updateSite.isPresent()) {
+            log.error(site.getName() + " is missing in base!!!");
+            return 0;}
+        long result = pageRepo.countBySite(site);
+        if (isStopFlag()) {
+            siteRepo.updateStatusAndLast_errorAndStatusTimeById(StatusType.FAILED,
+                    ("Stop by user. Found " + result + " pages"), new java.util.Date(), site.getId());
+            return result;
+        }
+        if (!updateSite.get().getStatus().equals(StatusType.FAILED)) {
+            siteRepo.updateStatusAndLast_errorAndStatusTimeById(StatusType.INDEXED,
+                    (result + " pages"), new java.util.Date(), site.getId());
+        }
+        return result;
+    }
+
+
     @Transactional
-    private SiteEntity preStartSiteIndexing(String urlSite, String nameSite) {
+    private SiteEntity createSiteForIndexing(String urlSite, String nameSite) {
         log.info("Start indexing site: " + nameSite);
         siteRepo.deleteByUrlAndName(urlSite, nameSite);
         SiteEntity currentSite = new SiteEntity(urlSite, nameSite);
-        saveSite(currentSite, StatusType.INDEXING, null);
+        siteRepo.save(currentSite);
         return currentSite;
-    }
-
-    @Override
-    @Transactional
-    public void saveSite(SiteEntity siteEntity, StatusType statusType, String last_error) {
-        if (isStopFlag()) {
-            statusType = StatusType.FAILED;
-            last_error = "Stop by user";
-            //log.error(siteEntity.getName() + " - stop by user");
-        }
-        siteEntity.setStatus(statusType);
-        siteEntity.setLast_error(last_error);
-        siteEntity.setStatusTime(new java.util.Date());
-        synchronized (siteRepo) {
-            siteRepo.save(siteEntity);
-        }
-
     }
 
 
