@@ -16,6 +16,6 @@ public class JsoupCfg {
         private  boolean ignoreContentType;
         private boolean ignoreHttpErrors;
         private boolean followRedirects;
-        private Integer timeoutMin;
-        private Integer timeoutMax;
+        //private Integer timeoutMin;
+        //private Integer timeoutMax;
 }

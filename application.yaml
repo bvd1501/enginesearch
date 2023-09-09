@@ -70,8 +70,8 @@ jsoup-setting:
   ignoreContentType: false
   ignoreHttpErrors: true
   followRedirects: false
-  timeoutMin: 10
-  timeoutMax: 500
+  #timeoutMin: 10
+  #timeoutMax: 500
 
 
 

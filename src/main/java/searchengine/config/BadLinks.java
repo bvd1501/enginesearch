@@ -25,7 +25,8 @@ public enum BadLinks {
     QUOTES ("\""),
     QUOTES2 ("%5c%22"),
     HTTP ("%20http"),
-    SQUARE_BRACKET("["),
+    SQUARE_BRACKET("%5c"),
+    SQUARE_BRACKET1("["),
     PARENTHESIS ("{");
 
     private final String title;

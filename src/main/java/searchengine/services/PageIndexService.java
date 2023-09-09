@@ -25,6 +25,7 @@ import java.net.*;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.RecursiveTask;
@@ -57,7 +58,8 @@ public class PageIndexService extends RecursiveAction {
     @Override
     public void compute() {
         if (siteIndexingService.isStopFlag()) {
-            ForkJoinTask.getPool().shutdown();
+            //ForkJoinTask.getPool().shutdown();
+            return;
         }
         try {
             Connection.Response response = connector();
@@ -66,14 +68,14 @@ public class PageIndexService extends RecursiveAction {
             //TODO запуск лемантизатора для индексации содержимого страницы (в отдельном потоке???)
             ForkJoinTask.invokeAll(pageHandler(response.parse()));
         } catch (UnsupportedMimeTypeException e) {
-        } catch (InterruptedException e) {
-            siteRepo.updateStatusAndLast_errorAndStatusTimeById(StatusType.FAILED,
-                    "Timeout error", new java.util.Date(), site.getId());
-            ForkJoinTask.getPool().shutdown();
-        } catch (IOException e) {
+            //log.error("Bad mime type " + pageAddress);
+        }  catch (IOException e) {
             siteRepo.updateStatusAndLast_errorAndStatusTimeById(StatusType.FAILED,
                     "Connection error", new java.util.Date(), site.getId());
+            log.error("Connection error " + pageAddress);
             ForkJoinTask.getPool().shutdown();
+        } catch (Exception e) {
+            log.error(pageAddress + " " + e.getMessage());
         }
     }
 
@@ -89,9 +91,7 @@ public class PageIndexService extends RecursiveAction {
         return true;
     }
 
-    private Connection.Response connector() throws IOException, InterruptedException {
-        long timeout = jsoupCfg.getTimeoutMin() + (long) (Math.random() * (jsoupCfg.getTimeoutMax() - jsoupCfg.getTimeoutMin()));
-        Thread.sleep(timeout);
+    private Connection.Response connector() throws IOException {
         return Jsoup
                 .connect(pageAddress)
                 .userAgent(jsoupCfg.getUserAgent())
