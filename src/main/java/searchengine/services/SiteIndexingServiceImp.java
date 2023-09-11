@@ -13,6 +13,7 @@ import searchengine.model.StatusType;
 import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.*;
 
@@ -82,7 +83,6 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
         ForkJoinPool sitePool = new ForkJoinPool();
         var pageIndexService = context.getBean(PageIndexService.class, context, currentSite, urlSite);
         sitePool.invoke(pageIndexService);
-        sitePool.shutdownNow();
         long countPages = refreshSite(currentSite);
         long resultTime = (System.currentTimeMillis() - startTime) / 60000;
         log.info(nameSite + " - " + resultTime + " min / " + countPages + " pages");
@@ -96,14 +96,15 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
             log.error(site.getName() + " is missing in base!!!");
             return 0;}
         long result = pageRepo.countBySite(site);
-        if (isStopFlag()) {
-            siteRepo.updateStatusAndLast_errorAndStatusTimeById(StatusType.FAILED,
-                    ("Stop by user. Found " + result + " pages"), new java.util.Date(), site.getId());
-            return result;
-        }
-        if (!updateSite.get().getStatus().equals(StatusType.FAILED)) {
+        String last_error = updateSite.get().getLast_error();
+        if (isStopFlag()) {last_error = "Stop by user";}
+        if (last_error == null) {
             siteRepo.updateStatusAndLast_errorAndStatusTimeById(StatusType.INDEXED,
                     (result + " pages"), new java.util.Date(), site.getId());
+        } else {
+            siteRepo.updateStatusAndLast_errorAndStatusTimeById(StatusType.FAILED,
+                    last_error + " / " + result + " pages",
+                    new java.util.Date(), site.getId());
         }
         return result;
     }
