@@ -105,8 +105,7 @@ public class PageIndexService extends RecursiveAction {
                         .ignoreContentType(jsoupCfg.isIgnoreContentType())
                         .execute();
             }
-            catch (IOException e) {
-                log.error(e.getMessage() + " " + pageAddress);
+            catch (IOException e) { log.error(e.getMessage() + " " + pageAddress);
                 Thread.sleep(retriveCount*1000);
             }
             retriveCount++;
