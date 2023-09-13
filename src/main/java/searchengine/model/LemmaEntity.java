@@ -17,7 +17,7 @@ import javax.persistence.*;
         , uniqueConstraints = {@UniqueConstraint(name = "idx_lemma_site", columnNames = {"lemma", "site_id"})}
         , indexes = {@Index(name = "idx_lemma", columnList = "lemma")}
 )
-//@Table(name = "page")
+
 public class LemmaEntity {
     @Setter(AccessLevel.NONE)
     @Id

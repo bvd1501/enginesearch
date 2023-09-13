@@ -5,12 +5,19 @@ import lombok.Getter;
 
 @Getter
 public enum BadLinks {
-    SPACE1(" "),
+    SPACE(" "),
     LATTICE("#"),
     DOWNLOAD("download"),
     QUOTES ("\""),
     SQUARE_BRACKET("["),
-    PARENTHESIS ("{");
+    PARENTHESIS ("{"),
+    PDF (".pdf"),
+    DOC (".doc"),
+    JPG (".jpg"),
+    JPEG (".jpeg"),
+    PNG (".png"),
+    XLS (".xls"),
+    ZIP (".zip");
 
     private final String title;
 

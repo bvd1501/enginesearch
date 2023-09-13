@@ -16,6 +16,11 @@ import java.util.Optional;
 public interface SiteRepo extends CrudRepository<SiteEntity, Integer> {
     @Transactional
     @Modifying
+    @Query("update SiteEntity s set s.statusTime = ?1, s.last_error = ?2 where s.id = ?3")
+    int updateStatusTimeAndLast_errorById(Date statusTime, String last_error, Integer id);
+
+    @Transactional
+    @Modifying
     @Query("update SiteEntity s set s.statusTime = :statusTime where s.id = :id")
     void updateStatusTimeById(@Param("statusTime") Date statusTime, @Param("id") Integer id);
     @Transactional

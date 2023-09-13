@@ -16,20 +16,17 @@ import searchengine.config.BadLinks;
 import searchengine.config.JsoupCfg;
 import searchengine.model.PageEntity;
 import searchengine.model.SiteEntity;
-import searchengine.model.StatusType;
 import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.*;
-import java.util.Date;
+import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
-import java.util.concurrent.RecursiveTask;
+
 
 @Component
 @Scope("prototype")
@@ -67,19 +64,18 @@ public class PageIndexService extends RecursiveAction {
             if (!isSaved || response.statusCode() != 200) return;
             //TODO запуск лемантизатора для индексации содержимого страницы (в отдельном потоке???)
             ForkJoinTask.invokeAll(pageHandler(response.parse()));
-        } catch (UnsupportedMimeTypeException e) {
-        }  catch (IOException e) {
-            siteRepo.updateStatusAndLast_errorAndStatusTimeById(StatusType.INDEXING,
-                    "Connection error", new java.util.Date(), site.getId());
-            log.error(e.getMessage() + " " + pageAddress);
-        } catch (Exception e) {
-            log.error(e.getMessage() + " " + pageAddress);
-            siteRepo.updateStatusAndLast_errorAndStatusTimeById(StatusType.FAILED,
-                    e.getMessage() + " " + pageAddress, new java.util.Date(), site.getId());
-            ForkJoinTask.getPool().shutdown();
+        }   catch (Exception e) {
+            if (e instanceof UnsupportedMimeTypeException) {return;}
+            saveErrorIndexSite(e.getClass().toString() + " " + e.getMessage() + " " + pageAddress);
+            if (!(e instanceof IOException)) { ForkJoinTask.getPool().shutdown();}
         }
     }
 
+    @Transactional
+    private void saveErrorIndexSite(String errorText) {
+        log.error(errorText);
+        siteRepo.updateStatusTimeAndLast_errorById(new java.util.Date(), errorText, site.getId());
+    }
 
     @Transactional
     private boolean savePage(Connection.Response response) {
@@ -92,25 +88,15 @@ public class PageIndexService extends RecursiveAction {
         return true;
     }
 
-    private Connection.Response connector() throws IOException, InterruptedException {
-        int retriveCount=1;
-        while (retriveCount<5) {
-            try {
-                return Jsoup.connect(pageAddress)
-                        .userAgent(jsoupCfg.getUserAgent())
-                        .referrer(jsoupCfg.getReferrer())
-                        .timeout(jsoupCfg.getTimeout())
-                        .followRedirects(jsoupCfg.isFollowRedirects())
-                        .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
-                        .ignoreContentType(jsoupCfg.isIgnoreContentType())
-                        .execute();
-            }
-            catch (IOException e) { log.error(e.getMessage() + " " + pageAddress);
-                Thread.sleep(retriveCount*1000);
-            }
-            retriveCount++;
-        }
-        throw new IOException("Too many retries");
+    private Connection.Response connector() throws IOException {
+        return Jsoup.connect(pageAddress)
+                .userAgent(jsoupCfg.getUserAgent())
+                .referrer(jsoupCfg.getReferrer())
+                .timeout(jsoupCfg.getTimeout())
+                .followRedirects(jsoupCfg.isFollowRedirects())
+                .ignoreHttpErrors(jsoupCfg.isIgnoreHttpErrors())
+                .ignoreContentType(jsoupCfg.isIgnoreContentType())
+                .execute();
     }
 
 
@@ -120,7 +106,7 @@ public class PageIndexService extends RecursiveAction {
         for (Element element : elements) {
             String link = element.absUrl("href").toLowerCase();
             try {
-                link = URLDecoder.decode(link, "UTF-8");
+                link = URLDecoder.decode(link, StandardCharsets.UTF_8);
                 if (!link.startsWith(site.getUrl()) || !isLinkValid(link)) {continue;}
                 URI fullLinkURI = URI.create(link);
                 String cleanLink = fullLinkURI.getScheme() + "://" + fullLinkURI.getRawAuthority() + fullLinkURI.getPath();
@@ -128,8 +114,8 @@ public class PageIndexService extends RecursiveAction {
                 if (pageRepo.findBySiteAndPath(site, pathLink).isEmpty()) {
                     resultPageServices.add(context.getBean(PageIndexService.class, context, site, cleanLink));
                 }
-            } catch (IllegalArgumentException | UnsupportedEncodingException e) {
-                log.error(e.getMessage() + " " + link);
+            } catch (IllegalArgumentException e) {
+                log.error(e.getMessage() + " => " + link);
             }
         }
         return resultPageServices;

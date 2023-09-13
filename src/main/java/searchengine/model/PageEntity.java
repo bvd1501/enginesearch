@@ -17,7 +17,7 @@ import javax.persistence.*;
         , uniqueConstraints = {@UniqueConstraint(name = "idx_page_site", columnNames = {"path", "site_id"})}
         , indexes = {@Index(name = "idx_path", columnList = "path")}
 )
-//@Table(name = "page")
+
 public class PageEntity {
     @Setter(AccessLevel.NONE)
     @Id
