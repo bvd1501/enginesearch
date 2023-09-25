@@ -9,7 +9,7 @@ public interface DatabaseService {
 
 
     SiteEntity createSite(String urlSite, String nameSite);
-    boolean saveIndexPage(SiteEntity site, PageEntity page, Map<String, Integer> lemmaMap);
+    boolean saveIndexPage(PageEntity page, Map<String, Integer> lemmaMap);
 
     long endSiteIndex(SiteEntity site);
 

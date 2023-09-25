@@ -96,11 +96,12 @@ public class DatabaseServiceImpl implements DatabaseService{
      */
     @Override
     @Transactional(timeout = 5000)
-    public synchronized boolean saveIndexPage(SiteEntity site, PageEntity page, Map<String, Integer> lemmaMap) {
-        if (existPage(site, page.getPath())) {return false;}
+    public synchronized boolean saveIndexPage(PageEntity page, Map<String, Integer> lemmaMap) {
+        //if (existPage(site, page.getPath())) {return false;}
+        if(pageRepo.existsBySite_IdAndPath(page.getSite().getId(), page.getPath())) {return false;}
         pageRepo.save(page);
         //TODO обновление данных о леммах в таблицах lemma и index
-        siteRepo.updateStatusTimeById(new java.util.Date(), site.getId());
+        siteRepo.updateStatusTimeById(new java.util.Date(), page.getSite().getId());
         return true;
     }
 

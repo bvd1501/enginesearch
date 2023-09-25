@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -14,8 +16,10 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Table(name = "page"
-        , uniqueConstraints = {@UniqueConstraint(name = "idx_page_site", columnNames = {"path", "site_id"})}
-        , indexes = {@Index(name = "idx_path", columnList = "path")}
+        , uniqueConstraints = {
+                    @UniqueConstraint(name = "idx_path_site", columnNames = {"site_id", "path"})}
+        , indexes = {@Index(name = "idx_path", columnList = "path")
+                    , @Index(name = "idx_site_id", columnList = "site_id")}
 )
 
 public class PageEntity {
@@ -26,10 +30,10 @@ public class PageEntity {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "site_id", nullable = false, foreignKey = @ForeignKey(name = "fkp_site_id",
-            value = ConstraintMode.CONSTRAINT,
-            foreignKeyDefinition = "FOREIGN KEY (site_id) REFERENCES site(id) ON DELETE CASCADE"))
+    @JoinColumn (name = "site_id", nullable = false, referencedColumnName = "id"
+            , foreignKey = @ForeignKey(name = "fk_page_site"))
     @BatchSize(size = 10)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private SiteEntity site;
 
     @Column(name = "path", columnDefinition = "TEXT NOT NULL")

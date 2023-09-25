@@ -70,32 +70,34 @@ public class PageIndexService extends RecursiveAction {
      * @return Document содержащий прочитанную и проиндексированную страницу или null при ошибке
      **/
     public Document singlePageIndexing() {
+        String pathPage = "/" + URI.create(site.getUrl()).relativize(URI.create(pageAddress));
+        PageEntity page = new PageEntity(site, pathPage);
+        Map<String, Integer> lemmaMap = new HashMap<>();
         try {
             //long sleepTime = 500L + (long) (Math.random() * 5000);
             long sleepTime = 500L;
             Thread.sleep(sleepTime);
             Connection.Response responsePage = connector();
-            Map<String, Integer> lemmaMap = new HashMap<>();
+
             if (responsePage.statusCode() == HttpStatus.OK.value()) {
                 lemmaMap = lemmaService.lemmaCount(responsePage.body());
             }
-            String pathPage = "/" + URI.create(site.getUrl()).relativize(URI.create(pageAddress));
-            PageEntity resultPage = new PageEntity(site, pathPage,
-                    responsePage.statusCode(), responsePage.body());
-            if (!databaseService.saveIndexPage(site, resultPage, lemmaMap)) {return null;}
+            page.setCode(responsePage.statusCode());
+            page.setContent(responsePage.body());
+            if (!databaseService.saveIndexPage(page, lemmaMap)) {return null;}
             return responsePage.parse();
         } catch (Exception e) {
-            handlerConnectException(e);
+            if (!(e instanceof UnsupportedMimeTypeException)) {
+                log.error(e + " on " + pageAddress);
+                handlerConnectException(e);
+            }
         }
         return null;
     }
 
 
     private void handlerConnectException(Exception e) {
-        log.error(e + " on " + pageAddress);
-        if (!(e instanceof UnsupportedMimeTypeException)) {
-            databaseService.updateLastErrorOnSite(site, e.getMessage() + " on " + pageAddress);
-        }
+        databaseService.updateLastErrorOnSite(site, e.getMessage() + " on " + pageAddress);
         if (!(e instanceof  IOException)) {
             log.error("shutdown pool on " + pageAddress);
             ForkJoinTask.getPool().shutdown();

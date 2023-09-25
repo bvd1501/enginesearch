@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -14,7 +16,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Table(name = "lemma"
-        , uniqueConstraints = {@UniqueConstraint(name = "idx_lemma_site", columnNames = {"lemma", "site_id"})}
+        , uniqueConstraints = {@UniqueConstraint(name = "idx_lemma_site", columnNames = {"site_id", "lemma"})}
         , indexes = {@Index(name = "idx_lemma", columnList = "lemma")}
 )
 
@@ -26,9 +28,12 @@ public class LemmaEntity {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "site_id", nullable = false, foreignKey = @ForeignKey(name = "fkl_site_id",
-            value = ConstraintMode.CONSTRAINT,
-            foreignKeyDefinition = "FOREIGN KEY (site_id) REFERENCES site(id) ON DELETE CASCADE"))
+//    @JoinColumn(name = "site_id", nullable = false, foreignKey = @ForeignKey(name = "fkl_site_id",
+//            value = ConstraintMode.CONSTRAINT,
+//            foreignKeyDefinition = "FOREIGN KEY (site_id) REFERENCES site(id) ON DELETE CASCADE"))
+    @JoinColumn (name = "site_id", nullable = false, referencedColumnName = "id"
+            , foreignKey = @ForeignKey(name = "fk_lemma_site"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @BatchSize(size = 10)
     private SiteEntity site;
 
