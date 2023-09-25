@@ -3,7 +3,6 @@ package searchengine.services;
 import searchengine.model.PageEntity;
 import searchengine.model.SiteEntity;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public interface DatabaseService {

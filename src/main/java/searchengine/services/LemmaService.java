@@ -5,7 +5,6 @@ import org.apache.lucene.morphology.LuceneMorphology;
 import org.apache.lucene.morphology.russian.RussianLuceneMorphology;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -16,10 +15,10 @@ import java.util.*;
 public class LemmaService {
     private final LuceneMorphology luceneMorph;
     private static final String[] PARTICLES ={"МЕЖД", "ПРЕДЛ", "СОЮЗ", "ЧАСТ"};
-    private static final String WORD_TYPE_REGEX = "\\W\\w&&[^а-яА-Я\\s]";
+    //private static final String WORD_TYPE_REGEX = "\\W\\w&&[^а-яА-Я\\s]";
 
     public LemmaService() throws IOException {
-        this.luceneMorph = new RussianLuceneMorphology();;
+        this.luceneMorph = new RussianLuceneMorphology();
     }
 
 
@@ -30,13 +29,13 @@ public class LemmaService {
             if (word.isEmpty()) {continue;}
             List<String> wordLemmas = getNormalFormWords(word);
             if (wordLemmas == null) {continue;}
-            wordLemmas.stream().forEach(l->{
+            for (String l : wordLemmas) {
                 if (lemms.containsKey(l)) {
                     lemms.put(l, lemms.get(l) + 1);
                 } else {
                     lemms.put(l, 1);
                 }
-            });
+            }
         }
         return lemms;
     }
@@ -47,7 +46,7 @@ public class LemmaService {
             List<String> normaFormsInfo = luceneMorph.getMorphInfo(word);
             List<String> resultWords = new ArrayList<>();
             for (int i=0; i<normalFormsWord.size(); i++) {
-                if (!Arrays.stream(PARTICLES).anyMatch(normaFormsInfo.get(i)::contains)) {
+                if (Arrays.stream(PARTICLES).noneMatch(normaFormsInfo.get(i)::contains)) {
                     resultWords.add(normalFormsWord.get(i));
                 }
             }

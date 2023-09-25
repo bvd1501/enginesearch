@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import searchengine.model.PageEntity;
 import searchengine.model.SiteEntity;
@@ -36,8 +35,7 @@ public class DatabaseServiceImpl implements DatabaseService{
     public SiteEntity createSite(String urlSite, String nameSite) {
         log.info("Clean data on site " + nameSite);
         siteRepo.deleteByUrlAndName(urlSite, nameSite);
-        SiteEntity site = siteRepo.save(new SiteEntity(urlSite, nameSite));
-        return site;
+        return siteRepo.save(new SiteEntity(urlSite, nameSite));
     }
 
     /**
@@ -69,7 +67,6 @@ public class DatabaseServiceImpl implements DatabaseService{
      * Запись информации о произошедшей ошибке при индексации сайта
      * @param site - индексируемый сайт
      * @param error - описание произошедшей ошибки
-     * @return void
      */
     @Override
     //@Transactional (timeout = 3000, isolation = Isolation.READ_COMMITTED)

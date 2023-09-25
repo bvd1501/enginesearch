@@ -12,21 +12,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import searchengine.config.BadLinks;
 import searchengine.config.JsoupCfg;
 import searchengine.model.PageEntity;
 import searchengine.model.SiteEntity;
-import searchengine.repo.PageRepo;
 
 
 import java.io.IOException;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveAction;
 
 
