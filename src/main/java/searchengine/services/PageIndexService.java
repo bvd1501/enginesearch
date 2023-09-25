@@ -138,11 +138,10 @@ public class PageIndexService extends RecursiveAction {
             return null;}
         try {
             URI linkUri = URI.create(link);
-            String newLinkAddress = linkUri.getScheme()
+            return linkUri.getScheme()
                     + "://"
                     + linkUri.getRawAuthority()
                     + linkUri.getRawPath();
-            return newLinkAddress;
         } catch (IllegalArgumentException e) {
             log.error("Bad link: " + e.getMessage());
             return null;

@@ -89,7 +89,6 @@ public class DatabaseServiceImpl implements DatabaseService{
 
     /**
      * Внесение результатов индексации страницы в БД
-     * @param site - сайт, страница которого индексировалась
      * @param page - проиндексированная страница
      * @param lemmaMap - леммы, найденные на странице
      * @return - false, если страница уже есть в базе, иначе true
