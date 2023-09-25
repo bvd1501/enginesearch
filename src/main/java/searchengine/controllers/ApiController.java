@@ -2,11 +2,9 @@ package searchengine.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import searchengine.dto.statistics.StatisticsResponse;
-import searchengine.services.SiteIndexingService;
+import searchengine.services.IndexingService;
 import searchengine.services.StatisticsService;
 
 @RestController
@@ -14,9 +12,9 @@ import searchengine.services.StatisticsService;
 public class ApiController {
 
     private final StatisticsService statisticsService;
-    private final SiteIndexingService indexingService;
+    private final IndexingService indexingService;
 
-    public ApiController(StatisticsService statisticsService, SiteIndexingService indexingService) {
+    public ApiController(StatisticsService statisticsService, IndexingService indexingService) {
         this.statisticsService = statisticsService;
         this.indexingService = indexingService;
     }
@@ -39,6 +37,15 @@ public class ApiController {
     public ResponseEntity stopIndexing() {
         try {
             return ResponseEntity.ok(indexingService.getStopIndexing());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PostMapping (value = "/indexPage")
+    public ResponseEntity startPageIndexing(@RequestParam String url) {
+        try {
+            return ResponseEntity.ok(indexingService.getPageIndexing(url));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

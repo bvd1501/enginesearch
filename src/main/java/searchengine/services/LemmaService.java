@@ -3,15 +3,15 @@ package searchengine.services;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.morphology.LuceneMorphology;
 import org.apache.lucene.morphology.russian.RussianLuceneMorphology;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Component
-@Scope("prototype")
 @Slf4j
 public class LemmaService {
     private final LuceneMorphology luceneMorph;
@@ -23,60 +23,52 @@ public class LemmaService {
     }
 
 
-    private HashMap<String, Integer> lemmaCount(String text) throws IOException {
-        LuceneMorphology luceneMorph = new RussianLuceneMorphology();
-        //TODO разделяем текст на слова
-        //TODO
-        int startIndex = 0;
-        int endIndex = text.indexOf(" ");
-        HashMap<String, Integer> result = new HashMap<>();
-
-        while (endIndex != -1) {
-//            String word = inputString.substring(startIndex, endIndex);
-//
-//
-//            if (uniqueWords.containsKey(word)) {
-//                uniqueWords.put(word, uniqueWords.get(word) + 1);
-//            } else {
-//                uniqueWords.put(word, 1);
-//            }
-//
-              startIndex = endIndex + 1;
-//            endIndex = inputString.indexOf(" ", startIndex);
+    public Map<String, Integer> lemmaCount(String text) {
+        HashMap<String, Integer> lemms = new HashMap<>();
+        List<String> words = splitIntoWords(text);
+        for (String word : words) {
+            if (word.isEmpty()) {continue;}
+            List<String> wordLemmas = getNormalFormWords(word);
+            if (wordLemmas == null) {continue;}
+            wordLemmas.stream().forEach(l->{
+                if (lemms.containsKey(l)) {
+                    lemms.put(l, lemms.get(l) + 1);
+                } else {
+                    lemms.put(l, 1);
+                }
+            });
         }
-//        String lastWord = inputString.substring(startIndex);
-//
-//
-//        List<String> words = splitIntoWords(text);
-//        List<String> lemms = convertWordToLemm(words);
-
-//        for (String lemmItem : lemms) {
-//            if (result.containsKey(lemmItem)) {
-//                result.put(lemmItem, result.get(lemmItem) + 1);
-//            } else {
-//                result.put(lemmItem, 1);
-//            }
-//        }
-        return result;
+        return lemms;
     }
 
-    private HashMap<String, Integer> lemmAnalyse(HashMap<String, Integer> lemmMaps, List<String> lemms) {
-        for (String lemmItem : lemms) {
-            if (lemmMaps.containsKey(lemmItem)) {
-                lemmMaps.put(lemmItem, lemmMaps.get(lemmItem) + 1);
-            } else {
-                lemmMaps.put(lemmItem, 1);
+    private List<String> getNormalFormWords(String word) {
+        try {
+            List<String> normalFormsWord = luceneMorph.getNormalForms(word);
+            List<String> normaFormsInfo = luceneMorph.getMorphInfo(word);
+            List<String> resultWords = new ArrayList<>();
+            for (int i=0; i<normalFormsWord.size(); i++) {
+                if (!Arrays.stream(PARTICLES).anyMatch(normaFormsInfo.get(i)::contains)) {
+                    resultWords.add(normalFormsWord.get(i));
+                }
             }
+            return resultWords;
+        } catch (Exception e) {
+            log.error("Error on getNormalFormWord for " + word);
+            return null;
         }
-        return lemmMaps;
     }
 
-    private List<String> convertWordToLemm(List<String> inputWords) {
-        return null;
+    private List<String> splitIntoWords(String text) {
+        String textWithoutHTMLTags = Jsoup.clean(text, Safelist.none()).toLowerCase();        
+        return Arrays.stream(textWithoutHTMLTags.replaceAll("([^а-я\\s])", " ")
+                        .trim()
+                        .replaceAll("\\s+", " ")
+                        .split("\\s+")).toList();
     }
 
-//    List<String> wordBaseForms =
-//                luceneMorph.getNormalForms("воды");
-//        wordBaseForms.forEach(System.out::println);
-//        luceneMorph
+
+
+
+
+
 }

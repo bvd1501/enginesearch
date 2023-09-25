@@ -1,11 +1,10 @@
 package searchengine.services;
 
 import searchengine.dto.indexing.IndexingResponse;
-import searchengine.model.SiteEntity;
-import searchengine.model.StatusType;
 
-public interface SiteIndexingService {
+public interface IndexingService {
     IndexingResponse getStartIndexing();
     IndexingResponse getStopIndexing();
+    IndexingResponse getPageIndexing(String url);
     boolean isStopFlag();
 }

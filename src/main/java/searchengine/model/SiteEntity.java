@@ -48,6 +48,7 @@ public class SiteEntity {
     public SiteEntity(String url, String name) {
         this.url = url;
         this.name = name;
+        this.last_error = null;
         this.status = StatusType.INDEXING;
         this.statusTime = new java.util.Date();
     }

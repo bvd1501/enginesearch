@@ -4,39 +4,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import searchengine.config.Site;
 import searchengine.config.SitesList;
 import searchengine.dto.indexing.IndexingResponse;
 import searchengine.model.SiteEntity;
-import searchengine.model.StatusType;
-import searchengine.repo.PageRepo;
-import searchengine.repo.SiteRepo;
 
-import java.util.Date;
-import java.util.Optional;
 import java.util.concurrent.*;
 
 
 @Service
 @Slf4j
-public class SiteIndexingServiceImp implements SiteIndexingService {
+public class IndexingServiceImp implements IndexingService {
     private final ApplicationContext context;
+    private final DatabaseService databaseService;
     private final SitesList sites;
-    private final SiteRepo siteRepo;
-    private final PageRepo pageRepo;
-
     private static boolean stopFlag;
-
     private ExecutorService siteExecutor;
-
     @Autowired
-    public SiteIndexingServiceImp(ApplicationContext context) {
-        this.context = context;     
-        this.sites = this.context.getBean(SitesList.class);
-        this.siteRepo = this.context.getBean(SiteRepo.class);
-        this.pageRepo = this.context.getBean(PageRepo.class);
-        this.stopFlag = false;
+    public IndexingServiceImp(ApplicationContext context) {
+        this.context = context;
+        this.sites = context.getBean(SitesList.class);
+        this.databaseService = context.getBean(DatabaseService.class);
     }
 
     @Override
@@ -66,9 +54,18 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
         return new IndexingResponse(true);
     }
 
+    @Override
+    public IndexingResponse getPageIndexing(String url) {
+        boolean isUrlCorrect = sites.getSites().stream().anyMatch(site -> url.startsWith(site.getUrl()));
+        if (!isUrlCorrect) {
+            log.info("Страница " + url + " находится за пределами сайтов, указанных в конфигурационном файле");
+            return new IndexingResponse(false, "Данная страница находится за пределами сайтов, указанных в конфигурационном файле");
+        }
+
+        return new IndexingResponse(true);
+    }
+
     private boolean isRunning() {
-        // так же тестировался вариант:
-        // !(siteExecutor == null || (siteExecutor.isShutdown() && siteExecutor.isTerminated()))
         return siteExecutor != null && !siteExecutor.isTerminated();
     }
     @Override
@@ -79,45 +76,20 @@ public class SiteIndexingServiceImp implements SiteIndexingService {
     private void startIndex(String urlSite, String nameSite) {
         long startTime = System.currentTimeMillis();
         Thread.currentThread().setName("th." + nameSite);
-        SiteEntity currentSite = createSiteForIndexing(urlSite, nameSite);
+        SiteEntity currentSite = databaseService.createSite(urlSite, nameSite);
         ForkJoinPool sitePool = new ForkJoinPool();
         var pageIndexService = context.getBean(PageIndexService.class, context, currentSite, urlSite);
         sitePool.invoke(pageIndexService);
-        long countPages = refreshSite(currentSite);
+        sitePool.shutdown();
+        //sitePool.execute(pageIndexService);
+//        try {
+//            sitePool.awaitTermination(60, TimeUnit.MINUTES);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+        currentSite.setLast_error(isStopFlag() ? "Индексация остановлена пользователем" : null);
+        long countPages = databaseService.endSiteIndex(currentSite);
         long resultTime = (System.currentTimeMillis() - startTime) / 60000;
         log.info(nameSite + " - " + resultTime + " min / " + countPages + " pages");
     }
-
-
-
-    private long refreshSite(SiteEntity site) {
-        Optional<SiteEntity> updateSite = siteRepo.findById(site.getId());
-        if (!updateSite.isPresent()) {
-            log.error(site.getName() + " is missing in base!!!");
-            return 0;}
-        long result = pageRepo.countBySite(site);
-        String last_error = updateSite.get().getLast_error();
-        if (isStopFlag()) {last_error = "Stop by user";}
-        if (last_error == null) {
-            siteRepo.updateStatusAndLast_errorAndStatusTimeById(StatusType.INDEXED,
-                    (result + " pages"), new java.util.Date(), site.getId());
-        } else {
-            siteRepo.updateStatusAndLast_errorAndStatusTimeById(StatusType.FAILED,
-                    last_error + " / " + result + " pages",
-                    new java.util.Date(), site.getId());
-        }
-        return result;
-    }
-
-
-    @Transactional
-    private SiteEntity createSiteForIndexing(String urlSite, String nameSite) {
-        log.info("Start indexing site: " + nameSite);
-        siteRepo.deleteByUrlAndName(urlSite, nameSite);
-        SiteEntity currentSite = new SiteEntity(urlSite, nameSite);
-        siteRepo.save(currentSite);
-        return currentSite;
-    }
-
-
 }

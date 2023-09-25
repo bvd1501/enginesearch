@@ -10,30 +10,23 @@ import searchengine.model.SiteEntity;
 import searchengine.model.StatusType;
 
 import java.util.Date;
-import java.util.Optional;
+
 
 @Repository
 public interface SiteRepo extends CrudRepository<SiteEntity, Integer> {
-    @Transactional
-    @Modifying
-    @Query("update SiteEntity s set s.statusTime = ?1, s.last_error = ?2 where s.id = ?3")
-    int updateStatusTimeAndLast_errorById(Date statusTime, String last_error, Integer id);
-
-    @Transactional
     @Modifying
     @Query("update SiteEntity s set s.statusTime = :statusTime where s.id = :id")
+    @Transactional
     void updateStatusTimeById(@Param("statusTime") Date statusTime, @Param("id") Integer id);
-    @Transactional
-    @Modifying
-    @Query("""
-            update SiteEntity s set s.status = :status, s.last_error = :last_error, s.statusTime = :statusTime
-            where s.id = :id""")
-    void updateStatusAndLast_errorAndStatusTimeById(@Param("status") StatusType status, @Param("last_error") String last_error, @Param("statusTime") Date statusTime, @Param("id") Integer id);
 
 
     @Modifying
     @Transactional
-    long deleteByUrlAndName(String url, String name);
+    void deleteByUrlAndName(String url, String name);
+
+//    @Modifying
+//    @Query("delete from SiteEntity s where s.url = :url and s.name = :name")
+//    void deleteByUrlAndName(String url, String name);
 
 
 }
