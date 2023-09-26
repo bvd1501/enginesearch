@@ -51,7 +51,7 @@ public class PageEntity {
         this.site = site;
         this.path = path;
         this.code = 0;
-        this.content = new String();
+        this.content = "";
     }
 
    public String getFullPath() {

@@ -66,7 +66,6 @@ public class PageIndexService extends RecursiveAction {
     /**
      * 1) Соединиться со страницей, 2) получить ответ,
      * 3) записать страницу(ответ) в БД, 4) провести лемантизацию и 5) обновить данные сайта в БД
-     * @return Document содержащий прочитанную и проиндексированную страницу или null при ошибке
      **/
     public void readAndIndexPage() {
         Map<String, Integer> lemmaMap = new HashMap<>();
