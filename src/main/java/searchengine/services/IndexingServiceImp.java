@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import searchengine.config.Site;
 import searchengine.config.SitesList;
 import searchengine.dto.indexing.IndexingResponse;
+import searchengine.model.PageEntity;
 import searchengine.model.SiteEntity;
 
 import java.util.concurrent.*;
@@ -56,12 +57,16 @@ public class IndexingServiceImp implements IndexingService {
 
     @Override
     public IndexingResponse getPageIndexing(String url) {
-        boolean isUrlCorrect = sites.getSites().stream().anyMatch(site -> url.startsWith(site.getUrl()));
+        boolean isUrlCorrect = sites.getSites().stream().anyMatch(s -> url.startsWith(s.getUrl()));
         if (!isUrlCorrect) {
             log.info("Страница " + url + " находится за пределами сайтов, указанных в конфигурационном файле");
             return new IndexingResponse(false, "Данная страница находится за пределами сайтов, указанных в конфигурационном файле");
         }
-
+//        Site simpleSite = findSiteForPage(url);
+//        if (simpleSite == null) {
+//            log.info("Страница " + url + " находится за пределами сайтов, указанных в конфигурационном файле");
+//            return new IndexingResponse(false, "Данная страница находится за пределами сайтов, указанных в конфигурационном файле");
+//        }
         return new IndexingResponse(true);
     }
 
@@ -77,8 +82,10 @@ public class IndexingServiceImp implements IndexingService {
         long startTime = System.currentTimeMillis();
         Thread.currentThread().setName("th." + nameSite);
         SiteEntity currentSite = databaseService.createSite(urlSite, nameSite);
+        PageEntity firstPage = new PageEntity(currentSite, "/");
         ForkJoinPool sitePool = new ForkJoinPool();
-        var pageIndexService = context.getBean(PageIndexService.class, context, currentSite, urlSite);
+        var pageIndexService = context.getBean(PageIndexService.class, context, firstPage);
+        //var pageIndexService = context.getBean(PageIndexService.class, context, currentSite, urlSite);
         sitePool.invoke(pageIndexService);
         sitePool.shutdown();
         //sitePool.execute(pageIndexService);

@@ -5,11 +5,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.net.URI;
 
 @Getter
 @Setter
@@ -21,7 +23,7 @@ import javax.persistence.*;
         , indexes = {@Index(name = "idx_path", columnList = "path")
                     , @Index(name = "idx_site_id", columnList = "site_id")}
 )
-
+@Slf4j
 public class PageEntity {
     @Setter(AccessLevel.NONE)
     @Id
@@ -49,15 +51,13 @@ public class PageEntity {
         this.site = site;
         this.path = path;
         this.code = 0;
-        this.content = " ";
+        this.content = new String();
     }
 
-    public PageEntity(SiteEntity site, String path, Integer code, String content) {
-        this.site = site;
-        this.path = path;
-        this.code = code;
-        this.content = content;
-    }
+   public String getFullPath() {
+       URI baseURI = URI.create(site.getUrl());
+       return baseURI.toString().replaceFirst("/$","")+path;
+   }
 
 
 }

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import searchengine.config.BadLinks;
 import searchengine.config.JsoupCfg;
 import searchengine.model.PageEntity;
-import searchengine.model.SiteEntity;
 
 
 import java.io.IOException;
@@ -30,22 +29,23 @@ import java.util.concurrent.RecursiveAction;
 @Slf4j
 public class PageIndexService extends RecursiveAction {
     private final ApplicationContext context;
+    private final JsoupCfg jsoupCfg;
     private final IndexingService indexingService;
     private final LemmaService lemmaService;
     private final DatabaseService databaseService;
-    private final JsoupCfg jsoupCfg;
-    private final SiteEntity site;
-    private final String pageAddress;
+    private final PageEntity pageEntity;
+
+//    private final SiteEntity site;
+//    private final String pageAddress;
 
     @Autowired
-    public PageIndexService(ApplicationContext context, SiteEntity site, String pageAddress) {
+    public PageIndexService(ApplicationContext context, PageEntity pageEntity) {
         this.context = context;
         this.indexingService = context.getBean(IndexingService.class);
         this.lemmaService = context.getBean(LemmaService.class);
         this.databaseService = context.getBean(DatabaseService.class);
         this.jsoupCfg = context.getBean(JsoupCfg.class);
-        this.site = site;
-        this.pageAddress = pageAddress;
+        this.pageEntity = pageEntity;
     }
 
 
@@ -55,57 +55,52 @@ public class PageIndexService extends RecursiveAction {
         if (indexingService.isStopFlag() || ForkJoinTask.getPool().isShutdown()) {
             return;
         }
-        Document docPage = singlePageIndexing();
-        if (docPage == null) {
-            return;
-        }
-        ForkJoinTask.invokeAll(pageHandler(docPage));
+        readAndIndexPage();
+        if (pageEntity.getCode()!=HttpStatus.OK.value()) {return;}
+        if (pageEntity.getContent().isEmpty()) {return;}
+        Set<PageIndexService> childrenPageIndex = pageHandler(pageEntity);
+        ForkJoinTask.invokeAll(childrenPageIndex);
     }
 
 
     /**
      * 1) Соединиться со страницей, 2) получить ответ,
      * 3) записать страницу(ответ) в БД, 4) провести лемантизацию и 5) обновить данные сайта в БД
-     *
      * @return Document содержащий прочитанную и проиндексированную страницу или null при ошибке
      **/
-    public Document singlePageIndexing() {
-        String pathPage = "/" + URI.create(site.getUrl()).relativize(URI.create(pageAddress));
-        PageEntity page = new PageEntity(site, pathPage);
+    public void readAndIndexPage() {
         Map<String, Integer> lemmaMap = new HashMap<>();
         try {
             //long sleepTime = 500L + (long) (Math.random() * 5000);
             long sleepTime = 500L;
             Thread.sleep(sleepTime);
-            Connection.Response responsePage = connector();
-
+            Connection.Response responsePage = pageReader();
             if (responsePage.statusCode() == HttpStatus.OK.value()) {
                 lemmaMap = lemmaService.lemmaCount(responsePage.body());
             }
-            page.setCode(responsePage.statusCode());
-            page.setContent(responsePage.body());
-            if (!databaseService.saveIndexPage(page, lemmaMap)) {return null;}
-            return responsePage.parse();
+            pageEntity.setCode(responsePage.statusCode());
+            pageEntity.setContent(responsePage.body());
+            databaseService.savePage(pageEntity, lemmaMap);
         } catch (Exception e) {
             if (!(e instanceof UnsupportedMimeTypeException)) {
-                log.error(e + " on " + pageAddress);
                 handlerConnectException(e);
             }
         }
-        return null;
     }
 
 
     private void handlerConnectException(Exception e) {
-        databaseService.updateLastErrorOnSite(site, e.getMessage() + " on " + pageAddress);
+        String errorMsg = e + " on " + pageEntity.getFullPath();
+        log.error(errorMsg);
+        databaseService.updateLastErrorOnSite(pageEntity.getSite(), errorMsg);
         if (!(e instanceof  IOException)) {
-            log.error("shutdown pool on " + pageAddress);
+            log.error("shutdown pool on " + pageEntity.getFullPath());
             ForkJoinTask.getPool().shutdown();
         }
     }
 
-    private Connection.Response connector() throws IOException {
-        return Jsoup.connect(pageAddress)
+    private Connection.Response pageReader() throws IOException {
+        return Jsoup.connect(pageEntity.getFullPath())
                 .userAgent(jsoupCfg.getUserAgent())
                 .referrer(jsoupCfg.getReferrer())
                 .timeout(jsoupCfg.getTimeout())
@@ -116,33 +111,34 @@ public class PageIndexService extends RecursiveAction {
     }
 
 
-    private HashSet<PageIndexService> pageHandler(Document inputDoc) {
+    private HashSet<PageIndexService> pageHandler(PageEntity page) {
         HashSet<PageIndexService> resultPageServices = new HashSet<>();
-        Elements elements = inputDoc.select("a");
+        URI baseURL = URI.create(page.getSite().getUrl());
+        Document doc = Jsoup.parse(page.getContent(), page.getFullPath());
+        Elements elements = doc.select("a");
         for (Element element : elements) {
             String link = element.absUrl("href").toLowerCase();
-            String newPageAddress = linkValidator(link);
-            if (newPageAddress == null) {continue;}
-            String newPath = "/" + URI.create(site.getUrl()).relativize(URI.create(newPageAddress));
-            if (databaseService.existPage(site, newPath)) {continue;}
-            resultPageServices.add(context.getBean(PageIndexService.class, context, site, newPageAddress));
+            URI childURI = linkValidator(link);
+            if (childURI == null) {continue;}
+            String childPath = "/" + baseURL.relativize(childURI);
+            PageEntity childPage = new PageEntity(page.getSite(), childPath);
+            if (databaseService.existPage(childPage)) {continue;}
+            resultPageServices.add(context.getBean(PageIndexService.class, context, childPage));
         }
         return resultPageServices;
     }
 
-    private String linkValidator(String link) {
-        if (!link.startsWith(site.getUrl())) {
+    private URI linkValidator(String link) {
+        if (!link.startsWith(pageEntity.getSite().getUrl())) {
             return null;}
         if (EnumSet.allOf(BadLinks.class).stream().anyMatch(enumElement ->
                 link.contains(enumElement.toString()))) {
             return null;}
         try {
-            URI linkUri = URI.create(link);
-            return linkUri.getScheme()
-                    + "://"
-                    + linkUri.getRawAuthority()
-                    + linkUri.getRawPath();
-        } catch (IllegalArgumentException e) {
+            URI dirtyUri = URI.create(link);//
+            return new URI(dirtyUri.getScheme(), dirtyUri.getRawAuthority(),
+                    dirtyUri.getRawPath(), null, null);
+        } catch (IllegalArgumentException | URISyntaxException e) {
             log.error("Bad link: " + e.getMessage());
             return null;
         }

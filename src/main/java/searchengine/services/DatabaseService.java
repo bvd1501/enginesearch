@@ -9,13 +9,13 @@ public interface DatabaseService {
 
 
     SiteEntity createSite(String urlSite, String nameSite);
-    boolean saveIndexPage(PageEntity page, Map<String, Integer> lemmaMap);
+    boolean savePage(PageEntity page, Map<String, Integer> lemmaMap);
 
     long endSiteIndex(SiteEntity site);
 
 
     void updateLastErrorOnSite(SiteEntity site, String errorStr);
 
-    boolean existPage(SiteEntity site, String pathPage);
+    boolean existPage(PageEntity pageEntity);
 
 }

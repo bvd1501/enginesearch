@@ -78,13 +78,12 @@ public class DatabaseServiceImpl implements DatabaseService{
 
     /**
      * Поиск страницы в бД
-     * @param site - сайт, на котором ищется страница
-     * @param pathPage - относительный адрес страницы
+     * @param page - страница, которая ищется в базе     *
      * @return - true если страница найдена, иначе false
      */
     @Override
-    public boolean existPage(SiteEntity site, String pathPage) {
-        return  pageRepo.existsBySite_IdAndPath(site.getId(), pathPage);
+    public boolean existPage(PageEntity page) {
+        return  pageRepo.existsBySite_IdAndPath(page.getSite().getId(), page.getPath());
     }
 
     /**
@@ -95,7 +94,7 @@ public class DatabaseServiceImpl implements DatabaseService{
      */
     @Override
     @Transactional(timeout = 5000)
-    public synchronized boolean saveIndexPage(PageEntity page, Map<String, Integer> lemmaMap) {
+    public synchronized boolean savePage(PageEntity page, Map<String, Integer> lemmaMap) {
         //if (existPage(site, page.getPath())) {return false;}
         if(pageRepo.existsBySite_IdAndPath(page.getSite().getId(), page.getPath())) {return false;}
         pageRepo.save(page);
