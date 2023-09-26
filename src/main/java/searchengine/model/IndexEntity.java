@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "index_tbl")
+@Table(name = "`index`")
 @NoArgsConstructor
 
 public class IndexEntity {
