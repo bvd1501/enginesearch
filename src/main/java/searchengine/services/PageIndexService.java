@@ -35,8 +35,6 @@ public class PageIndexService extends RecursiveAction {
     private final DatabaseService databaseService;
     private final PageEntity pageEntity;
 
-//    private final SiteEntity site;
-//    private final String pageAddress;
 
     @Autowired
     public PageIndexService(ApplicationContext context, PageEntity pageEntity) {
@@ -117,30 +115,12 @@ public class PageIndexService extends RecursiveAction {
         Elements elements = doc.select("a");
         for (Element element : elements) {
             String link = element.absUrl("href").toLowerCase();
-            URI childURI = linkValidator(link);
-            if (childURI == null) {continue;}
-            String childPath = "/" + baseURL.relativize(childURI);
-            PageEntity childPage = new PageEntity(page.getSite(), childPath);
+            PageEntity childPage = new PageEntity(page.getSite(), link);
+            if (childPage.getPath().isEmpty()) {continue;}
             if (databaseService.existPage(childPage)) {continue;}
             resultPageServices.add(context.getBean(PageIndexService.class, context, childPage));
         }
         return resultPageServices;
-    }
-
-    private URI linkValidator(String link) {
-        if (!link.startsWith(pageEntity.getSite().getUrl())) {
-            return null;}
-        if (EnumSet.allOf(BadLinks.class).stream().anyMatch(enumElement ->
-                link.contains(enumElement.toString()))) {
-            return null;}
-        try {
-            URI dirtyUri = URI.create(link);//
-            return new URI(dirtyUri.getScheme(), dirtyUri.getRawAuthority(),
-                    dirtyUri.getRawPath(), null, null);
-        } catch (IllegalArgumentException | URISyntaxException e) {
-            log.error("Bad link: " + e.getMessage());
-            return null;
-        }
     }
 
 

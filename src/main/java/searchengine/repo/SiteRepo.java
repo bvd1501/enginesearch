@@ -9,10 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 import searchengine.model.SiteEntity;
 
 import java.util.Date;
+import java.util.Optional;
 
 
 @Repository
 public interface SiteRepo extends CrudRepository<SiteEntity, Integer> {
+    Optional<SiteEntity> findByUrl(String url);
     @Modifying
     @Query("update SiteEntity s set s.statusTime = :statusTime where s.id = :id")
     @Transactional

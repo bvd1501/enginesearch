@@ -87,6 +87,16 @@ public class DatabaseServiceImpl implements DatabaseService{
     }
 
     /**
+     * @param url
+     * @return
+     */
+    @Override
+    public SiteEntity findSiteByPageUrl(String url) {
+        Optional site = siteRepo.findByUrl(url);
+        return null;
+    }
+
+    /**
      * Внесение результатов индексации страницы в БД
      * @param page - проиндексированная страница
      * @param lemmaMap - леммы, найденные на странице

@@ -9,9 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import searchengine.config.BadLinks;
 
 import javax.persistence.*;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.EnumSet;
 
 @Getter
 @Setter
@@ -47,11 +50,25 @@ public class PageEntity {
     @Column(name = "content", length = 16777215, nullable = false, columnDefinition = "mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci")
     private String content;
 
-    public PageEntity(SiteEntity site, String path) {
+    public PageEntity(SiteEntity site, String fullPath) {
         this.site = site;
-        this.path = path;
+        this.path = "";
         this.code = 0;
         this.content = "";
+        URI baseURL = URI.create(site.getUrl());
+        boolean isPathBad = (!fullPath.startsWith(site.getUrl())) ||
+                (EnumSet.allOf(BadLinks.class).stream().anyMatch(enumElement ->
+                        fullPath.contains(enumElement.toString())));
+        if (!isPathBad) {
+            try {
+                URI dirtyUri = URI.create(fullPath);//
+                URI cleanURI = new URI(dirtyUri.getScheme(), dirtyUri.getRawAuthority(),
+                        dirtyUri.getRawPath(), null, null);
+                this.path = "/" + baseURL.relativize(cleanURI);
+            } catch (IllegalArgumentException | URISyntaxException e) {
+                log.error("Bad link: " + e.getMessage());
+            }
+        }
     }
 
    public String getFullPath() {

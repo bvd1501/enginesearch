@@ -18,4 +18,5 @@ public interface DatabaseService {
 
     boolean existPage(PageEntity pageEntity);
 
+    SiteEntity findSiteByPageUrl(String url);
 }
