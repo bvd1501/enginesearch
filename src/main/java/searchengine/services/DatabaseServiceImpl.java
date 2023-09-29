@@ -32,7 +32,7 @@ public class DatabaseServiceImpl implements DatabaseService{
      */
     @Override
     //@Transactional
-    public SiteEntity createSite(String urlSite, String nameSite) {
+    public SiteEntity initSite(String urlSite, String nameSite) {
         log.info("Clean data on site " + nameSite);
         siteRepo.deleteByUrlAndName(urlSite, nameSite);
         return siteRepo.save(new SiteEntity(urlSite, nameSite));
@@ -87,6 +87,8 @@ public class DatabaseServiceImpl implements DatabaseService{
     }
 
     /**
+     *
+     *
      * @param url
      * @return
      */

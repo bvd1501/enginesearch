@@ -10,7 +10,6 @@ import searchengine.dto.indexing.IndexingResponse;
 import searchengine.model.PageEntity;
 import searchengine.model.SiteEntity;
 
-import java.net.URI;
 import java.util.concurrent.*;
 
 
@@ -63,11 +62,12 @@ public class IndexingServiceImp implements IndexingService {
 //            log.info("Страница " + url + " находится за пределами сайтов, указанных в конфигурационном файле");
 //            return new IndexingResponse(false, "Данная страница находится за пределами сайтов, указанных в конфигурационном файле");
 //        }
-        SiteEntity siteEntity = databaseService.findSiteByPageUrl(url);
-        if (siteEntity == null) {
+        Site site = sites.getSites().stream().filter(s->url.startsWith(s.getUrl())).findAny().orElse(null);
+        if (site == null) {
             log.info("Страница " + url + " находится за пределами сайтов, указанных в конфигурационном файле");
             return new IndexingResponse(false, "Данная страница находится за пределами сайтов, указанных в конфигурационном файле");
         }
+        SiteEntity siteEntity = databaseService.findSiteByPageUrl(url);
         PageEntity pageEntity = new PageEntity(siteEntity, url);
         var pageIndexService = context.getBean(PageIndexService.class, context, pageEntity);
         pageIndexService.readAndIndexPage();
@@ -87,7 +87,7 @@ public class IndexingServiceImp implements IndexingService {
     private void startIndex(String urlSite, String nameSite) {
         long startTime = System.currentTimeMillis();
         Thread.currentThread().setName("th." + nameSite);
-        SiteEntity currentSite = databaseService.createSite(urlSite, nameSite);
+        SiteEntity currentSite = databaseService.initSite(urlSite, nameSite);
         PageEntity firstPage = new PageEntity(currentSite, urlSite);
         ForkJoinPool sitePool = new ForkJoinPool();
         var pageIndexService = context.getBean(PageIndexService.class, context, firstPage);
