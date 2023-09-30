@@ -15,5 +15,7 @@ public class UriTester {
         System.out.println("RawPath page - " + pageURI.getRawPath());
         System.out.println("reconstract = " + baseSite + pageURI.getRawPath().substring(1));
 
+        
+
     }
 }

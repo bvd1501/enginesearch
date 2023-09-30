@@ -57,18 +57,14 @@ public class IndexingServiceImp implements IndexingService {
 
     @Override
     public IndexingResponse getPageIndexing(String url) {
-//        boolean isUrlCorrect = sites.getSites().stream().anyMatch(s -> url.startsWith(s.getUrl()));
-//        if (!isUrlCorrect) {
-//            log.info("Страница " + url + " находится за пределами сайтов, указанных в конфигурационном файле");
-//            return new IndexingResponse(false, "Данная страница находится за пределами сайтов, указанных в конфигурационном файле");
-//        }
         Site site = sites.getSites().stream().filter(s->url.startsWith(s.getUrl())).findAny().orElse(null);
         if (site == null) {
             log.info("Страница " + url + " находится за пределами сайтов, указанных в конфигурационном файле");
             return new IndexingResponse(false, "Данная страница находится за пределами сайтов, указанных в конфигурационном файле");
         }
-        SiteEntity siteEntity = databaseService.findSiteByPageUrl(url);
+        SiteEntity siteEntity = databaseService.findSite(site.getUrl(), site.getName());
         PageEntity pageEntity = new PageEntity(siteEntity, url);
+        databaseService.cleanPage(pageEntity);
         var pageIndexService = context.getBean(PageIndexService.class, context, pageEntity);
         pageIndexService.readAndIndexPage();
         databaseService.endSiteIndex(siteEntity);
@@ -93,6 +89,7 @@ public class IndexingServiceImp implements IndexingService {
         var pageIndexService = context.getBean(PageIndexService.class, context, firstPage);
         sitePool.invoke(pageIndexService);
         sitePool.shutdown();
+        if (isStopFlag()) {currentSite.setLast_error("Принудительная остановка индексации пользователем");}
         long countPages = databaseService.endSiteIndex(currentSite);
         long resultTime = (System.currentTimeMillis() - startTime) / 60000;
         log.info(nameSite + " - " + resultTime + " min / " + countPages + " pages");

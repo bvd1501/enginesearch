@@ -18,5 +18,7 @@ public interface DatabaseService {
 
     boolean existPage(PageEntity pageEntity);
 
-    SiteEntity findSiteByPageUrl(String url);
+    SiteEntity findSite(String url, String name);
+
+    void cleanPage(PageEntity pageEntity);
 }
