@@ -6,9 +6,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 
 @Entity
@@ -42,8 +42,8 @@ public class SiteEntity {
 //   @OneToMany(fetch = FetchType.LAZY, mappedBy = "site", cascade = CascadeType.ALL)
 //   private Set<PageEntity> pages = new HashSet<>();
 
-//   @OneToMany(fetch = FetchType.LAZY, mappedBy = "site", cascade = CascadeType.ALL)
-//   private Set<LemmaEntity> lemmas;
+   @OneToMany(fetch = FetchType.LAZY, mappedBy = "site", cascade = CascadeType.ALL)
+   private Set<LemmaEntity> lemmas;
 
     public SiteEntity(String url, String name) {
         this.url = url;

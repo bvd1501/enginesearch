@@ -110,7 +110,6 @@ public class PageIndexService extends RecursiveAction {
 
     private HashSet<PageIndexService> pageHandler(PageEntity page) {
         HashSet<PageIndexService> resultPageServices = new HashSet<>();
-        URI baseURL = URI.create(page.getSite().getUrl());
         Document doc = Jsoup.parse(page.getContent(), page.getFullPath());
         Elements elements = doc.select("a");
         for (Element element : elements) {

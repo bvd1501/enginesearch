@@ -34,9 +34,6 @@ public class IndexEntity {
     private PageEntity page;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "lemma_id", nullable = false, foreignKey = @ForeignKey(name = "fk_lemma_id",
-//            value = ConstraintMode.CONSTRAINT,
-//            foreignKeyDefinition = "FOREIGN KEY (lemma_id) REFERENCES lemma(id) ON DELETE CASCADE"))
     @JoinColumn (name = "lemma_id", nullable = false, referencedColumnName = "id"
             , foreignKey = @ForeignKey(name = "fk_index_lemma"))
     @OnDelete(action = OnDeleteAction.CASCADE)
