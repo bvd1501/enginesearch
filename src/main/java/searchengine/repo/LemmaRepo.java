@@ -15,7 +15,7 @@ import java.util.Set;
 public interface LemmaRepo extends CrudRepository<LemmaEntity, Integer> {
 
     @Query("select l from LemmaEntity l where l.site.id = ?1 and l.lemma in ?2")
-    Set<LemmaEntity> findBySite_IdAndLemmaIn(Integer id, Collection<String> lemmata);
+    Set<LemmaEntity> findBySite_IdAndLemmaIn(Integer id, Collection<String> lemma);
 
     @Query("select l from LemmaEntity l where l.id in ?1")
     Set<LemmaEntity> findByIdIn(Collection<Integer> ids);

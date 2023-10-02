@@ -182,3 +182,225 @@
 2023-10-02 22:44:07 ERROR - shutdown pool on https://et-cetera.ru/mobile/performance/revizor-versiya/
 2023-10-02 22:44:08 INFO  - et-cetera.ru - 0 min / 18 pages
 2023-10-02 22:44:25 INFO  - ГИСЖКХ - 0 min / 137 pages
+2023-10-02 22:47:09 INFO  - Gallery - 3 min / 159 pages
+2023-10-02 22:49:15 INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 22:49:18 ERROR - Table 'search_engine.page' doesn't exist
+2023-10-02 22:49:18 ERROR - Table 'search_engine.page' doesn't exist
+2023-10-02 22:49:18 ERROR - org.springframework.dao.InvalidDataAccessResourceUsageException: could not extract ResultSet; SQL [n/a]; nested exception is org.hibernate.exception.SQLGrammarException: could not extract ResultSet on https://www.lutherancathedral.ru/2015/07/05/по-слову-твоему-закину-сети/
+2023-10-02 22:49:18 ERROR - org.springframework.dao.InvalidDataAccessResourceUsageException: could not extract ResultSet; SQL [n/a]; nested exception is org.hibernate.exception.SQLGrammarException: could not extract ResultSet on https://www.lutherancathedral.ru/2018/04/10/конфирмация-в-кафедральном-соборе/
+2023-10-02 22:49:18 ERROR - Table 'search_engine.site' doesn't exist
+2023-10-02 22:49:18 ERROR - Table 'search_engine.site' doesn't exist
+2023-10-02 22:49:18 INFO  - HikariPool-1 - Shutdown initiated...
+2023-10-02 22:49:18 INFO  - HikariPool-1 - Shutdown completed.
+2023-10-02 22:49:22 INFO  - Starting Application using Java 20 on bmpc with PID 8662 (/home/boris/Soft_project/enginesearch/target/classes started by boris in /home/boris/Soft_project/enginesearch)
+2023-10-02 22:49:22 INFO  - No active profile set, falling back to 1 default profile: "default"
+2023-10-02 22:49:24 INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-10-02 22:49:24 INFO  - Finished Spring Data repository scanning in 139 ms. Found 4 JPA repository interfaces.
+2023-10-02 22:49:25 INFO  - Tomcat initialized with port(s): 8083 (http)
+2023-10-02 22:49:25 INFO  - Starting service [Tomcat]
+2023-10-02 22:49:25 INFO  - Starting Servlet engine: [Apache Tomcat/9.0.64]
+2023-10-02 22:49:26 INFO  - Initializing Spring embedded WebApplicationContext
+2023-10-02 22:49:26 INFO  - Root WebApplicationContext: initialization completed in 3053 ms
+2023-10-02 22:49:27 INFO  - HikariPool-1 - Starting...
+2023-10-02 22:49:27 INFO  - HikariPool-1 - Start completed.
+2023-10-02 22:49:28 INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 22:49:29 WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-10-02 22:49:30 INFO  - Adding welcome page template: index
+2023-10-02 22:49:30 INFO  - Tomcat started on port(s): 8083 (http) with context path ''
+2023-10-02 22:49:30 INFO  - Started Application in 8.278 seconds (JVM running for 9.056)
+2023-10-02 22:50:25 INFO  - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-10-02 22:50:25 INFO  - Initializing Servlet 'dispatcherServlet'
+2023-10-02 22:50:25 INFO  - Completed initialization in 1 ms
+2023-10-02 22:50:25 INFO  - Индексация не запущена - остановка не возможна
+2023-10-02 22:50:28 INFO  - Все сайты отправлены на индексацию
+2023-10-02 22:50:28 INFO  - Clean data on site et-cetera.ru
+2023-10-02 22:50:33 ERROR - Duplicate entry '1-/performance/serdtse-ne-kamen/' for key 'idx_path_site'
+2023-10-02 22:50:33 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_path_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/performance/serdtse-ne-kamen/
+2023-10-02 22:50:33 ERROR - shutdown pool on https://et-cetera.ru/mobile/performance/serdtse-ne-kamen/
+2023-10-02 22:50:35 INFO  - et-cetera.ru - 0 min / 10 pages
+2023-10-02 22:51:22 INFO  - Индексация не запущена - остановка не возможна
+2023-10-02 22:51:24 INFO  - Все сайты отправлены на индексацию
+2023-10-02 22:51:24 INFO  - Clean data on site et-cetera.ru
+2023-10-02 22:52:11 INFO  - Принудительная остановка индексации пользователем
+2023-10-02 22:52:12 INFO  - et-cetera.ru - 0 min / 50 pages
+2023-10-02 22:52:17 INFO  - Все сайты отправлены на индексацию
+2023-10-02 22:52:17 INFO  - Clean data on site et-cetera.ru
+2023-10-02 22:53:01 INFO  - et-cetera.ru - 0 min / 50 pages
+2023-10-02 22:57:59 INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 22:58:00 INFO  - HikariPool-1 - Shutdown initiated...
+2023-10-02 22:58:00 INFO  - HikariPool-1 - Shutdown completed.
+2023-10-02 22:58:19 INFO  - Starting Application using Java 20 on bmpc with PID 9151 (/home/boris/Soft_project/enginesearch/target/classes started by boris in /home/boris/Soft_project/enginesearch)
+2023-10-02 22:58:19 INFO  - No active profile set, falling back to 1 default profile: "default"
+2023-10-02 22:58:20 INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-10-02 22:58:20 INFO  - Finished Spring Data repository scanning in 77 ms. Found 4 JPA repository interfaces.
+2023-10-02 22:58:21 INFO  - Tomcat initialized with port(s): 8083 (http)
+2023-10-02 22:58:21 INFO  - Starting service [Tomcat]
+2023-10-02 22:58:21 INFO  - Starting Servlet engine: [Apache Tomcat/9.0.64]
+2023-10-02 22:58:21 INFO  - Initializing Spring embedded WebApplicationContext
+2023-10-02 22:58:21 INFO  - Root WebApplicationContext: initialization completed in 2111 ms
+2023-10-02 22:58:22 INFO  - HikariPool-1 - Starting...
+2023-10-02 22:58:22 INFO  - HikariPool-1 - Start completed.
+2023-10-02 22:58:23 INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 22:58:24 WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-10-02 22:58:24 INFO  - Adding welcome page template: index
+2023-10-02 22:58:25 INFO  - Tomcat started on port(s): 8083 (http) with context path ''
+2023-10-02 22:58:25 INFO  - Started Application in 6.463 seconds (JVM running for 7.107)
+2023-10-02 22:58:29 INFO  - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-10-02 22:58:29 INFO  - Initializing Servlet 'dispatcherServlet'
+2023-10-02 22:58:29 INFO  - Completed initialization in 1 ms
+2023-10-02 22:58:29 INFO  - Индексация не запущена - остановка не возможна
+2023-10-02 22:58:32 INFO  - Все сайты отправлены на индексацию
+2023-10-02 22:58:32 INFO  - Clean data on site et-cetera.ru
+2023-10-02 22:58:35 ERROR - Duplicate entry '1-казаться' for key 'idx_lemma_site'
+2023-10-02 22:58:35 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/poster/
+2023-10-02 22:58:36 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 22:58:36 ERROR - Duplicate entry '1-образ' for key 'idx_lemma_site'
+2023-10-02 22:58:36 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/performance/moya_marusechka/
+2023-10-02 22:58:36 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 22:58:40 ERROR - Duplicate entry '1-/performance/eto-tak-esli-vam-tak-kazhetsya/' for key 'idx_path_site'
+2023-10-02 22:58:40 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_path_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/performance/eto-tak-esli-vam-tak-kazhetsya/
+2023-10-02 22:58:40 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 22:58:45 INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 22:58:45 INFO  - HikariPool-1 - Shutdown initiated...
+2023-10-02 22:58:45 INFO  - HikariPool-1 - Shutdown completed.
+2023-10-02 22:59:02 INFO  - Starting Application using Java 20 on bmpc with PID 9272 (/home/boris/Soft_project/enginesearch/target/classes started by boris in /home/boris/Soft_project/enginesearch)
+2023-10-02 22:59:02 INFO  - No active profile set, falling back to 1 default profile: "default"
+2023-10-02 22:59:04 INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-10-02 22:59:04 INFO  - Finished Spring Data repository scanning in 107 ms. Found 4 JPA repository interfaces.
+2023-10-02 22:59:05 INFO  - Tomcat initialized with port(s): 8083 (http)
+2023-10-02 22:59:05 INFO  - Starting service [Tomcat]
+2023-10-02 22:59:05 INFO  - Starting Servlet engine: [Apache Tomcat/9.0.64]
+2023-10-02 22:59:05 INFO  - Initializing Spring embedded WebApplicationContext
+2023-10-02 22:59:05 INFO  - Root WebApplicationContext: initialization completed in 2660 ms
+2023-10-02 22:59:06 INFO  - HikariPool-1 - Starting...
+2023-10-02 22:59:06 INFO  - HikariPool-1 - Start completed.
+2023-10-02 22:59:08 INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 22:59:09 WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-10-02 22:59:09 INFO  - Adding welcome page template: index
+2023-10-02 22:59:10 INFO  - Tomcat started on port(s): 8083 (http) with context path ''
+2023-10-02 22:59:10 INFO  - Started Application in 8.393 seconds (JVM running for 10.524)
+2023-10-02 22:59:35 INFO  - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-10-02 22:59:35 INFO  - Initializing Servlet 'dispatcherServlet'
+2023-10-02 22:59:35 INFO  - Completed initialization in 2 ms
+2023-10-02 22:59:35 INFO  - Индексация не запущена - остановка не возможна
+2023-10-02 23:00:15 INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 23:00:15 INFO  - HikariPool-1 - Shutdown initiated...
+2023-10-02 23:00:15 INFO  - HikariPool-1 - Shutdown completed.
+2023-10-02 23:00:19 INFO  - Starting Application using Java 20 on bmpc with PID 9369 (/home/boris/Soft_project/enginesearch/target/classes started by boris in /home/boris/Soft_project/enginesearch)
+2023-10-02 23:00:19 INFO  - No active profile set, falling back to 1 default profile: "default"
+2023-10-02 23:00:20 INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-10-02 23:00:21 INFO  - Finished Spring Data repository scanning in 130 ms. Found 4 JPA repository interfaces.
+2023-10-02 23:00:22 INFO  - Tomcat initialized with port(s): 8083 (http)
+2023-10-02 23:00:22 INFO  - Starting service [Tomcat]
+2023-10-02 23:00:22 INFO  - Starting Servlet engine: [Apache Tomcat/9.0.64]
+2023-10-02 23:00:22 INFO  - Initializing Spring embedded WebApplicationContext
+2023-10-02 23:00:22 INFO  - Root WebApplicationContext: initialization completed in 2617 ms
+2023-10-02 23:00:23 INFO  - HikariPool-1 - Starting...
+2023-10-02 23:00:23 INFO  - HikariPool-1 - Start completed.
+2023-10-02 23:00:24 INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 23:00:26 WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-10-02 23:00:26 INFO  - Adding welcome page template: index
+2023-10-02 23:00:26 INFO  - Tomcat started on port(s): 8083 (http) with context path ''
+2023-10-02 23:00:26 INFO  - Started Application in 8.121 seconds (JVM running for 9.057)
+2023-10-02 23:00:30 INFO  - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-10-02 23:00:30 INFO  - Initializing Servlet 'dispatcherServlet'
+2023-10-02 23:00:30 INFO  - Completed initialization in 2 ms
+2023-10-02 23:00:30 INFO  - Все сайты отправлены на индексацию
+2023-10-02 23:00:30 INFO  - Clean data on site et-cetera.ru
+2023-10-02 23:02:04 WARN  - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=56s893ms579µs677ns).
+2023-10-02 23:02:56 WARN  - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=51s718ms373µs889ns).
+2023-10-02 23:05:03 WARN  - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m34s218ms903µs22ns).
+2023-10-02 23:05:13 ERROR - Duplicate entry '1-день' for key 'idx_lemma_site'
+2023-10-02 23:05:15 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/performance/451_po_farengeytu/
+2023-10-02 23:06:39 WARN  - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m36s55ms303µs962ns).
+2023-10-02 23:06:39 ERROR - Lock wait timeout exceeded; try restarting transaction
+2023-10-02 23:06:39 INFO  - Принудительная остановка индексации пользователем
+2023-10-02 23:06:42 ERROR - Duplicate entry '1-казаться' for key 'idx_lemma_site'
+2023-10-02 23:06:42 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/poster/
+2023-10-02 23:06:52 ERROR - shutdown pool on https://et-cetera.ru/mobile/poster/
+2023-10-02 23:06:59 INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 23:06:59 INFO  - HikariPool-1 - Shutdown initiated...
+2023-10-02 23:06:59 INFO  - HikariPool-1 - Shutdown completed.
+2023-10-02 23:07:06 INFO  - Starting Application using Java 20 on bmpc with PID 9578 (/home/boris/Soft_project/enginesearch/target/classes started by boris in /home/boris/Soft_project/enginesearch)
+2023-10-02 23:07:06 INFO  - No active profile set, falling back to 1 default profile: "default"
+2023-10-02 23:07:07 INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-10-02 23:07:07 INFO  - Finished Spring Data repository scanning in 84 ms. Found 4 JPA repository interfaces.
+2023-10-02 23:07:08 INFO  - Tomcat initialized with port(s): 8083 (http)
+2023-10-02 23:07:08 INFO  - Starting service [Tomcat]
+2023-10-02 23:07:08 INFO  - Starting Servlet engine: [Apache Tomcat/9.0.64]
+2023-10-02 23:07:08 INFO  - Initializing Spring embedded WebApplicationContext
+2023-10-02 23:07:08 INFO  - Root WebApplicationContext: initialization completed in 2353 ms
+2023-10-02 23:07:09 INFO  - HikariPool-1 - Starting...
+2023-10-02 23:07:09 INFO  - HikariPool-1 - Start completed.
+2023-10-02 23:07:10 INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 23:07:12 WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-10-02 23:07:12 INFO  - Adding welcome page template: index
+2023-10-02 23:07:12 INFO  - Tomcat started on port(s): 8083 (http) with context path ''
+2023-10-02 23:07:12 INFO  - Started Application in 7.721 seconds (JVM running for 8.625)
+2023-10-02 23:07:27 INFO  - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-10-02 23:07:27 INFO  - Initializing Servlet 'dispatcherServlet'
+2023-10-02 23:07:27 INFO  - Completed initialization in 2 ms
+2023-10-02 23:07:27 INFO  - Все сайты отправлены на индексацию
+2023-10-02 23:07:27 INFO  - Clean data on site et-cetera.ru
+2023-10-02 23:08:05 ERROR - org.jsoup.UncheckedIOException: java.net.SocketTimeoutException: Read timeout on https://et-cetera.ru/mobile/poster/
+2023-10-02 23:08:05 ERROR - org.jsoup.UncheckedIOException: java.net.SocketTimeoutException: Read timeout on https://et-cetera.ru/mobile/performance/451_po_farengeytu/
+2023-10-02 23:08:05 ERROR - org.jsoup.UncheckedIOException: java.net.SocketTimeoutException: Read timeout on https://et-cetera.ru/mobile/performance/vash-chekhov/
+2023-10-02 23:09:12 WARN  - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=59s301ms266µs597ns).
+2023-10-02 23:09:56 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 23:09:56 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 23:09:56 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 23:10:21 ERROR - Duplicate entry '1-этот' for key 'idx_lemma_site'
+2023-10-02 23:10:22 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/poster/
+2023-10-02 23:10:25 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 23:10:26 ERROR - Duplicate entry '1-/news/' for key 'idx_path_site'
+2023-10-02 23:10:26 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_path_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/news/
+2023-10-02 23:10:26 ERROR - shutdown pool on https://et-cetera.ru/mobile/news/
+2023-10-02 23:10:28 ERROR - Duplicate entry '1-казаться' for key 'idx_lemma_site'
+2023-10-02 23:10:28 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/performance/
+2023-10-02 23:10:28 ERROR - shutdown pool on https://et-cetera.ru/mobile/performance/
+2023-10-02 23:11:31 INFO  - Индексация не запущена - остановка не возможна
+2023-10-02 23:12:03 INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 23:12:03 INFO  - HikariPool-1 - Shutdown initiated...
+2023-10-02 23:12:03 INFO  - HikariPool-1 - Shutdown completed.
+2023-10-02 23:12:06 INFO  - Starting Application using Java 20 on bmpc with PID 9842 (/home/boris/Soft_project/enginesearch/target/classes started by boris in /home/boris/Soft_project/enginesearch)
+2023-10-02 23:12:06 INFO  - No active profile set, falling back to 1 default profile: "default"
+2023-10-02 23:12:07 INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-10-02 23:12:08 INFO  - Finished Spring Data repository scanning in 85 ms. Found 4 JPA repository interfaces.
+2023-10-02 23:12:09 INFO  - Tomcat initialized with port(s): 8083 (http)
+2023-10-02 23:12:09 INFO  - Starting service [Tomcat]
+2023-10-02 23:12:09 INFO  - Starting Servlet engine: [Apache Tomcat/9.0.64]
+2023-10-02 23:12:09 INFO  - Initializing Spring embedded WebApplicationContext
+2023-10-02 23:12:09 INFO  - Root WebApplicationContext: initialization completed in 2299 ms
+2023-10-02 23:12:09 INFO  - HikariPool-1 - Starting...
+2023-10-02 23:12:10 INFO  - HikariPool-1 - Start completed.
+2023-10-02 23:12:11 INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 23:12:12 WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-10-02 23:12:12 INFO  - Adding welcome page template: index
+2023-10-02 23:12:13 INFO  - Tomcat started on port(s): 8083 (http) with context path ''
+2023-10-02 23:12:13 INFO  - Started Application in 7.629 seconds (JVM running for 8.41)
+2023-10-02 23:12:16 INFO  - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-10-02 23:12:16 INFO  - Initializing Servlet 'dispatcherServlet'
+2023-10-02 23:12:16 INFO  - Completed initialization in 2 ms
+2023-10-02 23:12:16 INFO  - Индексация не запущена - остановка не возможна
+2023-10-02 23:12:20 INFO  - Все сайты отправлены на индексацию
+2023-10-02 23:12:20 INFO  - Clean data on site et-cetera.ru
+2023-10-02 23:13:19 ERROR - Duplicate entry '1-комедия' for key 'idx_lemma_site'
+2023-10-02 23:13:20 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/poster/
+2023-10-02 23:13:23 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 23:13:29 ERROR - Duplicate entry '1-состояться' for key 'idx_lemma_site'
+2023-10-02 23:13:42 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/performance/eto-tak-esli-vam-tak-kazhetsya/
+2023-10-02 23:13:44 ERROR - org.jsoup.UncheckedIOException: java.net.SocketTimeoutException: Read timeout on https://et-cetera.ru/mobile/poster/
+2023-10-02 23:13:44 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 23:13:44 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 23:13:51 ERROR - Duplicate entry '1-показывать' for key 'idx_lemma_site'
+2023-10-02 23:13:52 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/performance/vanya_i_krokodil/
+2023-10-02 23:13:55 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 23:14:22 ERROR - Duplicate entry '1-помощь' for key 'idx_lemma_site'
+2023-10-02 23:14:22 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/performance/revizor-versiya/
+2023-10-02 23:14:23 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 23:14:24 ERROR - Duplicate entry '1-страна' for key 'idx_lemma_site'
+2023-10-02 23:14:24 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/news/aif-kamchatka-moskovskiy-teatr-et-cetera-pokazyvaet-na-kamchatke-svoi-luchshie-spektakli/
+2023-10-02 23:14:24 ERROR - shutdown pool on https://et-cetera.ru/mobile/news/aif-kamchatka-moskovskiy-teatr-et-cetera-pokazyvaet-na-kamchatke-svoi-luchshie-spektakli/
+2023-10-02 23:26:42 INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 23:26:42 INFO  - HikariPool-1 - Shutdown initiated...
+2023-10-02 23:26:42 INFO  - HikariPool-1 - Shutdown completed.

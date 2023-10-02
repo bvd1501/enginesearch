@@ -155,7 +155,7 @@ public class DatabaseServiceImpl implements DatabaseService{
                     lemmaEntitySet.add(new LemmaEntity(siteEntity, l));
                 }
         });
-        //lemmaRepo.saveAll(lemmaEntitySet);
+        lemmaRepo.saveAll(lemmaEntitySet);
         List<IndexEntity> indexEntityList = new ArrayList<>();
         for (LemmaEntity lemmaEntity : lemmaEntitySet) {
             float rank = lemmaMap.get(lemmaEntity.getLemma());

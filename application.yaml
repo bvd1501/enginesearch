@@ -36,10 +36,10 @@ indexing-settings:
     #  name: skillbox
     #- url: https://www.playback.ru/
     #  name: PlayBack.Ru
-    - url: https://www.tretyakovgallery.ru/
-      name: Gallery
-    - url: https://www.lutherancathedral.ru/
-      name: lutherancathedral.ru
+    #- url: https://www.tretyakovgallery.ru/
+    #  name: Gallery
+    #- url: https://www.lutherancathedral.ru/
+    #  name: lutherancathedral.ru
     #- url: https://clusterfly.ru
     #  name: MQTTBroker
     #- url: https://volochek.life/
@@ -58,8 +58,8 @@ indexing-settings:
     #  name: Bulgakov
     #- url: https://www.svetlovka.ru/
     #  name: svetlovka
-    - url: https://dom.gosuslugi.ru/
-      name: ГИСЖКХ
+    #- url: https://dom.gosuslugi.ru/
+    #  name: ГИСЖКХ
     #- url: https://samadm.ru/
     #  name: samadm
 
