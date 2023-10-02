@@ -46,6 +46,6 @@ public class LemmaEntity {
     public LemmaEntity(SiteEntity site, String lemma) {
         this.site = site;
         this.lemma = lemma;
-        this.frequency = 0;
+        this.frequency = 1;
     }
 }

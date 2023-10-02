@@ -43,9 +43,9 @@ public class IndexEntity {
     @Column(name = "rank", columnDefinition = "FLOAT NOT NULL")
     private float rank;
 
-    public IndexEntity(PageEntity page, LemmaEntity lemma) {
+    public IndexEntity(PageEntity page, LemmaEntity lemma, float rank) {
         this.page = page;
         this.lemma = lemma;
-        this.rank = 0;
+        this.rank = rank;
     }
 }

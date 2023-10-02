@@ -65,9 +65,4 @@ public class LemmaService {
                         .split("\\s+")).toList();
     }
 
-
-
-
-
-
 }

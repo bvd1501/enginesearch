@@ -11,9 +11,7 @@ import searchengine.repo.LemmaRepo;
 import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,7 +82,7 @@ public class DatabaseServiceImpl implements DatabaseService{
     }
 
     /**
-     * Поиск страницы в бД
+     * Поиск страницы в БД
      * @param page - страница, которая ищется в базе     *
      * @return - true если страница найдена, иначе false
      */
@@ -94,7 +92,7 @@ public class DatabaseServiceImpl implements DatabaseService{
     }
 
     /**
-     * Поиск сайта в БЖ
+     * Поиск сайта в БД
      * @param url - адрес главной страницы
      * @param name - имя (описание) сайта
      * @return - новый (если ранее не существовал), либо существующий объект SiteEntity из БДыы
@@ -121,7 +119,9 @@ public class DatabaseServiceImpl implements DatabaseService{
                 , pageEntity.getPath()).get();
         Set<IndexEntity> indexEntitiesInIndexTable = indexRepo.findByPage_Id(pageInBase.getId());
         Set<LemmaEntity> lemmaEntitiesInLemmaTable = lemmaRepo.findByIdIn(
-            indexEntitiesInIndexTable.stream().map(IndexEntity::getId).collect(Collectors.toSet()));
+            indexEntitiesInIndexTable.stream()
+                    .map(idx ->idx.getLemma().getId())
+                    .collect(Collectors.toSet()));
         lemmaEntitiesInLemmaTable.forEach(l->{
             l.setFrequency(l.getFrequency()-1);
             if (l.getFrequency()<1) {
@@ -139,12 +139,29 @@ public class DatabaseServiceImpl implements DatabaseService{
      * @return - false, если страница уже есть в базе, иначе true
      */
     @Override
-    @Transactional(timeout = 5000)
-    public synchronized boolean savePage(PageEntity page, Map<String, Integer> lemmaMap) {
-        if(pageRepo.existsBySite_IdAndPath(page.getSite().getId(), page.getPath())) {return false;}
-        pageRepo.save(page);
-        //TODO обновление данных о леммах в таблицах lemma и index
+    @Transactional
+    public synchronized void savePage(PageEntity page, Map<String, Integer> lemmaMap) {
+        if(pageRepo.existsBySite_IdAndPath(page.getSite().getId(), page.getPath())) {return;}
+        page = pageRepo.save(page);
+        SiteEntity siteEntity = siteRepo.findById(page.getSite().getId()).orElse(null);
+        Set<String> lemmaOnPage = lemmaMap.keySet();
+        Set<LemmaEntity> lemmaEntitySet = lemmaRepo.findBySite_IdAndLemmaIn(siteEntity.getId(), lemmaOnPage);
+        lemmaEntitySet.stream().forEach(l->l.setFrequency(l.getFrequency()+1));
+        Set<String> lemmaEntityStringSet = lemmaEntitySet.stream()
+                .map(LemmaEntity::getLemma)
+                .collect(Collectors.toSet());
+        lemmaOnPage.stream().forEach(l -> {
+                if (!lemmaEntityStringSet.contains(l)) {
+                    lemmaEntitySet.add(new LemmaEntity(siteEntity, l));
+                }
+        });
+        //lemmaRepo.saveAll(lemmaEntitySet);
+        List<IndexEntity> indexEntityList = new ArrayList<>();
+        for (LemmaEntity lemmaEntity : lemmaEntitySet) {
+            float rank = lemmaMap.get(lemmaEntity.getLemma());
+            indexEntityList.add(new IndexEntity(page, lemmaEntity, rank));
+        }
+        //indexRepo.saveAll(indexEntityList);
         siteRepo.updateStatusTimeById(new java.util.Date(), page.getSite().getId());
-        return true;
     }
 }

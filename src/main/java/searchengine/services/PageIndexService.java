@@ -73,7 +73,7 @@ public class PageIndexService extends RecursiveAction {
             Thread.sleep(sleepTime);
             Connection.Response responsePage = pageReader();
             if (responsePage.statusCode() == HttpStatus.OK.value()) {
-                lemmaMap = lemmaService.lemmaCount(responsePage.body());
+                lemmaMap = lemmaService.lemmaCount(responsePage.body().toLowerCase());
             }
             pageEntity.setCode(responsePage.statusCode());
             pageEntity.setContent(responsePage.body());

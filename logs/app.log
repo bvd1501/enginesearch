@@ -1,262 +1,184 @@
-2023-09-27 00:44:39 INFO  - Starting Application using Java 20 on bmpc with PID 14070 (/home/boris/Soft_project/enginesearch/target/classes started by boris in /home/boris/Soft_project/enginesearch)
-2023-09-27 00:44:39 INFO  - No active profile set, falling back to 1 default profile: "default"
-2023-09-27 00:44:41 INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2023-09-27 00:44:41 INFO  - Finished Spring Data repository scanning in 70 ms. Found 4 JPA repository interfaces.
-2023-09-27 00:44:41 INFO  - Tomcat initialized with port(s): 8083 (http)
-2023-09-27 00:44:41 INFO  - Starting service [Tomcat]
-2023-09-27 00:44:41 INFO  - Starting Servlet engine: [Apache Tomcat/9.0.64]
-2023-09-27 00:44:42 INFO  - Initializing Spring embedded WebApplicationContext
-2023-09-27 00:44:42 INFO  - Root WebApplicationContext: initialization completed in 2062 ms
-2023-09-27 00:44:42 INFO  - HikariPool-1 - Starting...
-2023-09-27 00:44:42 INFO  - HikariPool-1 - Start completed.
-2023-09-27 00:44:43 INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2023-09-27 00:44:44 WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2023-09-27 00:44:45 INFO  - Adding welcome page template: index
-2023-09-27 00:44:45 INFO  - Tomcat started on port(s): 8083 (http) with context path ''
-2023-09-27 00:44:45 INFO  - Started Application in 6.416 seconds (JVM running for 7.198)
-2023-09-27 00:44:59 INFO  - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2023-09-27 00:44:59 INFO  - Initializing Servlet 'dispatcherServlet'
-2023-09-27 00:44:59 INFO  - Completed initialization in 1 ms
-2023-09-27 00:44:59 INFO  - Индексация не запущена - остановка не возможна
-2023-09-27 00:45:08 INFO  - Все сайты отправлены на индексацию
-2023-09-27 00:45:08 INFO  - Clean data on site Gallery
-2023-09-27 00:45:08 INFO  - Clean data on site lutherancathedral.ru
-2023-09-27 00:45:08 INFO  - Clean data on site samadm
-2023-09-27 00:45:08 INFO  - Clean data on site ipfran
-2023-09-27 00:45:08 INFO  - Clean data on site PlayBack.Ru
-2023-09-27 00:45:08 INFO  - Clean data on site et-cetera.ru
-2023-09-27 00:45:08 INFO  - Clean data on site ГИСЖКХ
-2023-09-27 00:45:17 ERROR - Duplicate entry '5-/scientific-activity/experimental-base' for key 'idx_path_site'
-2023-09-27 00:45:17 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_path_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://ipfran.ru/scientific-activity/experimental-base
-2023-09-27 00:45:18 ERROR - shutdown pool on https://ipfran.ru/scientific-activity/experimental-base
-2023-09-27 00:45:18 INFO  - ipfran - 0 min / 8 pages
-2023-09-27 00:45:42 INFO  - ГИСЖКХ - 0 min / 137 pages
-2023-09-27 00:45:45 INFO  - et-cetera.ru - 0 min / 51 pages
-2023-09-27 00:46:14 INFO  - Принудительная остановка индексации пользователем
-2023-09-27 00:46:14 INFO  - PlayBack.Ru - 1 min / 138 pages
-2023-09-27 00:46:15 INFO  - Gallery - 1 min / 113 pages
-2023-09-27 00:46:15 INFO  - lutherancathedral.ru - 1 min / 228 pages
-2023-09-27 00:46:15 INFO  - samadm - 1 min / 163 pages
-2023-09-27 00:46:27 INFO  - Clean data on site PlayBack.Ru
-2023-09-27 00:46:27 INFO  - Clean data on site Gallery
-2023-09-27 00:46:27 INFO  - Clean data on site lutherancathedral.ru
-2023-09-27 00:46:27 INFO  - Clean data on site ipfran
-2023-09-27 00:46:27 INFO  - Clean data on site et-cetera.ru
-2023-09-27 00:46:27 INFO  - Clean data on site ГИСЖКХ
-2023-09-27 00:46:27 INFO  - Все сайты отправлены на индексацию
-2023-09-27 00:46:27 INFO  - Clean data on site samadm
-2023-09-27 00:47:05 INFO  - et-cetera.ru - 0 min / 51 pages
-2023-09-27 00:47:07 INFO  - ГИСЖКХ - 0 min / 137 pages
-2023-09-27 00:48:41 INFO  - Gallery - 2 min / 157 pages
-2023-09-27 00:56:19 INFO  - lutherancathedral.ru - 9 min / 509 pages
-2023-09-27 01:14:20 INFO  - ipfran - 27 min / 1044 pages
-2023-09-27 01:21:38 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/the_department_of_economic_development-_investments_and_trade/activities-to-promote-the-development-of-competition-/
-2023-09-27 01:22:37 INFO  - PlayBack.Ru - 36 min / 3983 pages
-2023-09-27 02:01:28 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/tkd-len/
-2023-09-27 02:01:29 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/for-the-population-industrial/
-2023-09-27 02:01:30 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/municipal_control/
-2023-09-27 02:01:30 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/property-support-for-smes/
-2023-09-27 02:01:34 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/anticorruption-len/
-2023-09-27 02:01:35 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/realizatsiya-proekta-sodeystvie/
-2023-09-27 02:01:35 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/reestr-samovolno-ustanovlennykh-i-ili-nezakonno-razmeshchennykh-nekapitalnykh-stroeniy-sooruzheniy/
-2023-09-27 02:01:35 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/official-publication/39552/
-2023-09-27 02:01:39 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/reestr-samovol-lvgr/
-2023-09-27 02:01:40 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/23302/
-2023-09-27 02:01:41 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/tos-oktyabrsky-district/
-2023-09-27 02:01:41 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/the-list-of-available-online-courses-for-digital-literacy/
-2023-09-27 02:01:45 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/perechen-mkd-bez-uk-lvgr/
-2023-09-27 02:01:46 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/the-pension-fund-informs/
-2023-09-27 02:01:46 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/sistema-antimonopolnogo-komplaensa/
-2023-09-27 02:01:46 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/program/1095/
-2023-09-27 02:01:50 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/municipal-service-len/
-2023-09-27 02:01:52 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/26209/
-2023-09-27 02:01:52 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/the-history-of-the-area-october/
-2023-09-27 02:01:52 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/city_life/blagoustroystvo-i-dorogi/rules-of-utilities/
-2023-09-27 02:01:56 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/the-installation-and-operation-of-advertising-structures/
-2023-09-27 02:01:57 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/news/list/
-2023-09-27 02:01:57 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/your-builder-yard-october/
-2023-09-27 02:01:57 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/public-hearings/
-2023-09-27 02:02:02 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/perechen-mkd-bez-uk-lvgr/
-2023-09-27 02:02:03 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/the-portal-of-state-services-prom/
-2023-09-27 02:02:03 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/municipal_control/
-2023-09-27 02:02:03 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/program/19345/
-2023-09-27 02:02:07 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/national-projects-leninisk-vgr/
-2023-09-27 02:02:08 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/24753/
-2023-09-27 02:02:08 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/tvoy-konstruktor-dvora-2023/
-2023-09-27 02:02:08 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/program/19513/
-2023-09-27 02:02:13 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/poryadok-obzhalovaniya-normativnykh-pravovykh-aktov-i-resheniy-prinyatykh-administratsiey-leninskogo/
-2023-09-27 02:02:14 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/the-registry-self-willedally-established-objects-that-are-to-be-removed-prom/
-2023-09-27 02:02:14 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/your-builder-yard-october/
-2023-09-27 02:02:14 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/program/1073/
-2023-09-27 02:02:18 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/institution-district-len/
-2023-09-27 02:02:19 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/the-registry-self-willedally-established-objects-that-are-to-be-removed-prom/
-2023-09-27 02:02:19 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/all-russian-day-of-reception-of-entrepreneurs-in-the-prosecutor-s-office/
-2023-09-27 02:02:19 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/antimonopolniy_komplaens/
-2023-09-27 02:02:24 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/reference-contacts-lenin/
-2023-09-27 02:02:25 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/the-portal-of-state-services-prom/
-2023-09-27 02:02:25 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/osm-oktyabrsky-district/
-2023-09-27 02:02:25 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/text-projects/
-2023-09-27 02:02:33 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/reference-utilities/
-2023-09-27 02:02:33 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/program/18740/
-2023-09-27 02:02:33 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/general-information-october/
-2023-09-27 02:02:33 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/osm_prom/
-2023-09-27 02:02:39 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/sport-leninskogo-rayona/
-2023-09-27 02:02:39 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/resheniya-soveta-deputatov/
-2023-09-27 02:02:39 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/program/13628/
-2023-09-27 02:02:39 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/23528/
-2023-09-27 02:02:44 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/formirovanie-komfortnoy-gorodskoy-sredy-2018-2022-gody/
-2023-09-27 02:02:44 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/the-formation-of-a-comfortable-urban-environment-prom/
-2023-09-27 02:02:44 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/list-of-municipal-services/
-2023-09-27 02:02:44 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/tvoy-konstruktor-dvora-2023/
-2023-09-27 02:02:50 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/on-the-situation-with-coronavirus/
-2023-09-27 02:02:50 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/reestr-samovolno-ustanovlennykh-i-ili-nezakonno-razmeshchennykh-nekapitalnykh-stroeniy-sooruzheniy/
-2023-09-27 02:02:50 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/news/list/
-2023-09-27 02:02:50 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/program/29847/
-2023-09-27 02:02:55 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/institution-district-len/
-2023-09-27 02:02:55 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/sistema-antimonopolnogo-komplaensa/
-2023-09-27 02:02:55 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/docs/list/
-2023-09-27 02:02:55 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/official-publication/
-2023-09-27 02:03:01 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/doska-pocheta-leninskogo-rayona/
-2023-09-27 02:03:01 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/obrashcheniya-grazhdan/
-2023-09-27 02:03:01 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/municipal-services-prom/
-2023-09-27 02:03:01 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/program/23161/
-2023-09-27 02:03:10 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/docs/list/
-2023-09-27 02:03:10 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/anticorruption-okt/
-2023-09-27 02:03:10 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/impact-assessment/
-2023-09-27 02:03:10 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/notice-to-owners-of-abandoned-vehicles/
-2023-09-27 02:03:16 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/general-information-october/
-2023-09-27 02:03:16 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/for-the-population-industrial/
-2023-09-27 02:03:16 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/perspektivy-razvitiya-lvgr/
-2023-09-27 02:03:16 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/program/1083/
-2023-09-27 02:03:21 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/for-entrepreneurs_okt/
-2023-09-27 02:03:22 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/program/29850/
-2023-09-27 02:03:22 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/23301/
-2023-09-27 02:03:22 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/purchase/
-2023-09-27 02:03:27 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/measures-of-social-support-of-the-october/
-2023-09-27 02:03:27 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/all-russia-population-census-2020/
-2023-09-27 02:03:27 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/for-the-population-leninsky/
-2023-09-27 02:03:27 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/program/13552/
-2023-09-27 02:03:33 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/information-from-the-inspectorate-of-the-federal-tax-service/
-2023-09-27 02:03:33 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/program/1069/
-2023-09-27 02:03:33 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/the-implementation-of-measures-on-prevention-of-violations/
-2023-09-27 02:03:33 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/23807/
-2023-09-27 02:03:38 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/for-entrepreneurs_okt/
-2023-09-27 02:03:38 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/reference-contacts-indust/
-2023-09-27 02:03:38 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/department_of_construction_and_architecture/docs/list/
-2023-09-27 02:03:38 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/sovetsky_district/
-2023-09-27 02:03:48 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/the-district-budget-prom/
-2023-09-27 02:03:48 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/43875/
-2023-09-27 02:03:48 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/leninskiy-perepis-2021/
-2023-09-27 02:03:48 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/antimonopolniy_komplaens/
-2023-09-27 02:03:53 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/inspectorate-of-federal-tax-service-informs/
-2023-09-27 02:03:53 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/sport-leninskogo-rayona/
-2023-09-27 02:03:53 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/urban-planning/the-program-of-complex-development-of-infrastructure-of-the-samara/
-2023-09-27 02:03:53 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/44381/
-2023-09-27 02:03:59 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/the-implementation-of-measures-on-prevention-of-violations/
-2023-09-27 02:03:59 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/reference-contacts-indust/
-2023-09-27 02:03:59 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/urban-planning/rules-of-land-use-and-development/
-2023-09-27 02:03:59 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/43683/
-2023-09-27 02:04:04 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/municipal-service-prom/
-2023-09-27 02:04:04 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/public-hearings/
-2023-09-27 02:04:04 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/measures-of-social-support-of-the-october/
-2023-09-27 02:04:04 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/mbu-sahtob/
-2023-09-27 02:04:10 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/vyyavlenie-pravoobladateley-ranee-uchtennykh-obektov-nedvizhimosti/
-2023-09-27 02:04:10 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/urban-planning/vidy-uslug-rabot
-2023-09-27 02:04:10 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/reestr-samovol-lvgr/
-2023-09-27 02:04:10 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/information-from-the-inspectorate-of-the-federal-tax-service/
-2023-09-27 02:04:15 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/information-on-the-resettlement-of-people-from-emergency-and-dilapidated-housing-prom/
-2023-09-27 02:04:15 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/projects-of-municipal-legal-acts/
-2023-09-27 02:04:15 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/text-projects/
-2023-09-27 02:04:15 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/43874/
-2023-09-27 02:04:25 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/26209/
-2023-09-27 02:04:25 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/doska-pocheta-leninskogo-rayona/
-2023-09-27 02:04:25 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/urban-planning/rules-of-land-use-and-development/
-2023-09-27 02:04:25 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/osm-oktyabrsky-district/
-2023-09-27 02:04:30 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/municipal-housing-control/
-2023-09-27 02:04:30 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/list-of-municipal-services/
-2023-09-27 02:04:30 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/about-administration-prom/
-2023-09-27 02:04:30 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/municipal_control/
-2023-09-27 02:04:36 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/impact-assessment/
-2023-09-27 02:04:36 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/tpsa-district-len/
-2023-09-27 02:04:36 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/municipal-service-prom/
-2023-09-27 02:04:36 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/for-entrepreneurs_okt/
-2023-09-27 02:04:41 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/on-the-administration-len/
-2023-09-27 02:04:41 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/department_of_construction_and_architecture/docs/list/
-2023-09-27 02:04:41 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/tpsa-district-prom/
-2023-09-27 02:04:42 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/44812/
-2023-09-27 02:04:47 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/docs/list/
-2023-09-27 02:04:47 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/urban-planning/vidy-uslug-rabot
-2023-09-27 02:04:47 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/23302/
-2023-09-27 02:04:47 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/perspektivy-razvitiya-lvgr/
-2023-09-27 02:04:53 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/city_life/blagoustroystvo-i-dorogi/rules-of-utilities/
-2023-09-27 02:04:53 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/all-russian-day-of-reception-of-entrepreneurs-in-the-prosecutor-s-office/
-2023-09-27 02:04:53 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/municipal-service-len/
-2023-09-27 02:04:53 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/the-75th-anniversary-of-the-great-victory/
-2023-09-27 02:05:02 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/control-districts-leninsky-district/
-2023-09-27 02:05:02 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/inspectorate-of-federal-tax-service-informs/
-2023-09-27 02:05:02 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/public-hearings/
-2023-09-27 02:05:02 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/44832/
-2023-09-27 02:05:08 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/municipal-housing-control/
-2023-09-27 02:05:08 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/list/the-city-s-budget/
-2023-09-27 02:05:08 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/23575/
-2023-09-27 02:05:08 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/44649/
-2023-09-27 02:05:13 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/finansovaya-gramotnost/
-2023-09-27 02:05:13 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/the-registry-of-self-willedally-established-trade-objects/
-2023-09-27 02:05:13 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/43684/
-2023-09-27 02:05:13 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/urban-planning/local-urban-design-regulations/
-2023-09-27 02:05:19 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/anticorruption-len/
-2023-09-27 02:05:19 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/vyyavlenie-pravoobladateley-ranee-uchtennykh-obektov-nedvizhimosti/
-2023-09-27 02:05:19 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/urban-planning/the-program-of-complex-development-of-infrastructure-of-the-samara/
-2023-09-27 02:05:19 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/reestr-samovolno-ustanovlennykh-i-ili-nezakonno-razmeshchennykh-nekapitalnykh-stroeniy-sooruzheniy/
-2023-09-27 02:05:24 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/tko-leninskiy/
-2023-09-27 02:05:24 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/45001/
-2023-09-27 02:05:24 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/urban-planning/local-urban-design-regulations/
-2023-09-27 02:05:24 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/the-registry-of-self-willedally-established-trade-objects/
-2023-09-27 02:05:30 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/tpsa-district-len/
-2023-09-27 02:05:30 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/public-hearings/
-2023-09-27 02:05:30 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/44768/
-2023-09-27 02:05:30 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/information-for-entrepreneurs-prom/
-2023-09-27 02:05:35 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/information-for-entrepreneurs-prom/
-2023-09-27 02:05:35 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/44197/
-2023-09-27 02:05:35 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/mbu-sahtob/
-2023-09-27 02:05:35 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/official-publication/
-2023-09-27 02:05:41 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/your-builder-yard-october/
-2023-09-27 02:05:41 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/notice-to-owners-of-abandoned-vehicles/
-2023-09-27 02:05:41 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/antimonopolniy_komplaens/
-2023-09-27 02:05:41 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/gubernatorskiy-proekt-sodeystvie-/
-2023-09-27 02:05:46 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/the-history-of-the-area-october/
-2023-09-27 02:05:46 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/23528/
-2023-09-27 02:05:46 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/list/the-city-s-budget/
-2023-09-27 02:05:46 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/predostavlenie-svedeniy-soderzhashchikhsya-v-munitsipalnom-arkhive-administratsii-leninskogo-vnutrig/
-2023-09-27 02:05:52 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/tvoy-konstruktor-dvora-2023/
-2023-09-27 02:05:52 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/the-district-budget-prom/
-2023-09-27 02:05:52 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/program/
-2023-09-27 02:05:52 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/control-districts-leninsky-district/
-2023-09-27 02:05:58 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/43832/
-2023-09-27 02:05:58 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/osm_prom/
-2023-09-27 02:05:58 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/obrashcheniya-zhiteley-i-yuridicheskikh-lits-v-administratsiyu-leninskogo-vnutrigorodskogo-rayona-g-/
-2023-09-27 02:05:58 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/city_life/blagoustroystvo-i-dorogi/rules-of-utilities/
-2023-09-27 02:06:03 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/the-list-of-organizations-for-management-of-an-apartment-house-in-respect-of-which-the-owners-of-pre/
-2023-09-27 02:06:03 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/formirovanie-komfortnoy-gorodskoy-sredy-2018-2022-gody/
-2023-09-27 02:06:03 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/impact-assessment/
-2023-09-27 02:06:03 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/information-on-the-resettlement-of-people-from-emergency-and-dilapidated-housing-prom/
-2023-09-27 02:06:09 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/opoveshchenie-naseleniya-pri-chs-i-v-voennoe-vremya/
-2023-09-27 02:06:09 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/44455/
-2023-09-27 02:06:09 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/the-pension-fund-informs/
-2023-09-27 02:06:09 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/public-hearings/
-2023-09-27 02:06:14 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/national-projects-leninisk-vgr/
-2023-09-27 02:06:14 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/44017/
-2023-09-27 02:06:14 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/about-administration-prom/
-2023-09-27 02:06:14 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/list-of-municipal-services/
-2023-09-27 02:06:20 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/the-history-of-the-area-leninsk/
-2023-09-27 02:06:20 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/docs/text-projects/
-2023-09-27 02:06:20 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/the-75th-anniversary-of-the-great-victory/
-2023-09-27 02:06:20 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/octobyarsky_district/sistema-antimonopolnogo-komplaensa/
-2023-09-27 02:06:25 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/leninsky_district/a-nationwide-vote/
-2023-09-27 02:06:25 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/industrial-inner-city/tpsa-district-prom/
-2023-09-27 02:06:25 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/authority/anti-corruption/
-2023-09-27 02:06:25 ERROR - java.net.SocketTimeoutException: Read timed out on https://samadm.ru/media/news/45194/
-2023-09-27 03:16:21 INFO  - samadm - 149 min / 2230 pages
-2023-09-27 08:51:46 INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'
-2023-09-27 08:51:51 INFO  - HikariPool-1 - Shutdown initiated...
-2023-09-27 08:51:51 INFO  - HikariPool-1 - Shutdown completed.
+2023-10-02 22:19:35 INFO  - Starting Application using Java 20 on bmpc with PID 7002 (/home/boris/Soft_project/enginesearch/target/classes started by boris in /home/boris/Soft_project/enginesearch)
+2023-10-02 22:19:35 INFO  - No active profile set, falling back to 1 default profile: "default"
+2023-10-02 22:19:36 INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-10-02 22:19:36 INFO  - Finished Spring Data repository scanning in 69 ms. Found 4 JPA repository interfaces.
+2023-10-02 22:19:37 INFO  - Tomcat initialized with port(s): 8083 (http)
+2023-10-02 22:19:37 INFO  - Starting service [Tomcat]
+2023-10-02 22:19:37 INFO  - Starting Servlet engine: [Apache Tomcat/9.0.64]
+2023-10-02 22:19:37 INFO  - Initializing Spring embedded WebApplicationContext
+2023-10-02 22:19:37 INFO  - Root WebApplicationContext: initialization completed in 1929 ms
+2023-10-02 22:19:37 INFO  - HikariPool-1 - Starting...
+2023-10-02 22:19:37 INFO  - HikariPool-1 - Start completed.
+2023-10-02 22:19:38 INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 22:19:39 WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-10-02 22:19:40 INFO  - Adding welcome page template: index
+2023-10-02 22:19:40 INFO  - Tomcat started on port(s): 8083 (http) with context path ''
+2023-10-02 22:19:40 INFO  - Started Application in 6.085 seconds (JVM running for 6.876)
+2023-10-02 22:21:16 INFO  - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-10-02 22:21:16 INFO  - Initializing Servlet 'dispatcherServlet'
+2023-10-02 22:21:16 INFO  - Completed initialization in 2 ms
+2023-10-02 22:21:42 INFO  - End index page: https://samadm.ru/about/
+2023-10-02 22:36:16 INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 22:36:16 INFO  - HikariPool-1 - Shutdown initiated...
+2023-10-02 22:36:16 INFO  - HikariPool-1 - Shutdown completed.
+2023-10-02 22:37:38 INFO  - Starting Application using Java 20 on bmpc with PID 7750 (/home/boris/Soft_project/enginesearch/target/classes started by boris in /home/boris/Soft_project/enginesearch)
+2023-10-02 22:37:38 INFO  - No active profile set, falling back to 1 default profile: "default"
+2023-10-02 22:37:40 INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-10-02 22:37:40 INFO  - Finished Spring Data repository scanning in 91 ms. Found 4 JPA repository interfaces.
+2023-10-02 22:37:41 INFO  - Tomcat initialized with port(s): 8083 (http)
+2023-10-02 22:37:41 INFO  - Starting service [Tomcat]
+2023-10-02 22:37:41 INFO  - Starting Servlet engine: [Apache Tomcat/9.0.64]
+2023-10-02 22:37:41 INFO  - Initializing Spring embedded WebApplicationContext
+2023-10-02 22:37:41 INFO  - Root WebApplicationContext: initialization completed in 2515 ms
+2023-10-02 22:37:41 INFO  - HikariPool-1 - Starting...
+2023-10-02 22:37:42 INFO  - HikariPool-1 - Start completed.
+2023-10-02 22:37:43 INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 22:37:44 WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-10-02 22:37:44 INFO  - Adding welcome page template: index
+2023-10-02 22:37:44 INFO  - Tomcat started on port(s): 8083 (http) with context path ''
+2023-10-02 22:37:44 INFO  - Started Application in 7.172 seconds (JVM running for 7.93)
+2023-10-02 22:37:58 INFO  - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-10-02 22:37:58 INFO  - Initializing Servlet 'dispatcherServlet'
+2023-10-02 22:37:58 INFO  - Completed initialization in 1 ms
+2023-10-02 22:38:04 INFO  - Все сайты отправлены на индексацию
+2023-10-02 22:38:04 INFO  - Clean data on site lutherancathedral.ru
+2023-10-02 22:38:04 INFO  - Clean data on site ГИСЖКХ
+2023-10-02 22:38:04 INFO  - Clean data on site Gallery
+2023-10-02 22:38:04 INFO  - Clean data on site et-cetera.ru
+2023-10-02 22:38:09 ERROR - Duplicate entry '2-метро' for key 'idx_lemma_site'
+2023-10-02 22:38:09 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://www.tretyakovgallery.ru/events/o/lektsiya-nataliya-goncharova-10-2023/
+2023-10-02 22:38:09 ERROR - shutdown pool on https://www.tretyakovgallery.ru/events/o/lektsiya-nataliya-goncharova-10-2023/
+2023-10-02 22:38:09 INFO  - Gallery - 0 min / 4 pages
+2023-10-02 22:38:10 ERROR - Duplicate entry '4-город' for key 'idx_lemma_site'
+2023-10-02 22:38:10 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/news/
+2023-10-02 22:38:10 ERROR - shutdown pool on https://et-cetera.ru/mobile/news/
+2023-10-02 22:38:11 ERROR - Duplicate entry '3-младенец' for key 'idx_lemma_site'
+2023-10-02 22:38:11 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://www.lutherancathedral.ru/община/конфирмационные-занятия/
+2023-10-02 22:38:11 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 22:38:12 ERROR - Duplicate entry '4-/performance/' for key 'idx_path_site'
+2023-10-02 22:38:12 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_path_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/performance/
+2023-10-02 22:38:12 ERROR - shutdown pool on https://et-cetera.ru/mobile/performance/
+2023-10-02 22:38:12 INFO  - et-cetera.ru - 0 min / 3 pages
+2023-10-02 22:38:12 ERROR - Duplicate entry '1-установить' for key 'idx_lemma_site'
+2023-10-02 22:38:12 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://dom.gosuslugi.ru/webhelp/main/source/statistika_i_otchetnost/osn_pom.html
+2023-10-02 22:38:12 ERROR - shutdown pool on https://dom.gosuslugi.ru/webhelp/main/source/statistika_i_otchetnost/osn_pom.html
+2023-10-02 22:38:12 INFO  - ГИСЖКХ - 0 min / 10 pages
+2023-10-02 22:38:14 ERROR - Duplicate entry '3-можно' for key 'idx_lemma_site'
+2023-10-02 22:38:14 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://www.lutherancathedral.ru/главная/архив/
+2023-10-02 22:38:14 ERROR - shutdown pool on https://www.lutherancathedral.ru/главная/архив/
+2023-10-02 22:39:12 INFO  - Индексация не запущена - остановка не возможна
+2023-10-02 22:39:17 INFO  - Clean data on site lutherancathedral.ru
+2023-10-02 22:39:17 INFO  - Все сайты отправлены на индексацию
+2023-10-02 22:39:17 INFO  - Clean data on site Gallery
+2023-10-02 22:39:17 INFO  - Clean data on site et-cetera.ru
+2023-10-02 22:39:17 INFO  - Clean data on site ГИСЖКХ
+2023-10-02 22:39:19 ERROR - Duplicate entry '6-иза' for key 'idx_lemma_site'
+2023-10-02 22:39:19 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://dom.gosuslugi.ru/webhelp/main/source/statistika_i_otchetnost/privlechenie_uo_k_adm_otv.html
+2023-10-02 22:39:19 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 22:39:20 ERROR - Duplicate entry '7-город' for key 'idx_lemma_site'
+2023-10-02 22:39:20 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/news/
+2023-10-02 22:39:20 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 22:39:21 ERROR - Duplicate entry '6-раздел' for key 'idx_lemma_site'
+2023-10-02 22:39:21 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://dom.gosuslugi.ru/webhelp/main/source/och/razdel_obuchayushchiye_materialy.html
+2023-10-02 22:39:21 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 22:39:21 ERROR - Duplicate entry '6-смотреть' for key 'idx_lemma_site'
+2023-10-02 22:39:21 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://dom.gosuslugi.ru/webhelp/main/source/och/verhnee_gorizontaljnoe_menyu.html
+2023-10-02 22:39:21 ERROR - shutdown pool on https://dom.gosuslugi.ru/webhelp/main/source/och/verhnee_gorizontaljnoe_menyu.html
+2023-10-02 22:39:21 ERROR - Duplicate entry '5-метро' for key 'idx_lemma_site'
+2023-10-02 22:39:21 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://www.tretyakovgallery.ru/events/o/lektsiya-rokoko-10-2023/
+2023-10-02 22:39:21 ERROR - shutdown pool on https://www.tretyakovgallery.ru/events/o/lektsiya-rokoko-10-2023/
+2023-10-02 22:39:21 INFO  - Gallery - 0 min / 4 pages
+2023-10-02 22:39:22 ERROR - Duplicate entry '7-деть' for key 'idx_lemma_site'
+2023-10-02 22:39:22 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/news/
+2023-10-02 22:39:22 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 22:39:23 ERROR - Duplicate entry '8-работа' for key 'idx_lemma_site'
+2023-10-02 22:39:23 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://www.lutherancathedral.ru/община/молодежная-группа/
+2023-10-02 22:39:23 ERROR - shutdown pool on https://www.lutherancathedral.ru/община/молодежная-группа/
+2023-10-02 22:39:24 ERROR - Duplicate entry '7-увлекательный' for key 'idx_lemma_site'
+2023-10-02 22:39:24 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/to/
+2023-10-02 22:39:24 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 22:39:25 INFO  - lutherancathedral.ru - 0 min / 12 pages
+2023-10-02 22:39:27 ERROR - Duplicate entry '7-биеннал' for key 'idx_lemma_site'
+2023-10-02 22:39:27 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/performance/eto-tak-esli-vam-tak-kazhetsya/
+2023-10-02 22:39:27 ERROR - shutdown pool on https://et-cetera.ru/mobile/performance/eto-tak-esli-vam-tak-kazhetsya/
+2023-10-02 22:40:03 INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 22:40:03 INFO  - HikariPool-1 - Shutdown initiated...
+2023-10-02 22:40:03 INFO  - HikariPool-1 - Shutdown completed.
+2023-10-02 22:41:09 INFO  - Starting Application using Java 20 on bmpc with PID 8062 (/home/boris/Soft_project/enginesearch/target/classes started by boris in /home/boris/Soft_project/enginesearch)
+2023-10-02 22:41:09 INFO  - No active profile set, falling back to 1 default profile: "default"
+2023-10-02 22:41:10 INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-10-02 22:41:10 INFO  - Finished Spring Data repository scanning in 79 ms. Found 4 JPA repository interfaces.
+2023-10-02 22:41:11 INFO  - Tomcat initialized with port(s): 8083 (http)
+2023-10-02 22:41:11 INFO  - Starting service [Tomcat]
+2023-10-02 22:41:11 INFO  - Starting Servlet engine: [Apache Tomcat/9.0.64]
+2023-10-02 22:41:11 INFO  - Initializing Spring embedded WebApplicationContext
+2023-10-02 22:41:11 INFO  - Root WebApplicationContext: initialization completed in 2102 ms
+2023-10-02 22:41:12 INFO  - HikariPool-1 - Starting...
+2023-10-02 22:41:12 INFO  - HikariPool-1 - Start completed.
+2023-10-02 22:41:13 INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 22:41:14 WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-10-02 22:41:14 INFO  - Adding welcome page template: index
+2023-10-02 22:41:15 INFO  - Tomcat started on port(s): 8083 (http) with context path ''
+2023-10-02 22:41:15 INFO  - Started Application in 6.505 seconds (JVM running for 7.137)
+2023-10-02 22:41:21 INFO  - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-10-02 22:41:21 INFO  - Initializing Servlet 'dispatcherServlet'
+2023-10-02 22:41:21 INFO  - Completed initialization in 1 ms
+2023-10-02 22:41:21 INFO  - Индексация не запущена - остановка не возможна
+2023-10-02 22:41:25 INFO  - Все сайты отправлены на индексацию
+2023-10-02 22:41:25 INFO  - Clean data on site lutherancathedral.ru
+2023-10-02 22:41:25 INFO  - Clean data on site Gallery
+2023-10-02 22:41:25 INFO  - Clean data on site ГИСЖКХ
+2023-10-02 22:41:25 INFO  - Clean data on site et-cetera.ru
+2023-10-02 22:41:28 ERROR - Duplicate entry '2-запрос' for key 'idx_lemma_site'
+2023-10-02 22:41:28 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://dom.gosuslugi.ru/special/
+2023-10-02 22:41:28 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 22:41:28 ERROR - Duplicate entry '3-/poster/' for key 'idx_path_site'
+2023-10-02 22:41:28 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_path_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/poster/
+2023-10-02 22:41:28 ERROR - shutdown pool on https://et-cetera.ru/mobile/poster/
+2023-10-02 22:41:30 INFO  - et-cetera.ru - 0 min / 5 pages
+2023-10-02 22:41:30 ERROR - Duplicate entry '2-этот' for key 'idx_lemma_site'
+2023-10-02 22:41:30 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://dom.gosuslugi.ru/webhelp/main/source/och/otkrytiye_danniye.html
+2023-10-02 22:41:30 ERROR - Deadlock found when trying to get lock; try restarting transaction
+2023-10-02 22:41:32 ERROR - Duplicate entry '2-необходимость' for key 'idx_lemma_site'
+2023-10-02 22:41:32 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://dom.gosuslugi.ru/webhelp/main/source/och/npa_mer_sots_pod.html
+2023-10-02 22:41:32 ERROR - shutdown pool on https://dom.gosuslugi.ru/webhelp/main/source/och/npa_mer_sots_pod.html
+2023-10-02 22:41:32 ERROR - Duplicate entry '2-детальный' for key 'idx_lemma_site'
+2023-10-02 22:41:32 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://dom.gosuslugi.ru/webhelp/main/source/statistika_i_otchetnost/statistika_vnedreniia_gis_zhkkh.html
+2023-10-02 22:41:32 ERROR - shutdown pool on https://dom.gosuslugi.ru/webhelp/main/source/statistika_i_otchetnost/statistika_vnedreniia_gis_zhkkh.html
+2023-10-02 22:41:34 ERROR - Duplicate entry '4-обходиться' for key 'idx_lemma_site'
+2023-10-02 22:41:34 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_lemma_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://www.lutherancathedral.ru/церковь/молитвослов/
+2023-10-02 22:41:34 ERROR - shutdown pool on https://www.lutherancathedral.ru/церковь/молитвослов/
+2023-10-02 22:41:35 INFO  - lutherancathedral.ru - 0 min / 14 pages
+2023-10-02 22:42:56 INFO  - Closing JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 22:42:57 INFO  - HikariPool-1 - Shutdown initiated...
+2023-10-02 22:42:57 INFO  - HikariPool-1 - Shutdown completed.
+2023-10-02 22:43:04 INFO  - Starting Application using Java 20 on bmpc with PID 8233 (/home/boris/Soft_project/enginesearch/target/classes started by boris in /home/boris/Soft_project/enginesearch)
+2023-10-02 22:43:04 INFO  - No active profile set, falling back to 1 default profile: "default"
+2023-10-02 22:43:05 INFO  - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-10-02 22:43:05 INFO  - Finished Spring Data repository scanning in 80 ms. Found 4 JPA repository interfaces.
+2023-10-02 22:43:06 INFO  - Tomcat initialized with port(s): 8083 (http)
+2023-10-02 22:43:06 INFO  - Starting service [Tomcat]
+2023-10-02 22:43:06 INFO  - Starting Servlet engine: [Apache Tomcat/9.0.64]
+2023-10-02 22:43:06 INFO  - Initializing Spring embedded WebApplicationContext
+2023-10-02 22:43:06 INFO  - Root WebApplicationContext: initialization completed in 2154 ms
+2023-10-02 22:43:07 INFO  - HikariPool-1 - Starting...
+2023-10-02 22:43:07 INFO  - HikariPool-1 - Start completed.
+2023-10-02 22:43:08 INFO  - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-10-02 22:43:09 WARN  - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-10-02 22:43:10 INFO  - Adding welcome page template: index
+2023-10-02 22:43:10 INFO  - Tomcat started on port(s): 8083 (http) with context path ''
+2023-10-02 22:43:10 INFO  - Started Application in 6.756 seconds (JVM running for 7.477)
+2023-10-02 22:43:57 INFO  - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-10-02 22:43:57 INFO  - Initializing Servlet 'dispatcherServlet'
+2023-10-02 22:43:57 INFO  - Completed initialization in 2 ms
+2023-10-02 22:43:57 INFO  - Индексация не запущена - остановка не возможна
+2023-10-02 22:44:00 INFO  - Все сайты отправлены на индексацию
+2023-10-02 22:44:00 INFO  - Clean data on site et-cetera.ru
+2023-10-02 22:44:00 INFO  - Clean data on site ГИСЖКХ
+2023-10-02 22:44:00 INFO  - Clean data on site lutherancathedral.ru
+2023-10-02 22:44:00 INFO  - Clean data on site Gallery
+2023-10-02 22:44:07 ERROR - Duplicate entry '3-/performance/revizor-versiya/' for key 'idx_path_site'
+2023-10-02 22:44:07 ERROR - org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [idx_path_site]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement on https://et-cetera.ru/mobile/performance/revizor-versiya/
+2023-10-02 22:44:07 ERROR - shutdown pool on https://et-cetera.ru/mobile/performance/revizor-versiya/
+2023-10-02 22:44:08 INFO  - et-cetera.ru - 0 min / 18 pages
+2023-10-02 22:44:25 INFO  - ГИСЖКХ - 0 min / 137 pages
