@@ -20,6 +20,6 @@ public interface PageRepo extends CrudRepository<PageEntity, Integer> {
     long countBySite_Id(Integer id);
 
 
-    @Override
-    void deleteById(Integer integer);
+//    @Override
+//    void deleteById(Integer integer);
 }

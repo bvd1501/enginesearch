@@ -17,7 +17,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Table(name = "lemma"
         , uniqueConstraints = {@UniqueConstraint(name = "idx_lemma_site", columnNames = {"site_id", "lemma"})}
-        , indexes = {@Index(name = "idx_lemma", columnList = "lemma")}
+        , indexes = {@Index(name = "idx_lemma", columnList = "lemma")
+        , @Index(name = "idx_site_id", columnList = "site_id")}
 )
 
 public class LemmaEntity {

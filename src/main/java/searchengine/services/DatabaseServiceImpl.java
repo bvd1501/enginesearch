@@ -143,25 +143,16 @@ public class DatabaseServiceImpl implements DatabaseService{
     public synchronized void savePage(PageEntity page, Map<String, Integer> lemmaMap) {
         if(pageRepo.existsBySite_IdAndPath(page.getSite().getId(), page.getPath())) {return;}
         page = pageRepo.save(page);
-        SiteEntity siteEntity = siteRepo.findById(page.getSite().getId()).orElse(null);
-        Set<String> lemmaOnPage = lemmaMap.keySet();
-        Set<LemmaEntity> lemmaEntitySet = lemmaRepo.findBySite_IdAndLemmaIn(siteEntity.getId(), lemmaOnPage);
-        lemmaEntitySet.stream().forEach(l->l.setFrequency(l.getFrequency()+1));
-        Set<String> lemmaEntityStringSet = lemmaEntitySet.stream()
-                .map(LemmaEntity::getLemma)
-                .collect(Collectors.toSet());
-        lemmaOnPage.stream().forEach(l -> {
-                if (!lemmaEntityStringSet.contains(l)) {
-                    lemmaEntitySet.add(new LemmaEntity(siteEntity, l));
-                }
-        });
-        lemmaRepo.saveAll(lemmaEntitySet);
-        List<IndexEntity> indexEntityList = new ArrayList<>();
-        for (LemmaEntity lemmaEntity : lemmaEntitySet) {
-            float rank = lemmaMap.get(lemmaEntity.getLemma());
-            indexEntityList.add(new IndexEntity(page, lemmaEntity, rank));
+        for (Map.Entry<String, Integer> entry : lemmaMap.entrySet()) {
+            lemmaRepo.insertOrUpdate(page.getSite().getId(), entry.getKey());
+            Optional<LemmaEntity> lemmaEntityOptional =
+                    lemmaRepo.findBySite_IdAndLemma(page.getSite().getId()
+                            , entry.getKey());
+            if (lemmaEntityOptional.isPresent()) {
+                //Integer rank = entry.getValue();
+                //indexRepo.save(new IndexEntity(page, lemmaEntityOptional.get(), rank));
+            }
         }
-        //indexRepo.saveAll(indexEntityList);
         siteRepo.updateStatusTimeById(new java.util.Date(), page.getSite().getId());
     }
 }
