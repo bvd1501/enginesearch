@@ -22,7 +22,7 @@ spring:
 logging:
   level:
     org.springframework.web: info
-    org.hibernate: info
+    org.hibernate: error
   pattern:
     console: "%highlight(%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n)"
     file: "%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n"
@@ -52,16 +52,16 @@ indexing-settings:
     #  name: dimonvideo
     #- url: https://nikoartgallery.com/
     #  name: nikoartgallery
-    #- url: https://et-cetera.ru/mobile/
-    #  name: et-cetera.ru
+    - url: https://et-cetera.ru/mobile/
+      name: et-cetera.ru
     #- url: https://dombulgakova.ru/
     #  name: Bulgakov
     #- url: https://www.svetlovka.ru/
     #  name: svetlovka
-    #- url: https://dom.gosuslugi.ru/
-    #  name: ГИСЖКХ
-    #- url: https://samadm.ru/
-    #  name: samadm
+    - url: https://dom.gosuslugi.ru/
+      name: ГИСЖКХ
+    - url: https://samadm.ru/
+      name: samadm
 
 
 jsoup-setting:
