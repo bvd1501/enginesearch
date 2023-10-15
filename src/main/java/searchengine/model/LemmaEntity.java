@@ -29,13 +29,9 @@ public class LemmaEntity {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "site_id", nullable = false, foreignKey = @ForeignKey(name = "fkl_site_id",
-//            value = ConstraintMode.CONSTRAINT,
-//            foreignKeyDefinition = "FOREIGN KEY (site_id) REFERENCES site(id) ON DELETE CASCADE"))
     @JoinColumn (name = "site_id", nullable = false, referencedColumnName = "id"
             , foreignKey = @ForeignKey(name = "fk_lemma_site"))
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @BatchSize(size = 10)
     private SiteEntity site;
 
     @Column(name = "lemma", columnDefinition = "VARCHAR(255) NOT NULL")

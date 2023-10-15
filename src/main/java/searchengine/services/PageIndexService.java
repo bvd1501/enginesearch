@@ -12,13 +12,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import searchengine.config.BadLinks;
 import searchengine.config.JsoupCfg;
 import searchengine.model.PageEntity;
 
 
 import java.io.IOException;
-import java.net.*;
 import java.util.*;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
@@ -53,23 +51,24 @@ public class PageIndexService extends RecursiveAction {
         if (indexingService.isStopFlag() || ForkJoinTask.getPool().isShutdown()) {
             return;
         }
-        readAndIndexPage();
-        if (pageEntity.getCode()!=HttpStatus.OK.value()) {return;}
-        if (pageEntity.getContent().isEmpty()) {return;}
+        if (!singePageHandler()) {return;};
         Set<PageIndexService> childrenPageIndex = pageHandler(pageEntity);
         ForkJoinTask.invokeAll(childrenPageIndex);
     }
 
 
     /**
-     * 1) Соединиться со страницей, 2) получить ответ,
-     * 3) записать страницу(ответ) в БД, 4) провести лемантизацию и 5) обновить данные сайта в БД
+     * Обработчик отдельной страницы. Выполняет следующе действия:
+     * - читает страницу из сети;
+     * - обрабатывет (поводит анализ лемм) содержимое страницы;
+     * - записывает в базу страницу, леммы, индексы и обновляет в базе данные по сайту.
+     * @return true, если процесс завершен успешно, и можно(нужно)
+     * переходить к обработке дочерних страниц, иначе - false
      **/
-    public void readAndIndexPage() {
+    public boolean singePageHandler() {
         Map<String, Integer> lemmaMap = new HashMap<>();
         try {
-            //long sleepTime = 500L + (long) (Math.random() * 5000);
-            long sleepTime = 500L;
+            long sleepTime = 300L;
             Thread.sleep(sleepTime);
             Connection.Response responsePage = pageReader();
             if (responsePage.statusCode() == HttpStatus.OK.value()) {
@@ -77,12 +76,16 @@ public class PageIndexService extends RecursiveAction {
             }
             pageEntity.setCode(responsePage.statusCode());
             pageEntity.setContent(responsePage.body());
-            databaseService.savePage(pageEntity, lemmaMap);
+            if (!databaseService.saveUsedPage(pageEntity, lemmaMap)) {return false;};
         } catch (Exception e) {
             if (!(e instanceof UnsupportedMimeTypeException)) {
                 handlerConnectException(e);
+                return false;
             }
         }
+        if (pageEntity.getCode()!=HttpStatus.OK.value()
+                || pageEntity.getContent().isEmpty()) {return false;}
+        return true;
     }
 
 

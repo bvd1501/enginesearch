@@ -1,8 +1,10 @@
 package searchengine.repo;
 
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import searchengine.model.PageEntity;
@@ -19,7 +21,13 @@ public interface PageRepo extends CrudRepository<PageEntity, Integer> {
     @Transactional
     long countBySite_Id(Integer id);
 
+    @Transactional
+    @Modifying
+    @Query(value = "INSERT IGNORE INTO page (site_id, path, code, content) " +
+            "values (:#{#page.site.id}, :#{#page.path}, :#{#page.code}, :#{#page.content})",
+            nativeQuery = true)
+    int insertNewPage(
+            @Param("page") PageEntity pageEntity);
 
-//    @Override
-//    void deleteById(Integer integer);
+
 }

@@ -59,17 +59,22 @@ public class IndexingServiceImp implements IndexingService {
     public IndexingResponse getPageIndexing(String url) {
         Site site = sites.getSites().stream().filter(s->url.startsWith(s.getUrl())).findAny().orElse(null);
         if (site == null) {
-            log.info("Страница " + url + " находится за пределами сайтов, указанных в конфигурационном файле");
+            log.error("Страница " + url + " находится за пределами сайтов, указанных в конфигурационном файле");
             return new IndexingResponse(false, "Данная страница находится за пределами сайтов, указанных в конфигурационном файле");
         }
         SiteEntity siteEntity = databaseService.findSite(site.getUrl(), site.getName());
-        PageEntity pageEntity = new PageEntity(siteEntity, url);
-        databaseService.cleanPage(pageEntity);
-        var pageIndexService = context.getBean(PageIndexService.class, context, pageEntity);
-        pageIndexService.readAndIndexPage();
+        PageEntity currentPage = new PageEntity(siteEntity, url);
+        databaseService.cleanPage(currentPage);
+        var pageIndexService = context.getBean(PageIndexService.class, context, currentPage);
+        IndexingResponse indexingResponse =new IndexingResponse(true);
+        if (!pageIndexService.singePageHandler()) {
+            log.error("Страница " + url + " не проиндексирована");
+            siteEntity.setLast_error("Страница " + url + " не проиндексирована");
+            indexingResponse = new IndexingResponse(false, "Ошибка индексации страницы");
+        }
         databaseService.endSiteIndex(siteEntity);
         log.info("End index page: " + url);
-        return new IndexingResponse(true);
+        return indexingResponse;
     }
 
     private boolean isRunning() {

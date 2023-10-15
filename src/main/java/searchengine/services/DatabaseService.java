@@ -9,7 +9,7 @@ public interface DatabaseService {
 
 
     SiteEntity initSite(String urlSite, String nameSite);
-    void savePage(PageEntity page, Map<String, Integer> lemmaMap);
+    boolean saveUsedPage(PageEntity page, Map<String, Integer> lemmaMap);
 
     long endSiteIndex(SiteEntity site);
 

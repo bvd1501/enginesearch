@@ -22,17 +22,16 @@ public interface LemmaRepo extends CrudRepository<LemmaEntity, Integer> {
 
     @Modifying
     @Query(value = "insert INTO lemma (site_id, lemma, frequency) " +
-            "values (:lemma_site_id, :lemma_lemma, 1) " +
+            "values (:#{#lemmaEnt.site.id}, :#{#lemmaEnt.lemma}, 1) " +
             "on duplicate key update frequency = frequency+1",
             nativeQuery = true)
-    void  insertOrUpdate(Integer lemma_site_id, String lemma_lemma);
+    void  insertOrUpdate( @Param("lemmaEnt") LemmaEntity lemmaEntity);
 
 
     @Query("select l from LemmaEntity l where l.id in ?1")
     Set<LemmaEntity> findByIdIn(Collection<Integer> ids);
 
-//    @Override
-//    void deleteById(Integer integer);
+
 
 
 }

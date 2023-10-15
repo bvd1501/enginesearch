@@ -36,7 +36,7 @@ public class DatabaseServiceImpl implements DatabaseService{
      * @return site - экземпляр сущности SiteEntity, сохраненный в БД
      */
     @Override
-    //@Transactional
+    @Transactional
     public SiteEntity initSite(String urlSite, String nameSite) {
         log.info("Clean data on site " + nameSite);
         siteRepo.deleteByUrlAndName(urlSite, nameSite);
@@ -49,7 +49,7 @@ public class DatabaseServiceImpl implements DatabaseService{
      * @return - количество страниц сайта в БД
      */
     @Override
-    //@Transactional
+    @Transactional
     public long endSiteIndex(SiteEntity site) {
         Optional<SiteEntity> existSite = siteRepo.findById(site.getId());
         if (existSite.isEmpty()) {
@@ -74,7 +74,7 @@ public class DatabaseServiceImpl implements DatabaseService{
      * @param error - описание произошедшей ошибки
      */
     @Override
-    //@Transactional (timeout = 3000, isolation = Isolation.READ_COMMITTED)
+    @Transactional
     public void updateLastErrorOnSite(SiteEntity site, String error) {
         site.setLast_error(error);
         site.setStatusTime(new java.util.Date());
@@ -87,6 +87,7 @@ public class DatabaseServiceImpl implements DatabaseService{
      * @return - true если страница найдена, иначе false
      */
     @Override
+    @Transactional
     public boolean existPage(PageEntity page) {
         return  pageRepo.existsBySite_IdAndPath(page.getSite().getId(), page.getPath());
     }
@@ -98,6 +99,7 @@ public class DatabaseServiceImpl implements DatabaseService{
      * @return - новый (если ранее не существовал), либо существующий объект SiteEntity из БДыы
      */
     @Override
+    @Transactional
     public SiteEntity findSite(String url, String name) {
         Optional<SiteEntity> siteEntityOptional = siteRepo.findByUrlAndName(url, name);
         if (!siteEntityOptional.isPresent()) {
@@ -117,12 +119,12 @@ public class DatabaseServiceImpl implements DatabaseService{
         if (!existPage(pageEntity)) {return;}
         PageEntity pageInBase = pageRepo.findBySite_IdAndPath(pageEntity.getSite().getId()
                 , pageEntity.getPath()).get();
-        Set<IndexEntity> indexEntitiesInIndexTable = indexRepo.findByPage_Id(pageInBase.getId());
-        Set<LemmaEntity> lemmaEntitiesInLemmaTable = lemmaRepo.findByIdIn(
-            indexEntitiesInIndexTable.stream()
+        Set<IndexEntity> indexInBase = indexRepo.findByPage_Id(pageInBase.getId());
+        Set<LemmaEntity> lemmaInBase = lemmaRepo.findByIdIn(
+            indexInBase.stream()
                     .map(idx ->idx.getLemma().getId())
                     .collect(Collectors.toSet()));
-        lemmaEntitiesInLemmaTable.forEach(l->{
+        lemmaInBase.forEach(l->{
             l.setFrequency(l.getFrequency()-1);
             if (l.getFrequency()<1) {
                 lemmaRepo.deleteById(l.getId());
@@ -140,19 +142,22 @@ public class DatabaseServiceImpl implements DatabaseService{
      */
     @Override
     @Transactional
-    public synchronized void savePage(PageEntity page, Map<String, Integer> lemmaMap) {
-        if(pageRepo.existsBySite_IdAndPath(page.getSite().getId(), page.getPath())) {return;}
-        page = pageRepo.save(page);
+    public synchronized boolean saveUsedPage(PageEntity page, Map<String, Integer> lemmaMap) {
+        if (page==null) {return false;}
+        if (pageRepo.insertNewPage(page) !=1)  {return false;}
+        page = pageRepo.findBySite_IdAndPath(page.getSite().getId(), page.getPath()).get();
         for (Map.Entry<String, Integer> entry : lemmaMap.entrySet()) {
-            lemmaRepo.insertOrUpdate(page.getSite().getId(), entry.getKey());
+            LemmaEntity lemmaEntity = new LemmaEntity(page.getSite(), entry.getKey());
+            lemmaRepo.insertOrUpdate(lemmaEntity);
             Optional<LemmaEntity> lemmaEntityOptional =
                     lemmaRepo.findBySite_IdAndLemma(page.getSite().getId()
                             , entry.getKey());
             if (lemmaEntityOptional.isPresent()) {
-                //Integer rank = entry.getValue();
-                //indexRepo.save(new IndexEntity(page, lemmaEntityOptional.get(), rank));
+                Integer rank = entry.getValue();
+                indexRepo.save(new IndexEntity(page, lemmaEntityOptional.get(), rank));
             }
         }
         siteRepo.updateStatusTimeById(new java.util.Date(), page.getSite().getId());
+        return true;
     }
 }

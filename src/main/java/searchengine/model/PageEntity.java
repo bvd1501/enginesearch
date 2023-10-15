@@ -37,7 +37,6 @@ public class PageEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn (name = "site_id", nullable = false, referencedColumnName = "id"
             , foreignKey = @ForeignKey(name = "fk_page_site"))
-    //@BatchSize(size = 10)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private SiteEntity site;
 
