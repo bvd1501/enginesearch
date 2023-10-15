@@ -58,10 +58,10 @@ indexing-settings:
     #  name: Bulgakov
     #- url: https://www.svetlovka.ru/
     #  name: svetlovka
-    - url: https://dom.gosuslugi.ru/
-      name: ГИСЖКХ
-    - url: https://samadm.ru/
-      name: samadm
+    #- url: https://dom.gosuslugi.ru/
+    #  name: ГИСЖКХ
+    #- url: https://samadm.ru/
+    #  name: samadm
 
 
 jsoup-setting:

@@ -139,6 +139,7 @@ public class DatabaseServiceImpl implements DatabaseService{
      * @param page - проиндексированная страница
      * @param lemmaMap - леммы, найденные на странице
      * @return - false, если страница уже есть в базе, иначе true
+     * ключ synchronized - обязателен! Без недо возможны deadlock
      */
     @Override
     @Transactional

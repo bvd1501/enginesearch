@@ -37,6 +37,13 @@ public class LemmaService {
                 }
             }
         }
+//        for (Map.Entry<String, Integer> lemm : lemms.entrySet()) {
+//            System.out.println(lemm);
+//        }
+        //TODO найти почему есть лишние леммы, например
+        // на странице https://et-cetera.ru/mobile/performance/revizor-versiya/
+        // находит в качестве лемм "а", "п", "я"
+
         return lemms;
     }
 
