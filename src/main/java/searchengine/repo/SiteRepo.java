@@ -14,6 +14,11 @@ import java.util.Optional;
 
 @Repository
 public interface SiteRepo extends CrudRepository<SiteEntity, Integer> {
+    @Transactional
+    @Modifying
+    @Query("update SiteEntity s set s.statusTime = :statusTime, s.last_error = :last_error where s.id = :id")
+    void updateStatusTimeAndLast_errorById(@Param("statusTime") Date statusTime, @Param("last_error") String last_error, @Param("id") Integer id);
+
     @Query("select s from SiteEntity s where s.url = ?1 and s.name = ?2")
     Optional<SiteEntity> findByUrlAndName(String url, String name);
 

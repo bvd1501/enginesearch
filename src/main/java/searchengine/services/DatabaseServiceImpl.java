@@ -76,9 +76,7 @@ public class DatabaseServiceImpl implements DatabaseService{
     @Override
     @Transactional
     public void updateLastErrorOnSite(SiteEntity site, String error) {
-        site.setLast_error(error);
-        site.setStatusTime(new java.util.Date());
-        siteRepo.save(site);
+        siteRepo.updateStatusTimeAndLast_errorById(new java.util.Date(), error, site.getId());
     }
 
     /**

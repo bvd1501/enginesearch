@@ -68,7 +68,7 @@ public class PageIndexService extends RecursiveAction {
     public boolean singePageHandler() {
         Map<String, Integer> lemmaMap = new HashMap<>();
         try {
-            long sleepTime = 300L;
+            long sleepTime = 30L;
             Thread.sleep(sleepTime);
             Connection.Response responsePage = pageReader();
             if (responsePage.statusCode() == HttpStatus.OK.value()) {
