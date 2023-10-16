@@ -34,20 +34,20 @@ indexing-settings:
   sites:
     #- url: https://skillbox.ru
     #  name: skillbox
-    #- url: https://www.playback.ru/
-    #  name: PlayBack.Ru
-    #- url: https://www.tretyakovgallery.ru/
-    #  name: Gallery
-    #- url: https://www.lutherancathedral.ru/
-    #  name: lutherancathedral.ru
-    #- url: https://clusterfly.ru
-    #  name: MQTTBroker
+    - url: https://www.playback.ru/
+      name: PlayBack.Ru
+    - url: https://www.tretyakovgallery.ru/
+      name: Gallery
+    - url: https://www.lutherancathedral.ru/
+      name: lutherancathedral.ru
+    - url: https://clusterfly.ru
+      name: MQTTBroker
     #- url: https://volochek.life/
     #  name: Volochek
-    #- url: https://radiomv.ru/
-    #  name: radiomv
-    #- url: https://ipfran.ru/
-    #  name: ipfran
+    - url: https://radiomv.ru/
+      name: radiomv
+    - url: https://ipfran.ru/
+      name: ipfran
     #- url: https://dimonvideo.ru/
     #  name: dimonvideo
     #- url: https://nikoartgallery.com/
@@ -58,10 +58,10 @@ indexing-settings:
     #  name: Bulgakov
     #- url: https://www.svetlovka.ru/
     #  name: svetlovka
-    #- url: https://dom.gosuslugi.ru/
-    #  name: ГИСЖКХ
-    #- url: https://samadm.ru/
-    #  name: samadm
+    - url: https://dom.gosuslugi.ru/
+      name: ГИСЖКХ
+    - url: https://samadm.ru/
+      name: samadm
 
 
 jsoup-setting:
