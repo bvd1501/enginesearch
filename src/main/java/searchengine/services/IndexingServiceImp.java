@@ -66,15 +66,13 @@ public class IndexingServiceImp implements IndexingService {
         PageEntity currentPage = new PageEntity(siteEntity, url);
         databaseService.cleanPage(currentPage);
         var pageIndexService = context.getBean(PageIndexService.class, context, currentPage);
-        IndexingResponse indexingResponse =new IndexingResponse(true);
-        if (!pageIndexService.singePageHandler()) {
-            log.error("Страница " + url + " не проиндексирована");
-            siteEntity.setLast_error("Страница " + url + " не проиндексирована");
-            indexingResponse = new IndexingResponse(false, "Ошибка индексации страницы");
-        }
-        databaseService.endSiteIndex(siteEntity);
-        log.info("End index page: " + url);
-        return indexingResponse;
+        Thread thread = new Thread(()->{
+            pageIndexService.singePageHandler();
+            databaseService.endSiteIndex(siteEntity);
+            log.info("End index page: " + url);
+        });
+        thread.start();
+        return new IndexingResponse(true);
     }
 
     private boolean isRunning() {

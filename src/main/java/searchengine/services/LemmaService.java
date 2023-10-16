@@ -14,7 +14,7 @@ import java.util.*;
 @Slf4j
 public class LemmaService {
     private final LuceneMorphology luceneMorph;
-    private static final String[] PARTICLES ={"МЕЖД", "ПРЕДЛ", "СОЮЗ", "ЧАСТ"};
+    private static final String[] PARTICLES ={" МЕЖД", " ПРЕДЛ", " СОЮЗ", " ЧАСТ"};
     //private static final String WORD_TYPE_REGEX = "\\W\\w&&[^а-яА-Я\\s]";
 
     public LemmaService() throws IOException {
@@ -26,7 +26,7 @@ public class LemmaService {
         HashMap<String, Integer> lemms = new HashMap<>();
         List<String> words = splitIntoWords(text);
         for (String word : words) {
-            if (word.isEmpty()) {continue;}
+            if (word.length()<2) {continue;}
             List<String> wordLemmas = getNormalFormWords(word);
             if (wordLemmas == null) {continue;}
             for (String l : wordLemmas) {
@@ -37,13 +37,6 @@ public class LemmaService {
                 }
             }
         }
-//        for (Map.Entry<String, Integer> lemm : lemms.entrySet()) {
-//            System.out.println(lemm);
-//        }
-        //TODO найти почему есть лишние леммы, например
-        // на странице https://et-cetera.ru/mobile/performance/revizor-versiya/
-        // находит в качестве лемм "а", "п", "я"
-
         return lemms;
     }
 

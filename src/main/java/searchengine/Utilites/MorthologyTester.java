@@ -17,7 +17,7 @@ public class MorthologyTester {
 
     public static void main(String[] args) throws IOException {
         LemmaService lemmaService = new LemmaService();
-        String text = "азаровди азартный леса азнавур а a это еще что";
+        String text = "вон неужели разве вур ф и п на и бы ли м";
 
         Map<String, Integer> lemmas = lemmaService.lemmaCount(text);
         lemmas.entrySet().forEach(entry -> System.out.println(entry.getKey()
