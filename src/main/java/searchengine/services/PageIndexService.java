@@ -51,9 +51,10 @@ public class PageIndexService extends RecursiveAction {
         if (indexingService.isStopFlag() || ForkJoinTask.getPool().isShutdown()) {
             return;
         }
-        if (!singePageHandler()) {return;};
+        if (!singePageHandler()) {return;}
         Set<PageIndexService> childrenPageIndex = pageHandler(pageEntity);
         ForkJoinTask.invokeAll(childrenPageIndex);
+        //childrenPageIndex.stream().forEach(p->p.fork());
     }
 
 
@@ -76,21 +77,20 @@ public class PageIndexService extends RecursiveAction {
             }
             pageEntity.setCode(responsePage.statusCode());
             pageEntity.setContent(responsePage.body());
-            if (!databaseService.saveUsedPage(pageEntity, lemmaMap)) {return false;};
+            if (!databaseService.saveUsedPage(pageEntity, lemmaMap)) {return false;}
         } catch (Exception e) {
             if (!(e instanceof UnsupportedMimeTypeException)) {
                 handlerConnectException(e);
                 return false;
             }
         }
-        if (pageEntity.getCode()!=HttpStatus.OK.value()
-                || pageEntity.getContent().isEmpty()) {return false;}
-        return true;
+        return pageEntity.getCode() == HttpStatus.OK.value()
+                && !pageEntity.getContent().isEmpty();
     }
 
 
     private void handlerConnectException(Exception e) {
-        String errorMsg = e + " on " + pageEntity.getFullPath();
+        String errorMsg = e + " on page: " + pageEntity.getFullPath();
         log.error(errorMsg);
         databaseService.updateLastErrorOnSite(pageEntity.getSite(), errorMsg);
         if (!(e instanceof  IOException)) {

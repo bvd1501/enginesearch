@@ -15,14 +15,14 @@ import java.util.concurrent.*;
 
 @Service
 @Slf4j
-public class IndexingServiceImp implements IndexingService {
+public class IndexingServiceImpl implements IndexingService {
     private final ApplicationContext context;
     private final DatabaseService databaseService;
     private final SitesList sites;
     private static boolean stopFlag;
     private ExecutorService siteExecutor;
     @Autowired
-    public IndexingServiceImp(ApplicationContext context) {
+    public IndexingServiceImpl(ApplicationContext context) {
         this.context = context;
         this.sites = context.getBean(SitesList.class);
         this.databaseService = context.getBean(DatabaseService.class);

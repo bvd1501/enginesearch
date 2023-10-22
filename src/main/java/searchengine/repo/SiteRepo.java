@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import searchengine.model.SiteEntity;
 
 import java.util.Date;
@@ -14,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface SiteRepo extends CrudRepository<SiteEntity, Integer> {
-    @Transactional
+    //@Transactional
     @Modifying
     @Query("update SiteEntity s set s.statusTime = :statusTime, s.last_error = :last_error where s.id = :id")
     void updateStatusTimeAndLast_errorById(@Param("statusTime") Date statusTime, @Param("last_error") String last_error, @Param("id") Integer id);
@@ -24,17 +23,14 @@ public interface SiteRepo extends CrudRepository<SiteEntity, Integer> {
 
     @Modifying
     @Query("update SiteEntity s set s.statusTime = :statusTime where s.id = :id")
-    @Transactional
+    //@Transactional
     void updateStatusTimeById(@Param("statusTime") Date statusTime, @Param("id") Integer id);
 
 
     @Modifying
-    @Transactional
+    //@Transactional
     void deleteByUrlAndName(String url, String name);
 
-//    @Modifying
-//    @Query("delete from SiteEntity s where s.url = :url and s.name = :name")
-//    void deleteByUrlAndName(String url, String name);
 
 
 }

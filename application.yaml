@@ -12,17 +12,20 @@ spring:
       hibernate:
       #format_sql: true
       dialect: org.hibernate.dialect.MySQL8Dialect
+      batch_size: 100
     hibernate:
-      #ddl-auto: update
-      ddl-auto: create-drop
+      ddl-auto: update
+      #ddl-auto: create-drop
     #show-sql: true
+
+
 
 #logging:
 #  config: logback-spring.xml
 logging:
   level:
     org.springframework.web: info
-    org.hibernate: error
+    org.hibernate: info
   pattern:
     console: "%highlight(%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n)"
     file: "%d{yyyy-MM-dd HH:mm:ss} %-5level - %msg%n"
@@ -32,8 +35,8 @@ logging:
 # example values
 indexing-settings:
   sites:
-    #- url: https://skillbox.ru
-    #  name: skillbox
+    - url: https://skillbox.ru
+      name: skillbox
     - url: https://www.playback.ru/
       name: PlayBack.Ru
     - url: https://www.tretyakovgallery.ru/
@@ -44,24 +47,24 @@ indexing-settings:
       name: MQTTBroker
     #- url: https://volochek.life/
     #  name: Volochek
-    - url: https://radiomv.ru/
-      name: radiomv
-    - url: https://ipfran.ru/
-      name: ipfran
+    #- url: https://radiomv.ru/
+    #  name: radiomv
+    #- url: https://ipfran.ru/
+    #  name: ipfran
     #- url: https://dimonvideo.ru/
     #  name: dimonvideo
     #- url: https://nikoartgallery.com/
     #  name: nikoartgallery
-    - url: https://et-cetera.ru/mobile/
-      name: et-cetera.ru
+    #- url: https://et-cetera.ru/mobile/
+    #  name: et-cetera.ru
     #- url: https://dombulgakova.ru/
     #  name: Bulgakov
     #- url: https://www.svetlovka.ru/
     #  name: svetlovka
     - url: https://dom.gosuslugi.ru/
       name: ГИСЖКХ
-    - url: https://samadm.ru/
-      name: samadm
+    #- url: https://samadm.ru/
+    #  name: samadm
 
 
 jsoup-setting:

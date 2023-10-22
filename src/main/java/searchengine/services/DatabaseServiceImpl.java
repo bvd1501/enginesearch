@@ -4,13 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import org.springframework.transaction.annotation.Transactional;
 import searchengine.model.*;
 import searchengine.repo.IndexRepo;
 import searchengine.repo.LemmaRepo;
 import searchengine.repo.PageRepo;
 import searchengine.repo.SiteRepo;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,16 +68,7 @@ public class DatabaseServiceImpl implements DatabaseService{
         return result;
     }
 
-    /**
-     * Запись информации о произошедшей ошибке при индексации сайта
-     * @param site - индексируемый сайт
-     * @param error - описание произошедшей ошибки
-     */
-    @Override
-    @Transactional
-    public void updateLastErrorOnSite(SiteEntity site, String error) {
-        siteRepo.updateStatusTimeAndLast_errorById(new java.util.Date(), error, site.getId());
-    }
+
 
     /**
      * Поиск страницы в БД
@@ -145,18 +136,25 @@ public class DatabaseServiceImpl implements DatabaseService{
         if (page==null) {return false;}
         if (pageRepo.insertNewPage(page) !=1)  {return false;}
         page = pageRepo.findBySite_IdAndPath(page.getSite().getId(), page.getPath()).get();
-        for (Map.Entry<String, Integer> entry : lemmaMap.entrySet()) {
-            LemmaEntity lemmaEntity = new LemmaEntity(page.getSite(), entry.getKey());
-            lemmaRepo.insertOrUpdate(lemmaEntity);
-            Optional<LemmaEntity> lemmaEntityOptional =
-                    lemmaRepo.findBySite_IdAndLemma(page.getSite().getId()
-                            , entry.getKey());
-            if (lemmaEntityOptional.isPresent()) {
-                Integer rank = entry.getValue();
-                indexRepo.save(new IndexEntity(page, lemmaEntityOptional.get(), rank));
-            }
+        List<IndexEntity> indexEntities = new ArrayList<>();
+        for (String lemmaStr : lemmaMap.keySet()) {
+            lemmaRepo.insertOrUpdate(new LemmaEntity(page.getSite(), lemmaStr));
+            LemmaEntity lemma = lemmaRepo.findBySiteAndLemma(page.getSite(), lemmaStr);
+            indexEntities.add(new IndexEntity(page, lemma, lemmaMap.get(lemmaStr)));
         }
+        indexRepo.saveAll(indexEntities);
         siteRepo.updateStatusTimeById(new java.util.Date(), page.getSite().getId());
         return true;
+    }
+
+    /**
+     * Запись информации о произошедшей ошибке при индексации сайта
+     * @param site - индексируемый сайт
+     * @param error - описание произошедшей ошибки
+     */
+    @Override
+    @Transactional
+    public void updateLastErrorOnSite(SiteEntity site, String error) {
+        siteRepo.updateStatusTimeAndLast_errorById(new java.util.Date(), error, site.getId());
     }
 }
