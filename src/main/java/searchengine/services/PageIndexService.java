@@ -30,7 +30,7 @@ public class PageIndexService extends RecursiveAction {
     private final JsoupCfg jsoupCfg;
     private final IndexingService indexingService;
     private final LemmaService lemmaService;
-    private final DatabaseService databaseService;
+    private final RepoService repoService;
     private final PageEntity pageEntity;
 
 
@@ -39,7 +39,7 @@ public class PageIndexService extends RecursiveAction {
         this.context = context;
         this.indexingService = context.getBean(IndexingService.class);
         this.lemmaService = context.getBean(LemmaService.class);
-        this.databaseService = context.getBean(DatabaseService.class);
+        this.repoService = context.getBean(RepoService.class);
         this.jsoupCfg = context.getBean(JsoupCfg.class);
         this.pageEntity = pageEntity;
     }
@@ -69,7 +69,7 @@ public class PageIndexService extends RecursiveAction {
     public boolean singePageHandler() {
         Map<String, Integer> lemmaMap = new HashMap<>();
         try {
-            long sleepTime = 30L;
+            long sleepTime = 300L;
             Thread.sleep(sleepTime);
             Connection.Response responsePage = pageReader();
             if (responsePage.statusCode() == HttpStatus.OK.value()) {
@@ -77,7 +77,7 @@ public class PageIndexService extends RecursiveAction {
             }
             pageEntity.setCode(responsePage.statusCode());
             pageEntity.setContent(responsePage.body());
-            if (!databaseService.saveUsedPage(pageEntity, lemmaMap)) {return false;}
+            if (!repoService.saveAllDataPage(pageEntity, lemmaMap, null)) {return false;}
         } catch (Exception e) {
             if (!(e instanceof UnsupportedMimeTypeException)) {
                 handlerConnectException(e);
@@ -90,9 +90,9 @@ public class PageIndexService extends RecursiveAction {
 
 
     private void handlerConnectException(Exception e) {
-        String errorMsg = e + " on page: " + pageEntity.getFullPath();
+        String errorMsg = e + ". Page: " + pageEntity.getFullPath();
         log.error(errorMsg);
-        databaseService.updateLastErrorOnSite(pageEntity.getSite(), errorMsg);
+        repoService.saveAllDataPage(pageEntity, null, errorMsg);
         if (!(e instanceof  IOException)) {
             log.error("shutdown pool on " + pageEntity.getFullPath());
             ForkJoinTask.getPool().shutdown();
@@ -119,7 +119,7 @@ public class PageIndexService extends RecursiveAction {
             String link = element.absUrl("href").toLowerCase();
             PageEntity childPage = new PageEntity(page.getSite(), link);
             if (childPage.getPath().isEmpty()) {continue;}
-            if (databaseService.existPage(childPage)) {continue;}
+            if (repoService.existPage(childPage)) {continue;}
             resultPageServices.add(context.getBean(PageIndexService.class, context, childPage));
         }
         return resultPageServices;

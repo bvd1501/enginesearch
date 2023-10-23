@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class DatabaseServiceImpl implements DatabaseService{
+public class RepoServiceImpl implements RepoService {
     @Autowired
     private final SiteRepo siteRepo;
     @Autowired
@@ -127,13 +127,18 @@ public class DatabaseServiceImpl implements DatabaseService{
      * Внесение результатов индексации страницы в БД
      * @param page - проиндексированная страница
      * @param lemmaMap - леммы, найденные на странице
+     * @param error - ошибка, возникшая при обработке страницы
      * @return - false, если страница уже есть в базе, иначе true
      * ключ synchronized - обязателен! Без недо возможны deadlock
      */
     @Override
     @Transactional
-    public synchronized boolean saveUsedPage(PageEntity page, Map<String, Integer> lemmaMap) {
+    public synchronized boolean saveAllDataPage(PageEntity page, Map<String, Integer> lemmaMap, String error) {
         if (page==null) {return false;}
+        if (error!=null) {
+            siteRepo.updateStatusTimeAndLast_errorById(new java.util.Date(), error, page.getSite().getId());
+            return true;
+        }
         if (pageRepo.insertNewPage(page) !=1)  {return false;}
         page = pageRepo.findBySite_IdAndPath(page.getSite().getId(), page.getPath()).get();
         List<IndexEntity> indexEntities = new ArrayList<>();
@@ -145,16 +150,5 @@ public class DatabaseServiceImpl implements DatabaseService{
         indexRepo.saveAll(indexEntities);
         siteRepo.updateStatusTimeById(new java.util.Date(), page.getSite().getId());
         return true;
-    }
-
-    /**
-     * Запись информации о произошедшей ошибке при индексации сайта
-     * @param site - индексируемый сайт
-     * @param error - описание произошедшей ошибки
-     */
-    @Override
-    @Transactional
-    public void updateLastErrorOnSite(SiteEntity site, String error) {
-        siteRepo.updateStatusTimeAndLast_errorById(new java.util.Date(), error, site.getId());
     }
 }

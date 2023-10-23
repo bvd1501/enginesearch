@@ -17,7 +17,7 @@ import java.util.concurrent.*;
 @Slf4j
 public class IndexingServiceImpl implements IndexingService {
     private final ApplicationContext context;
-    private final DatabaseService databaseService;
+    private final RepoService repoService;
     private final SitesList sites;
     private static boolean stopFlag;
     private ExecutorService siteExecutor;
@@ -25,7 +25,7 @@ public class IndexingServiceImpl implements IndexingService {
     public IndexingServiceImpl(ApplicationContext context) {
         this.context = context;
         this.sites = context.getBean(SitesList.class);
-        this.databaseService = context.getBean(DatabaseService.class);
+        this.repoService = context.getBean(RepoService.class);
     }
 
     @Override
@@ -62,13 +62,13 @@ public class IndexingServiceImpl implements IndexingService {
             log.error("Страница " + url + " находится за пределами сайтов, указанных в конфигурационном файле");
             return new IndexingResponse(false, "Данная страница находится за пределами сайтов, указанных в конфигурационном файле");
         }
-        SiteEntity siteEntity = databaseService.findSite(site.getUrl(), site.getName());
+        SiteEntity siteEntity = repoService.findSite(site.getUrl(), site.getName());
         PageEntity currentPage = new PageEntity(siteEntity, url);
-        databaseService.cleanPage(currentPage);
+        repoService.cleanPage(currentPage);
         var pageIndexService = context.getBean(PageIndexService.class, context, currentPage);
         Thread thread = new Thread(()->{
             pageIndexService.singePageHandler();
-            databaseService.endSiteIndex(siteEntity);
+            repoService.endSiteIndex(siteEntity);
             log.info("End index page: " + url);
         });
         thread.start();
@@ -86,14 +86,14 @@ public class IndexingServiceImpl implements IndexingService {
     private void startIndex(String urlSite, String nameSite) {
         long startTime = System.currentTimeMillis();
         Thread.currentThread().setName("th." + nameSite);
-        SiteEntity currentSite = databaseService.initSite(urlSite, nameSite);
+        SiteEntity currentSite = repoService.initSite(urlSite, nameSite);
         PageEntity firstPage = new PageEntity(currentSite, urlSite);
         ForkJoinPool sitePool = new ForkJoinPool();
         var pageIndexService = context.getBean(PageIndexService.class, context, firstPage);
         sitePool.invoke(pageIndexService);
         sitePool.shutdown();
         if (isStopFlag()) {currentSite.setLast_error("Принудительная остановка индексации пользователем");}
-        long countPages = databaseService.endSiteIndex(currentSite);
+        long countPages = repoService.endSiteIndex(currentSite);
         long resultTime = (System.currentTimeMillis() - startTime) / 60000;
         log.info(nameSite + " - " + resultTime + " min / " + countPages + " pages");
     }

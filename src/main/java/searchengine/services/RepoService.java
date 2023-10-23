@@ -5,16 +5,15 @@ import searchengine.model.SiteEntity;
 
 import java.util.Map;
 
-public interface DatabaseService {
+public interface RepoService {
 
 
     SiteEntity initSite(String urlSite, String nameSite);
-    boolean saveUsedPage(PageEntity page, Map<String, Integer> lemmaMap);
+    boolean saveAllDataPage(PageEntity page, Map<String, Integer> lemmaMap, String error);
 
     long endSiteIndex(SiteEntity site);
 
 
-    void updateLastErrorOnSite(SiteEntity site, String errorStr);
 
     boolean existPage(PageEntity pageEntity);
 
