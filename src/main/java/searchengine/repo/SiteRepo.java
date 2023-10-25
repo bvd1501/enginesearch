@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface SiteRepo extends CrudRepository<SiteEntity, Integer> {
+
     //@Transactional
     @Modifying
     @Query("update SiteEntity s set s.statusTime = :statusTime, s.last_error = :last_error where s.id = :id")

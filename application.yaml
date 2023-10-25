@@ -35,10 +35,10 @@ logging:
 # example values
 indexing-settings:
   sites:
-    - url: https://skillbox.ru
-      name: skillbox
-    - url: https://www.playback.ru/
-      name: PlayBack.Ru
+    #- url: https://skillbox.ru
+    #  name: skillbox
+    #- url: https://www.playback.ru/
+    #  name: PlayBack.Ru
     - url: https://www.tretyakovgallery.ru/
       name: Gallery
     - url: https://www.lutherancathedral.ru/
@@ -55,8 +55,8 @@ indexing-settings:
     #  name: dimonvideo
     #- url: https://nikoartgallery.com/
     #  name: nikoartgallery
-    #- url: https://et-cetera.ru/mobile/
-    #  name: et-cetera.ru
+    - url: https://et-cetera.ru/mobile/
+      name: et-cetera.ru
     #- url: https://dombulgakova.ru/
     #  name: Bulgakov
     #- url: https://www.svetlovka.ru/

@@ -124,6 +124,27 @@ public class RepoServiceImpl implements RepoService {
     }
 
     /**
+     * @param siteEntity 
+     * @return - количество страниц сайта
+     */
+    @Override
+    @Transactional (readOnly = true)
+    public int countPagesOnSite(SiteEntity siteEntity) {
+        return (int) pageRepo.countBySite(siteEntity);
+    }
+
+    /**
+     * @param siteEntity 
+     * @return
+     */
+    @Override
+    @Transactional (readOnly = true)
+    public int countLemmasOnSite(SiteEntity siteEntity) {
+        return (int) lemmaRepo.countBySite(siteEntity);
+    }
+
+
+    /**
      * Внесение результатов индексации страницы в БД
      * @param page - проиндексированная страница
      * @param lemmaMap - леммы, найденные на странице

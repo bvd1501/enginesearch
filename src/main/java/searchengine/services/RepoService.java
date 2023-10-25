@@ -20,4 +20,11 @@ public interface RepoService {
     SiteEntity findSite(String url, String name);
 
     void cleanPage(PageEntity pageEntity);
+
+
+    int countPagesOnSite(SiteEntity siteEntity);
+
+    int countLemmasOnSite(SiteEntity siteEntity);
+
+
 }

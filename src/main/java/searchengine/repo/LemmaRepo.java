@@ -9,12 +9,12 @@ import searchengine.model.LemmaEntity;
 import searchengine.model.SiteEntity;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 
 @Repository
 public interface LemmaRepo extends CrudRepository<LemmaEntity, Integer> {
+    long countBySite(SiteEntity site);
     LemmaEntity findBySiteAndLemma(SiteEntity site, String lemma);
 
     @Modifying

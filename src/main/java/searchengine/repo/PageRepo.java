@@ -7,10 +7,13 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import searchengine.model.PageEntity;
+import searchengine.model.SiteEntity;
+
 import java.util.Optional;
 
 @Repository
 public interface PageRepo extends CrudRepository<PageEntity, Integer> {
+    long countBySite(SiteEntity site);
     @Query("select p from PageEntity p where p.site.id = ?1 and p.path = ?2")
     Optional<PageEntity> findBySite_IdAndPath(Integer id, String path);
     //@Transactional
