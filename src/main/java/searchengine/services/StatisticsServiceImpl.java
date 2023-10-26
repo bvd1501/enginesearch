@@ -28,7 +28,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 //        String[] errors = {
 //                "Ошибка индексации: главная страница сайта не доступна",
 //                "Ошибка индексации: сайт не доступен",
-//                ""
+//                "Нет ошибок"
 //        };
 
         TotalStatistics total = new TotalStatistics();
@@ -55,7 +55,7 @@ public class StatisticsServiceImpl implements StatisticsService {
             //item.setStatus(statuses[i % 3]);
             item.setStatus(siteEntity.getStatus().toString());
 
-            //item.setError(errors[i % 3]);
+            //item.setError(errors[1 % 3]);
             item.setError(siteEntity.getLast_error());
 
             //item.setStatusTime(System.currentTimeMillis() -

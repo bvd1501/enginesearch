@@ -93,7 +93,8 @@ public class IndexingServiceImpl implements IndexingService {
         sitePool.invoke(pageIndexService);
         sitePool.shutdown();
         if (isStopFlag()) {currentSite.setLast_error("Принудительная остановка индексации пользователем");}
-        long countPages = repoService.endSiteIndex(currentSite);
+        repoService.endSiteIndex(currentSite);
+        long countPages = repoService.countPagesOnSite(currentSite);
         long resultTime = (System.currentTimeMillis() - startTime) / 60000;
         log.info(nameSite + " - " + resultTime + " min / " + countPages + " pages");
     }

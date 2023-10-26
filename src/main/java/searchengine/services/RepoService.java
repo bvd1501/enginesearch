@@ -11,7 +11,7 @@ public interface RepoService {
     SiteEntity initSite(String urlSite, String nameSite);
     boolean saveAllDataPage(PageEntity page, Map<String, Integer> lemmaMap, String error);
 
-    long endSiteIndex(SiteEntity site);
+    void endSiteIndex(SiteEntity site);
 
 
 

@@ -50,22 +50,18 @@ public class RepoServiceImpl implements RepoService {
      */
     @Override
     @Transactional
-    public long endSiteIndex(SiteEntity site) {
+    public void endSiteIndex(SiteEntity site) {
         Optional<SiteEntity> existSite = siteRepo.findById(site.getId());
         if (existSite.isEmpty()) {
             log.error(site.getName() + " is missing in base. Create it");
             siteRepo.save(site);
-            return 0;
+            return;
         }
-        long result = pageRepo.countBySite_Id(site.getId());
-        if (site.getLast_error() == null) {
-            site.setLast_error(existSite.get().getLast_error());
-        }
-        site.setStatus(site.getLast_error()!=null ? StatusType.FAILED : StatusType.INDEXED);
-        site.setLast_error("Found " + result + " pages. Error: " + site.getLast_error());
+        site.setStatus(existSite.get().getLast_error()!=null ? StatusType.FAILED : StatusType.INDEXED);
+        site.setLast_error(existSite.get().getLast_error()!=null ?
+                existSite.get().getLast_error() : "Ошибок нет, сайт успешно проиндексирован");
         site.setStatusTime(new java.util.Date());
         siteRepo.save(site);
-        return result;
     }
 
 
@@ -94,8 +90,7 @@ public class RepoServiceImpl implements RepoService {
         if (!siteEntityOptional.isPresent()) {
             return siteRepo.save(new SiteEntity(url, name));
         }
-        siteEntityOptional.get().setLast_error(null);
-        return siteRepo.save(siteEntityOptional.get());
+        return siteEntityOptional.get();
     }
 
     /**
@@ -120,7 +115,13 @@ public class RepoServiceImpl implements RepoService {
             } else {
                 lemmaRepo.save(l);
             }});
+        SiteEntity site = siteRepo.findById(pageInBase.getSite().getId()).get();
+        site.setLast_error(null);
+        site.setStatusTime(new java.util.Date());
+        site.setStatus(StatusType.INDEXING);
+        siteRepo.save(site);
         pageRepo.deleteById(pageInBase.getId());
+
     }
 
     /**
@@ -168,6 +169,7 @@ public class RepoServiceImpl implements RepoService {
             LemmaEntity lemma = lemmaRepo.findBySiteAndLemma(page.getSite(), lemmaStr);
             indexEntities.add(new IndexEntity(page, lemma, lemmaMap.get(lemmaStr)));
         }
+
         indexRepo.saveAll(indexEntities);
         siteRepo.updateStatusTimeById(new java.util.Date(), page.getSite().getId());
         return true;
