@@ -14,8 +14,8 @@ spring:
       dialect: org.hibernate.dialect.MySQL8Dialect
       batch_size: 100
     hibernate:
-      ddl-auto: update
-      #ddl-auto: create-drop
+      #ddl-auto: update
+      ddl-auto: create-drop
     #show-sql: true
 
 
@@ -43,10 +43,10 @@ indexing-settings:
     #  name: Gallery
     #- url: https://www.lutherancathedral.ru/
     #  name: lutherancathedral.ru
-    #- url: https://clusterfly.ru
-    #  name: MQTTBroker
-    - url: https://volochek.life/
-      name: Volochek
+    - url: https://clusterfly.ru
+      name: MQTTBroker
+    #- url: https://volochek.life/
+    #  name: Volochek
     #- url: https://radiomv.ru/
     #  name: radiomv
     #- url: https://ipfran.ru/
@@ -55,16 +55,16 @@ indexing-settings:
     #  name: dimonvideo
     #- url: https://nikoartgallery.com/
     #  name: nikoartgallery
-    #- url: https://et-cetera.ru/mobile/
-    #  name: et-cetera.ru
+    - url: https://et-cetera.ru/mobile/
+      name: et-cetera.ru
     #- url: https://dombulgakova.ru/
     #  name: Bulgakov
     #- url: https://www.svetlovka.ru/
     #  name: svetlovka
-    #- url: https://dom.gosuslugi.ru/
-    #  name: ГИСЖКХ
-    - url: https://samadm.ru/
-      name: samadm
+    - url: https://dom.gosuslugi.ru/
+      name: ГИСЖКХ
+    #- url: https://samadm.ru/
+    #  name: samadm
 
 
 jsoup-setting:

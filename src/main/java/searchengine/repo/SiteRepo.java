@@ -1,9 +1,11 @@
 package searchengine.repo;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import searchengine.model.SiteEntity;
 
@@ -12,10 +14,11 @@ import java.util.Optional;
 
 
 @Repository
-public interface SiteRepo extends CrudRepository<SiteEntity, Integer> {
+public interface SiteRepo extends JpaRepository<SiteEntity, Integer> {
 
     //@Transactional
     @Modifying
+    @Async
     @Query("update SiteEntity s set s.statusTime = :statusTime, s.last_error = :last_error where s.id = :id")
     void updateStatusTimeAndLast_errorById(@Param("statusTime") Date statusTime, @Param("last_error") String last_error, @Param("id") Integer id);
 
@@ -23,6 +26,7 @@ public interface SiteRepo extends CrudRepository<SiteEntity, Integer> {
     Optional<SiteEntity> findByUrlAndName(String url, String name);
 
     @Modifying
+    @Async
     @Query("update SiteEntity s set s.statusTime = :statusTime where s.id = :id")
     //@Transactional
     void updateStatusTimeById(@Param("statusTime") Date statusTime, @Param("id") Integer id);

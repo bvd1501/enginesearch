@@ -49,7 +49,7 @@ public class SiteEntity {
         this.url = url;
         this.name = name;
         this.last_error = null;
-        this.status = StatusType.INDEXING;
+        this.status = StatusType.FAILED;
         this.statusTime = new java.util.Date();
     }
 }

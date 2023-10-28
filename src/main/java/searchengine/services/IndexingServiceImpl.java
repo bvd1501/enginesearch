@@ -9,6 +9,7 @@ import searchengine.config.SitesList;
 import searchengine.dto.indexing.IndexingResponse;
 import searchengine.model.PageEntity;
 import searchengine.model.SiteEntity;
+import searchengine.model.StatusType;
 
 import java.util.concurrent.*;
 
@@ -63,6 +64,8 @@ public class IndexingServiceImpl implements IndexingService {
             return new IndexingResponse(false, "Данная страница находится за пределами сайтов, указанных в конфигурационном файле");
         }
         SiteEntity siteEntity = repoService.findSite(site.getUrl(), site.getName());
+        if (siteEntity.getStatus()== StatusType.INDEXING) {
+            return new IndexingResponse(false, "Индексация уже запущена. Дождитесь ее окончания");}
         PageEntity currentPage = new PageEntity(siteEntity, url);
         repoService.cleanPage(currentPage);
         var pageIndexService = context.getBean(PageIndexService.class, context, currentPage);

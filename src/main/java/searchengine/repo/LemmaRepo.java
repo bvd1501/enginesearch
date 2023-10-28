@@ -1,5 +1,6 @@
 package searchengine.repo;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -9,11 +10,12 @@ import searchengine.model.LemmaEntity;
 import searchengine.model.SiteEntity;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 
 @Repository
-public interface LemmaRepo extends CrudRepository<LemmaEntity, Integer> {
+public interface LemmaRepo extends JpaRepository<LemmaEntity, Integer> {
     long countBySite(SiteEntity site);
     LemmaEntity findBySiteAndLemma(SiteEntity site, String lemma);
 
@@ -26,6 +28,8 @@ public interface LemmaRepo extends CrudRepository<LemmaEntity, Integer> {
 
     @Query("select l from LemmaEntity l where l.id in ?1")
     Set<LemmaEntity> findByIdIn(Collection<Integer> ids);
+
+
 
 
 

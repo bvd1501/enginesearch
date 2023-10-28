@@ -40,7 +40,9 @@ public class RepoServiceImpl implements RepoService {
     public SiteEntity initSite(String urlSite, String nameSite) {
         log.info("Clean data on site " + nameSite);
         siteRepo.deleteByUrlAndName(urlSite, nameSite);
-        return siteRepo.save(new SiteEntity(urlSite, nameSite));
+        SiteEntity siteEntity = new SiteEntity(urlSite, nameSite);
+        siteEntity.setStatus(StatusType.INDEXING);
+        return siteRepo.save(siteEntity);
     }
 
     /**
@@ -169,7 +171,6 @@ public class RepoServiceImpl implements RepoService {
             LemmaEntity lemma = lemmaRepo.findBySiteAndLemma(page.getSite(), lemmaStr);
             indexEntities.add(new IndexEntity(page, lemma, lemmaMap.get(lemmaStr)));
         }
-
         indexRepo.saveAll(indexEntities);
         siteRepo.updateStatusTimeById(new java.util.Date(), page.getSite().getId());
         return true;

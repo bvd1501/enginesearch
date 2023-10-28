@@ -1,6 +1,7 @@
 package searchengine.repo;
 
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -12,7 +13,7 @@ import searchengine.model.SiteEntity;
 import java.util.Optional;
 
 @Repository
-public interface PageRepo extends CrudRepository<PageEntity, Integer> {
+public interface PageRepo extends JpaRepository<PageEntity, Integer> {
     long countBySite(SiteEntity site);
     @Query("select p from PageEntity p where p.site.id = ?1 and p.path = ?2")
     Optional<PageEntity> findBySite_IdAndPath(Integer id, String path);
