@@ -5,16 +5,24 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import searchengine.model.SiteEntity;
+import searchengine.model.StatusType;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 
 @Repository
 public interface SiteRepo extends JpaRepository<SiteEntity, Integer> {
+    @Query("select s from SiteEntity s where s.status = ?1 and s.url in ?2")
+    List<SiteEntity> findByStatusAndUrlIn(StatusType status, Collection<String> urls);
+
+
 
     //@Transactional
     @Modifying

@@ -56,8 +56,8 @@ public class ApiController {
     }
 
     @GetMapping(value = "/search")
-    public ResponseEntity<SearchResponse> startSearch(@RequestParam String query, String site) {
-        return ResponseEntity.ok(searchService.getSearch(query, site));
+    public ResponseEntity<SearchResponse> startSearch(@RequestParam String query, String site, int offset, int limit) {
+        return ResponseEntity.ok(searchService.getSearch(query, site, offset, limit));
     }
 }
 

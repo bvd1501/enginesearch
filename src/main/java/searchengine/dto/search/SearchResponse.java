@@ -12,6 +12,7 @@ public class SearchResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String error;
     private int count;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<DataPageItem> data;
 
     public SearchResponse(String error) {

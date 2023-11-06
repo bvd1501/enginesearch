@@ -146,6 +146,27 @@ public class RepoServiceImpl implements RepoService {
         return (int) lemmaRepo.countBySite(siteEntity);
     }
 
+    /**
+     * @param sitesURLs - список проверяемых на статус сайтов
+     * @return - список пронидексированных сущностей-сайтов
+     */
+    @Override
+    @Transactional (readOnly = true)
+    public List<SiteEntity> findIndexedSite(List<String> sitesURLs) {
+        return siteRepo.findByStatusAndUrlIn(StatusType.INDEXED,sitesURLs);
+    }
+
+    /**
+     * @param siteEntities 
+     * @param lemmas
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<LemmaEntity> findQueryLemmas(List<SiteEntity> siteEntities, Set<String> lemmas) {
+        return lemmaRepo.findBySiteInAndLemmaIn(siteEntities, lemmas);
+    }
+
 
     /**
      * Внесение результатов индексации страницы в БД
@@ -153,7 +174,7 @@ public class RepoServiceImpl implements RepoService {
      * @param lemmaMap - леммы, найденные на странице
      * @param error - ошибка, возникшая при обработке страницы
      * @return - false, если страница уже есть в базе, иначе true
-     * ключ synchronized - обязателен! Без недо возможны deadlock
+     * ключ synchronized - обязателен! Без него возможны deadlock
      */
     @Override
     @Transactional

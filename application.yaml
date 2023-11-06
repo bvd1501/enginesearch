@@ -14,8 +14,8 @@ spring:
       dialect: org.hibernate.dialect.MySQL8Dialect
       batch_size: 100
     hibernate:
-      #ddl-auto: update
-      ddl-auto: create-drop
+      ddl-auto: update
+      #ddl-auto: create-drop
     #show-sql: true
 
 
@@ -37,8 +37,8 @@ indexing-settings:
   sites:
     #- url: https://skillbox.ru
     #  name: skillbox
-    - url: https://www.playback.ru/
-      name: PlayBack.Ru
+    #- url: https://www.playback.ru/
+    #  name: PlayBack.Ru
     #- url: https://www.tretyakovgallery.ru/
     #  name: Gallery
     #- url: https://www.lutherancathedral.ru/
@@ -75,6 +75,7 @@ jsoup-setting:
   ignoreContentType: false
   ignoreHttpErrors: true
   followRedirects: false
+  maxFreqPercent: 75
 
 
 

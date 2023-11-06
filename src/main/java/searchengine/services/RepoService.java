@@ -1,9 +1,13 @@
 package searchengine.services;
 
+import searchengine.model.LemmaEntity;
 import searchengine.model.PageEntity;
 import searchengine.model.SiteEntity;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface RepoService {
 
@@ -27,4 +31,8 @@ public interface RepoService {
     int countLemmasOnSite(SiteEntity siteEntity);
 
 
+    List<SiteEntity> findIndexedSite(List<String> siteURL);
+
+
+    Set<LemmaEntity> findQueryLemmas(List<SiteEntity> siteEntities, Set<String> lemmas);
 }
