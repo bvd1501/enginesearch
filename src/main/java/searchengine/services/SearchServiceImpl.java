@@ -90,7 +90,6 @@ public class SearchServiceImpl implements SearchService{
         } else {
             sitesURL.addAll(siteList.getSites().stream().map(Site::getUrl).toList());
         }
-        List<SiteEntity> siteIndexed = new ArrayList<>(repoService.findIndexedSite(sitesURL));
-        return siteIndexed;
+        return new ArrayList<>(repoService.findIndexedSite(sitesURL));
     }
 }
