@@ -3,8 +3,6 @@ package searchengine.services;
 import searchengine.model.LemmaEntity;
 import searchengine.model.PageEntity;
 import searchengine.model.SiteEntity;
-
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

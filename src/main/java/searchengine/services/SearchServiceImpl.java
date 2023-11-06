@@ -17,7 +17,7 @@ import java.util.*;
 @Slf4j
 //@RequiredArgsConstructor
 public class SearchServiceImpl implements SearchService{
-    private final ApplicationContext context;
+    //private final ApplicationContext context;
     private final RepoService repoService;
     private final LemmaService lemmaService;
 
@@ -27,7 +27,7 @@ public class SearchServiceImpl implements SearchService{
 
      @Autowired
     public SearchServiceImpl(ApplicationContext context) {
-        this.context = context;
+        //this.context = context;
         this.repoService = context.getBean(RepoService.class);
         this.lemmaService = context.getBean(LemmaService.class);
         this.siteList = context.getBean(SitesList.class);
@@ -35,10 +35,6 @@ public class SearchServiceImpl implements SearchService{
     }
 
 
-    /**
-     * @param query
-     * @return
-     */
     @Override
     public SearchResponse getSearch(String query, String site, int offset, int limit) {
         //Определение списка сайтов, по которым производится поиск
@@ -55,7 +51,7 @@ public class SearchServiceImpl implements SearchService{
 
         log.info("Леммы в базе: " + lemmaEntitySet.stream().map(l->{
             return ("\n" + l.getLemma()+" " + l.getSite().getName() + " " + l.getFrequency());
-        }).toList().toString());
+        }).toList());
 
         return new SearchResponse("Ошибочка. Поиск не настроен");
     }
@@ -73,9 +69,9 @@ public class SearchServiceImpl implements SearchService{
         int max=Integer.MIN_VALUE;
         for (SiteEntity s : siteEntities) {
             int count = repoService.countPagesOnSite(s);
-            max = (max>count) ? max : count;
+            max = Math.max(max, count);
         }
-        max = 1 + (int) max * jsoupCfg.getMaxFreqPercent() / 100;
+        max = 1 + max * jsoupCfg.getMaxFreqPercent() / 100;
         return max;
     }
 
@@ -88,14 +84,13 @@ public class SearchServiceImpl implements SearchService{
      * осуществлять поиск
      */
     private List<SiteEntity> siteIndexedList(String site) {
-        List<SiteEntity> siteIndexed = new ArrayList<>();
         List<String> sitesURL = new ArrayList<>();
         if (site!=null) {
             sitesURL.add(site);
         } else {
             sitesURL.addAll(siteList.getSites().stream().map(Site::getUrl).toList());
         }
-        siteIndexed.addAll(repoService.findIndexedSite(sitesURL));
+        List<SiteEntity> siteIndexed = new ArrayList<>(repoService.findIndexedSite(sitesURL));
         return siteIndexed;
     }
 }

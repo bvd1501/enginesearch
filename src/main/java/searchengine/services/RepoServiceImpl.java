@@ -45,12 +45,7 @@ public class RepoServiceImpl implements RepoService {
         return siteRepo.save(siteEntity);
     }
 
-    /**
-     * Запись информации о завершении обхода страниц сайта
-     * @param site - сайт, данные которого необходимо обновить     *
-     * @return - количество страниц сайта в БД
-     */
-    @Override
+     @Override
     @Transactional
     public void endSiteIndex(SiteEntity site) {
         Optional<SiteEntity> existSite = siteRepo.findById(site.getId());
@@ -89,10 +84,7 @@ public class RepoServiceImpl implements RepoService {
     @Transactional
     public SiteEntity findSite(String url, String name) {
         Optional<SiteEntity> siteEntityOptional = siteRepo.findByUrlAndName(url, name);
-        if (!siteEntityOptional.isPresent()) {
-            return siteRepo.save(new SiteEntity(url, name));
-        }
-        return siteEntityOptional.get();
+        return siteEntityOptional.orElseGet(() -> siteRepo.save(new SiteEntity(url, name)));
     }
 
     /**
@@ -126,41 +118,27 @@ public class RepoServiceImpl implements RepoService {
 
     }
 
-    /**
-     * @param siteEntity 
-     * @return - количество страниц сайта
-     */
+
     @Override
     @Transactional (readOnly = true)
     public int countPagesOnSite(SiteEntity siteEntity) {
         return (int) pageRepo.countBySite(siteEntity);
     }
 
-    /**
-     * @param siteEntity 
-     * @return
-     */
+
     @Override
     @Transactional (readOnly = true)
     public int countLemmasOnSite(SiteEntity siteEntity) {
         return (int) lemmaRepo.countBySite(siteEntity);
     }
 
-    /**
-     * @param sitesURLs - список проверяемых на статус сайтов
-     * @return - список пронидексированных сущностей-сайтов
-     */
+
     @Override
     @Transactional (readOnly = true)
     public List<SiteEntity> findIndexedSite(List<String> sitesURLs) {
         return siteRepo.findByStatusAndUrlIn(StatusType.INDEXED,sitesURLs);
     }
 
-    /**
-     * @param siteEntities 
-     * @param lemmas
-     * @return
-     */
     @Override
     @Transactional(readOnly = true)
     public Set<LemmaEntity> findQueryLemmas(List<SiteEntity> siteEntities, Set<String> lemmas) {
